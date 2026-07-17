@@ -2,6 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getCarsApi } from "@/api/car";
+import { Car } from "@/lib/types";
 
 const vehicles = [
   {
@@ -40,6 +43,22 @@ const vehicles = [
 
 export default function CatalogueVehiclesSection() {
   const router = useRouter();
+  const [cars, setCars] = useState<Car[]>([]);
+
+  const getCars = async () => {
+    try {
+      const response = await getCarsApi();
+      setCars(response.data);
+      console.log("Fetched cars:", response.data);
+    } catch (error) {
+      console.error("Error fetching cars:", error);
+      
+    }
+  };
+
+  useEffect(() => {
+    getCars();
+  }, []);
 
   return (
     <section className="py-16 bg-white">
@@ -56,28 +75,28 @@ export default function CatalogueVehiclesSection() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {vehicles.map((car, i) => (
+          {cars.map((car, i) => (
             <div key={i} className="group bg-white border rounded-3xl overflow-hidden hover:shadow-xl transition-all">
               <div className="relative h-52">
-                <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
-                {car.badge && (
+                <img src={car.photo_url} alt={car.mark} className="w-full h-full object-cover" />
+                {/* {car.badge && (
                   <Badge className={`absolute top-4 left-4 ${car.badgeColor}`}>
                     {car.badge}
                   </Badge>
-                )}
+                )} */}
               </div>
 
               <div className="p-5">
-                <h3 className="font-semibold text-xl">{car.name}</h3>
+                <h3 className="font-semibold text-xl">{car.mark} {car.model}</h3>
                 <p className="text-gray-500 text-sm mt-1">{car.type}</p>
 
                 <div className="flex justify-between items-end mt-6">
                   <div>
-                    <span className="text-xl font-bold">{car.price} FCFA</span>
+                    <span className="text-xl font-bold">{car.dayAmount} FCFA</span>
                     <span className="text-sm text-gray-500">/jour</span>
                   </div>
                   <div className="text-right text-sm text-gray-600">
-                    {car.places} Places
+                    {car.place} Places
                   </div>
                 </div>
 
