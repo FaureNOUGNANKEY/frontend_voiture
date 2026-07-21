@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Filter, PlusCircle, Pencil, TriangleAlert, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,80 +14,87 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Car } from "@/lib/types";
 
-export type Vehicle = {
-  id: string;
-  brand: string;
-  model: string;
-  category: string;
-  plate: string;
-  status: VehicleStatus;
-  mileage: string;
-  imageUrl: string;
-};
+// export type Vehicle = {
+//   id: string;
+//   brand: string;
+//   model: string;
+//   category: string;
+//   plate: string;
+//   status: VehicleStatus;
+//   mileage: string;
+//   imageUrl: string;
+// };
 
-type VehicleStatus = "Disponible" | "Loué" | "En Panne";
+type carStatus = "disponible" | "loué" | "en maintenance"|"En Panne";
 
-const STATUS_CLASSES: Record<VehicleStatus, string> = {
-  Disponible: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
-  Loué: "bg-blue-100 text-blue-900 hover:bg-blue-100",
+const STATUS_CLASSES: Record<carStatus, string> = {
+  disponible: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  loué: "bg-blue-100 text-blue-900 hover:bg-blue-100",
+  "en maintenance": "bg-blue-100 text-blue-900 hover:bg-blue-100",
   "En Panne": "bg-amber-100 text-amber-700 hover:bg-amber-100",
 };
 
-export const vehicles: Vehicle[] = [
-  {
-    id: "v1",
-    brand: "Mercedes-Benz",
-    model: "Classe C 2023",
-    category: "Premium",
-    plate: "AA-123-BB",
-    status: "Disponible",
-    mileage: "12 450 km",
-    imageUrl:
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=200&h=140&fit=crop",
-  },
-  {
-    id: "v2",
-    brand: "Peugeot",
-    model: "3008 GT",
-    category: "SUV",
-    plate: "CC-456-DD",
-    status: "Loué",
-    mileage: "45 820 km",
-    imageUrl:
-      "https://images.unsplash.com/photo-1568844293986-8d0400bd4745?w=200&h=140&fit=crop",
-  },
-  {
-    id: "v3",
-    brand: "Renault",
-    model: "Master L2H2",
-    category: "Utilitaire",
-    plate: "EE-789-FF",
-    status: "En Panne",
-    mileage: "102 150 km",
-    imageUrl:
-      "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=200&h=140&fit=crop",
-  },
-  {
-    id: "v4",
-    brand: "Tesla",
-    model: "Model 3",
-    category: "Électrique",
-    plate: "GG-001-HH",
-    status: "Disponible",
-    mileage: "5 200 km",
-    imageUrl:
-      "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=200&h=140&fit=crop",
-  },
-];
+// export const vehicles: Vehicle[] = [
+//   {
+//     id: "v1",
+//     brand: "Mercedes-Benz",
+//     model: "Classe C 2023",
+//     category: "Premium",
+//     plate: "AA-123-BB",
+//     status: "Disponible",
+//     mileage: "12 450 km",
+//     imageUrl:
+//       "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=200&h=140&fit=crop",
+//   },
+//   {
+//     id: "v2",
+//     brand: "Peugeot",
+//     model: "3008 GT",
+//     category: "SUV",
+//     plate: "CC-456-DD",
+//     status: "Loué",
+//     mileage: "45 820 km",
+//     imageUrl:
+//       "https://images.unsplash.com/photo-1568844293986-8d0400bd4745?w=200&h=140&fit=crop",
+//   },
+//   {
+//     id: "v3",
+//     brand: "Renault",
+//     model: "Master L2H2",
+//     category: "Utilitaire",
+//     plate: "EE-789-FF",
+//     status: "En Panne",
+//     mileage: "102 150 km",
+//     imageUrl:
+//       "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=200&h=140&fit=crop",
+//   },
+//   {
+//     id: "v4",
+//     brand: "Tesla",
+//     model: "Model 3",
+//     category: "Électrique",
+//     plate: "GG-001-HH",
+//     status: "Disponible",
+//     mileage: "5 200 km",
+//     imageUrl:
+//       "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=200&h=140&fit=crop",
+//   },
+// ];
 
-export default function VehiclesTable() {
+interface CarProps {
+  cars: Car[];
+}
+
+export default function VehiclesTable({ cars }: CarProps) {
   const [search, setSearch] = useState("");
 
-  const filtered = vehicles.filter((v) =>
-    `${v.brand} ${v.model} ${v.plate}`.toLowerCase().includes(search.toLowerCase())
+  const filtered = cars.filter((c) =>
+    `${c.mark} ${c.model} ${c.imatriculation}`.toLowerCase().includes(search.toLowerCase())
   );
 
+    
   return (
     <Card className="shadow-sm overflow-hidden">
       {/* Toolbar */}
@@ -125,54 +132,54 @@ export default function VehiclesTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((vehicle) => (
+            {filtered.map((car) => (
               <TableRow
-                key={vehicle.id}
+                key={car.id}
                 className={`hover:bg-slate-50 transition-colors ${
-                  vehicle.status === "En Panne" ? "bg-red-50/40" : ""
+                  car.status === "En Panne" ? "bg-red-50/40" : ""
                 }`}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-12 h-8 rounded bg-slate-100 overflow-hidden border border-slate-200 ${
-                        vehicle.status === "En Panne" ? "grayscale opacity-70" : ""
+                        car.status === "En Panne" ? "grayscale opacity-70" : ""
                       }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={vehicle.imageUrl}
-                        alt={vehicle.brand}
+                        src={car.photo_url}
+                        alt={car.imatriculation}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-900">{vehicle.brand}</p>
-                      <p className="text-xs text-slate-500">{vehicle.model}</p>
+                      <p className="text-sm font-bold text-slate-900">{car.imatriculation}</p>
+                      <p className="text-xs text-slate-500">{car.model}</p>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm">{vehicle.category}</TableCell>
+                <TableCell className="text-sm">{car.category.name}</TableCell>
                 <TableCell>
                   <code className="font-mono text-xs bg-slate-100 px-2 py-1 rounded">
-                    {vehicle.plate}
+                    {car.imatriculation}
                   </code>
                 </TableCell>
                 <TableCell>
-                  <Badge className={`${STATUS_CLASSES[vehicle.status]} font-bold uppercase tracking-tight text-[10px] gap-1.5`}>
+                  <Badge className={`${STATUS_CLASSES[car.status]} font-bold uppercase tracking-tight text-[10px] gap-1.5`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                    {vehicle.status}
+                    {car.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm text-slate-700">
-                  {vehicle.mileage}
+                  {car.kilometrage}
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-center gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
                       <Pencil size={18} />
                     </Button>
-                    {vehicle.status === "En Panne" ? (
+                    {car.status === "En Panne" ? (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
                         <Eye size={18} />
                       </Button>

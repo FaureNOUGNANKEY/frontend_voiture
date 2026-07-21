@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Heart, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { getCarsApi } from "@/api/car";
+import { Car } from "@/lib/types";
 
 const vehicles = [
   {
@@ -81,6 +83,24 @@ export default function CataloguePage() {
     const normalized = Array.isArray(value) ? value : [value, value];
     setPriceRange(normalized as number[]);
   };
+
+  const [cars, setCars] = useState<Car[]>([]);
+
+  const getCars = async () => {
+    try {
+      const response = await getCarsApi();
+      setCars(response.data);
+      console.log("Fetched cars:", response.data);
+    } catch (error) {
+      console.error("Error fetching cars:", error);
+      
+    }
+  };
+
+  useEffect(() => {
+    getCars();
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -169,7 +189,7 @@ export default function CataloguePage() {
           {/* Liste des véhicules */}
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6">
-              <p className="text-lg font-medium">24 véhicules trouvés</p>
+              <p className="text-lg font-medium">{cars.length} véhicules trouvés</p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Trier par :</span>
                 <select className="bg-white border cursor-pointer border-gray-200 rounded-lg px-4 py-2 text-sm">
@@ -182,44 +202,45 @@ export default function CataloguePage() {
 
             {/* Vehicules */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {vehicles.map((car) => (
+              {cars.map((car) => (
                 <div
                   key={car.id}
                   className="bg-white rounded-3xl overflow-hidden border hover:shadow-lg transition-all group"
                 >
                   <div className="relative h-52">
                     <img
-                      src={car.image}
-                      alt={car.name}
+                      src={car.photo_url}
+                      alt={car.mark}
                       className="w-full h-full object-cover"
                     />
-                    {car.badge && (
+                    {/* {car.badge && (
                       <Badge className="absolute top-4 left-4 bg-primary">
                         {car.badge}
                       </Badge>
-                    )}
+                    )} */}
                     <button className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center shadow">
                       <Heart className="w-5 h-5 text-gray-600 group-hover:text-red-500 transition-colors" />
                     </button>
                   </div>
 
                   <div className="p-5">
-                    <h3 className="font-semibold text-xl">{car.name}</h3>
+                    <h3 className="font-semibold text-xl">{car.mark} {car.model} </h3>
                     <Badge className="text-secondary border-0 bg-blue-100 text-xs">{car.type}</Badge>
 
                     <div className="flex items-center gap-4 text-sm text-gray-600 my-4">
                       <div className="flex items-center gap-1">
-                        👥 {car.places} Places
+                        👥 {car.place} Places
                       </div>
                       <div className="flex items-center gap-1">
-                        ⚙️ {car.transmission}
+                        {/* ⚙️ {car.transmission} */}
+                        ⚙️ 
                       </div>
                     </div>
 
                     <div className="flex items-end justify-between">
                       <div>
                         <span className="text-3xl font-bold text-gray-900">
-                          {car.price.toLocaleString("fr-FR")}
+                          {car.dayAmount.toLocaleString("fr-FR")}
                         </span>
                         <span className="text-sm text-gray-500">
                           {" "}

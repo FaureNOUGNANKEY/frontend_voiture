@@ -1,44 +1,56 @@
-import { Car, CheckCircle2, CalendarDays, Wrench, TrendingUp, type LucideIcon } from "lucide-react";
+import { CheckCircle2, CalendarDays, Wrench, TrendingUp, type LucideIcon, CarIcon } from "lucide-react";
+import type { Car } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 
+
 const ICONS: Record<string, LucideIcon> = {
-  Car,
+  Car : CarIcon,
   CheckCircle2,
   CalendarDays,
   Wrench,
 };
 
-export const fleetKpis = [
-  {
-    id: "total",
-    label: "Total Véhicules",
-    value: "128",
-    delta: "+4.2%",
-    trend: "up" as const,
-    icon: "Car",
-  },
-  {
-    id: "available",
-    label: "Disponibles",
-    value: "84",
-    icon: "CheckCircle2",
-  },
-  {
-    id: "rented",
-    label: "En Location",
-    value: "36",
-    icon: "CalendarDays",
-  },
-  {
-    id: "broken",
-    label: "En Panne",
-    value: "8",
-    alert: "Attention",
-    icon: "Wrench",
-  },
-];
+interface CarProps {
+  cars: Car[];
+}
 
-export default function VehiculeKpis() {
+
+export default function VehiculeKpis({ cars }: CarProps) {
+
+  const total = cars.length;
+  const available = cars.filter((c) => c.status === "disponible").length;
+  const rented = cars.filter((c) => c.status === "loué").length;
+  const broken = cars.filter((c) => c.status === "En Panne").length;
+  const fleetKpis = [
+    {
+      id: "total",
+      label: "Total de véhicules",
+      value: total.toString(),
+      delta: "+4.2%",
+      trend: "up" as const,
+      icon: "Car",
+    },
+    {
+      id: "available",
+      label: "Disponibles",
+      value: available.toString(),
+      icon: "CheckCircle2",
+    },
+    {
+      id: "rented",
+      label: "En Location",
+      value: rented.toString(),
+      icon: "CalendarDays",
+    },
+    {
+      id: "broken",
+      label: "En Panne",
+      value: broken.toString(),
+      alert: "Attention",
+      icon: "Wrench",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {fleetKpis.map((kpi) => {

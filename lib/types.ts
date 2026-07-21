@@ -1,3 +1,5 @@
+type carStatus = "disponible" | "loué" | "en maintenance"|"En Panne";
+
 export interface Car {
     id: number;
     mark: string;
@@ -8,7 +10,7 @@ export interface Car {
     photo_url: string;
     imatriculation: string;
     description?: string;
-    status: string;
+    status: carStatus;
     kmAmount: number;
     dayAmount: number;
     state: string;

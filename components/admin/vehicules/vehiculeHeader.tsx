@@ -1,5 +1,6 @@
 import { Filter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Car } from "@/lib/types";
 
 export default function VehiculeHeader() {
   return (
