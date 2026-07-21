@@ -108,7 +108,7 @@ export default function CatalogueVehiclesSection() {
 
         <div className="flex justify-center mt-12">
           <Button onClick={() => router.push("catalogue/liste")} variant="outline" className="p-6">
-            Voir Tout le Catalogue (42 véhicules)
+            Voir Tout le Catalogue ( {cars.length} véhicules)
           </Button>
         </div>
       </div>
