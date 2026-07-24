@@ -21,15 +21,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { Driver, Reservation } from "@/lib/types";
+
 type PaymentStatus = "paid" | "pending" | "loyalty";
 type ReservationTimelineState = "active" | "upcoming" | "completed";
- 
-type Driver = {
-  name: string;
-  status: "Active" | "Standby" | "Available";
-};
 
-type Reservation = {
+/*type Reservation = {
   id: string;
   reference: string;
   client: {
@@ -56,9 +53,10 @@ type Reservation = {
     | { type: "select"; current: string; options: Driver[] }
     | { type: "unassigned"; options: Driver[] }
     | { type: "confirmed"; name: string };
-};
- 
-const reservations: Reservation[] = [
+};*/
+
+
+/*const reservations: Reservation[] = [
   {
     id: "r1",
     reference: "#RES-2024-901",
@@ -128,16 +126,53 @@ const FINANCIAL_CLASSES: Record<Reservation["financials"]["status"], string> = {
   paid: "text-emerald-600",
   pending: "text-red-600 italic",
   loyalty: "text-emerald-600",
-};
+};*/
 
-export default function ReservationsTable() {
+// 1. Définir les états possibles
+type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
+
+// 2. Associer chaque état à une couleur (classes Tailwind)
+const RESERVATION_CLASSES: Record<ReservationStatus, string> = {
+  "En attente": "bg-orange-100 text-orange-700 hover:bg-orange-200",
+  "en cours": "bg-green-100 text-green-700 hover:bg-green-200",
+  "annulée": "bg-red-100 text-red-700 hover:bg-red-200",
+  "terminée": "bg-blue-100 text-blue-700 hover:bg-blue-200",
+};
+const AVATAR_COLORS = [
+  "bg-emerald-100 text-emerald-700",
+  "bg-slate-100 text-slate-600",
+  "bg-amber-100 text-amber-700",
+  "bg-purple-100 text-purple-700",
+  "bg-pink-100 text-pink-700",
+];
+
+//calculer et etribut des couleur au avatar dinamiquement 
+function getAvatarColor(userName: string) {
+  const hash = userName
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+interface ReservationProps {
+  reservations: Reservation[];
+  drivers: Driver[];
+}
+
+export default function ReservationsTable({ reservations, drivers}: ReservationProps ) {
   const [search, setSearch] = useState("");
 
   const filtered = reservations.filter((r) =>
-    `${r.client.name} ${r.reference} ${r.vehicle.name}`
+    `${r.user.lastname}  ${r.car.mark}`
+    // `${r.user.lastname} ${r.reference} ${r.car.mark}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
+
+
+function getInitials(firstname: string, lastname: string) {
+  return `${firstname.charAt(0)}${lastname.charAt(0)}`.toUpperCase();
+}
+
 
   return (
     <Card className="shadow-sm overflow-hidden mb-8">
@@ -182,48 +217,53 @@ export default function ReservationsTable() {
               <TableRow key={r.id} className="hover:bg-slate-50 transition-colors group">
                 <TableCell>
                   <span className="font-mono text-xs text-primary bg-blue-50 px-2 py-1 rounded">
-                    {r.reference}
+                    {/* {r.reference} */}
                   </span>
                 </TableCell>
 
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${r.client.avatarColor}`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${getAvatarColor(r.user.firstname + r.user.lastname)}`}
                     >
-                      {r.client.initials}
+                      {getInitials(r.user.firstname, r.user.lastname)}
                     </div>
                     <div>
-                      <div className="font-bold text-slate-900 text-sm">{r.client.name}</div>
-                      <div className="text-[11px] text-slate-500">{r.client.subtitle}</div>
+                      <div className="font-bold text-slate-900 text-sm">{r.user.lastname}</div>
+                      <div className="text-[11px] text-slate-500">{r.user.firstname}</div>
                     </div>
                   </div>
                 </TableCell>
 
                 <TableCell>
-                  <div className="font-semibold text-slate-900 text-sm">{r.vehicle.name}</div>
-                  <div className="text-[11px] text-slate-500">{r.vehicle.subtitle}</div>
+                  <div className="font-semibold text-slate-900 text-sm">{r.car.mark} {r.car.model}</div>
+                  <div className="text-[11px] text-slate-500"> {r.car.category.name } {r.car.imatriculation}</div>
                 </TableCell>
 
                 <TableCell>
                   <div className="flex flex-col text-[13px]">
-                    <span className="text-slate-900">{r.timeline.range}</span>
-                    <span className={`text-[11px] font-semibold ${TIMELINE_CLASSES[r.timeline.state]}`}>
-                      {r.timeline.label}
+                    <span className="text-slate-900">{r.dateStart} {r.dateBack} </span>
+                    <span className={`${RESERVATION_CLASSES[r.status]} text-[11px]  font-semibold `}>
+                      {r.status}
                     </span>
                   </div>
                 </TableCell>
 
                 <TableCell>
-                  <div className="font-bold text-slate-900 text-sm">{r.financials.amount}</div>
+                  {/* <div className="font-bold text-slate-900 text-sm">{r.financials.amount}</div>
                   <div className={`flex items-center gap-1 text-[11px] font-semibold ${FINANCIAL_CLASSES[r.financials.status]}`}>
                     {r.financials.status === "loyalty" && <BadgeCheck size={12} />}
                     {r.financials.note}
-                  </div>
+                  </div> */}
+                  <div className="font-bold text-slate-900 text-sm">{r.amount}</div>
+                  {/* <div className={`flex items-center gap-1 text-[11px] font-semibold ${FINANCIAL_CLASSES[r.financials.status]}`}>
+                    {r.financials.status === "loyalty" && <BadgeCheck size={12} />}
+                    {r.financials.note}
+                  </div> */}
                 </TableCell>
 
                 <TableCell>
-                  {r.driverAssignment.type === "select" && (
+                  {/* {r.driverAssignment.type === "select" && (
                     <Select defaultValue={r.driverAssignment.current}>
                       <SelectTrigger className="w-full bg-white">
                         <SelectValue />
@@ -261,11 +301,11 @@ export default function ReservationsTable() {
                       <ShieldCheck size={18} />
                       {r.driverAssignment.name}
                     </div>
-                  )}
+                  )} */}
                 </TableCell>
 
                 <TableCell>
-                  <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {r.timeline.state === "completed" ? (
                       <>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
@@ -285,10 +325,11 @@ export default function ReservationsTable() {
                         </Button>
                       </>
                     )}
-                  </div>
+                  </div> */}
                 </TableCell>
               </TableRow>
             ))}
+            
             {filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-sm text-slate-400">
