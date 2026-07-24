@@ -161,7 +161,7 @@ export default function VehiclesTable({ cars }: CarProps) {
                 </TableCell>
                 <TableCell className="text-sm">{car.category.name}</TableCell>
                 <TableCell>
-                  <code className="font-mono text-xs bg-slate-100 px-2 py-1 rounded">
+                  <code className="font-ono text-xs bg-slate-100 px-2 py-1 rounded">
                     {car.imatriculation}
                   </code>
                 </TableCell>
@@ -205,7 +205,7 @@ export default function VehiclesTable({ cars }: CarProps) {
 
       <div className="p-6 bg-slate-50 flex items-center justify-between">
         <p className="text-sm text-slate-500">
-          Affichage de 1-{filtered.length} sur 128 véhicules
+          Affichage de 1-{filtered.length} sur {cars.length} véhicules
         </p>
         <div className="flex gap-2">
           <Button variant="outline" size="icon" className="h-8 w-8" disabled>

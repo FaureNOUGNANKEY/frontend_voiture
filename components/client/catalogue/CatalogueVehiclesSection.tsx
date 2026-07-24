@@ -100,7 +100,7 @@ export default function CatalogueVehiclesSection() {
                   </div>
                 </div>
 
-                <Button onClick={() => router.push("/client/reservation")} className="w-full mt-5">Réserver Maintenant</Button>
+                <Button onClick={() => router.push(`/client/reservation/${car.id}`)} className="w-full mt-5">Réserver Maintenant</Button>
               </div>
             </div>
           ))}
