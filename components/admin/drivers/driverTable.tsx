@@ -55,7 +55,7 @@ export default function DriversTable({ drivers }: DriverProps) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par immatriculation..."
+              placeholder="Rechercher par nom, prénoms, statut..."
               className="pl-10"
             />
           </div>
@@ -88,6 +88,9 @@ export default function DriversTable({ drivers }: DriverProps) {
                       // className={`w-12 h-8 rounded bg-slate-100 overflow-hidden border border-slate-200 ${
                       //   car.status === "En Panne" ? "grayscale opacity-70" : ""
                       // }`}
+                      className={`w-12 h-15 rounded bg-slate-100 overflow-hidden border border-slate-200 
+                        "grayscale opacity-70" : ""
+                      }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -102,7 +105,7 @@ export default function DriversTable({ drivers }: DriverProps) {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm">{driver.photo}</TableCell>
+                <TableCell className="text-sm">{driver.phone}</TableCell>
         
                 <TableCell>
                   <Badge className={`${STATUS_CLASSES[driver.status]} font-bold uppercase tracking-tight text-[10px] gap-1.5`}>

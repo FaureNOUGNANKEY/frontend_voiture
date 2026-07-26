@@ -80,6 +80,7 @@ export interface Driver {
     lastname:string,    
     firstname:string,
     photo?: string,
+    phone : string,
     photo_url?: string,
     status: driverStatus,
     created_at: string,
@@ -148,7 +149,3 @@ export interface Statistics {
   reservationActivity: ReservationActivity[];
 }
 
-// Réponse API complète
-// export interface Statistics {
-//   data: Statistic;
-// }
