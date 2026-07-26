@@ -14,30 +14,25 @@ import { Statistics } from "@/lib/types";
 import { useState, useEffect } from "react";
 
 export default function DashboardPage() {
-
   const [statistics, setStatistics] = useState<Statistics | null>(null);
-  
-    const getStatistics = async () => {
-      try {
-        const response = await getStatisticsApi();
-        setStatistics(response.data);
-        console.log("Fetched Statistics:", response.data);
-      } catch (error) {
-        console.error("Error fetching Statistics:", error);
-  
-      }
+
+  const getStatistics = async () => {
+    try {
+      const response = await getStatisticsApi();
+      setStatistics(response.data);
+      console.log("Fetched Statistics:", response.data);
+    } catch (error) {
+      console.error("Error fetching Statistics:", error);
     }
-    
-    useEffect(() => {
-      getStatistics();
-    }, []);
-  
+  };
+
+  useEffect(() => {
+    getStatistics();
+  }, []);
+
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
-      <AdminHeader />
-      <Sidebar />
-
-      <main className="ml-64 mt-16 p-6 min-h-screen">
+      <main className="p-6">
         <header className="mb-8 flex justify-between items-end">
           <div>
             <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
@@ -85,8 +80,6 @@ export default function DashboardPage() {
         {/* Fleet Table */}
         <FleetTable />
       </main>
-
-      <AdminFooter />
     </div>
   );
 }

@@ -49,10 +49,7 @@ export default function ReservationsPage() {
 
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
-      <AdminHeader />
-      <Sidebar />
-
-      <main className="md:ml-64 pt-16 min-h-screen">
+      <main className="">
         <div className="p-6 mx-auto">
           <ReservationsHeader />
           <ReservationsTable reservations={reservations} drivers={drivers}/>
@@ -64,8 +61,6 @@ export default function ReservationsPage() {
           </div>
         </div>
       </main>
-
-      <AdminFooter />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+// components/admin/Sidebar.tsx
 "use client";
 
 import Link from "next/link";
@@ -13,34 +14,53 @@ import {
   HelpCircle,
   LogOut,
   type LucideIcon,
+  UsersRound,
+  CarTaxiFront,
+  Wrench,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
   Car,
   CalendarRange,
   Users,
+  CarTaxiFront,
+  UsersRound,
   Receipt,
   Settings,
+  Wrench,
 };
 
 const sidebarLinks = [
   { id: "dashboard", label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
   { id: "vehicule", label: "Véhicules", href: "/admin/vehicules", icon: "Car" },
   { id: "reservations", label: "Reservations", href: "/admin/reservations", icon: "CalendarRange" },
-  { id: "drivers", label: "Conducteurs", href: "/admin/drivers", icon: "Users" },
+  { id: "drivers", label: "Conducteurs", href: "/admin/drivers", icon: "CarTaxiFront" },
+  { id: "users", label: "Utilisateurs", href: "/admin/users", icon: "UsersRound" },
+  { id: "maintenance", label: "Maintenance (Panne)", href: "/admin/maintenance", icon: "Wrench" },
   { id: "invoices", label: "Factures", href: "/admin/invoices", icon: "Receipt" },
   { id: "settings", label: "Paramètres", href: "/admin/settings", icon: "Settings" },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobile?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  
+  if(pathname.includes('login')) return;
 
   return (
     <aside
-      className="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 flex flex-col z-40
-      bg-primary/10 border-r border-slate-400 rounded-2xl"
+      className={cn(
+        "w-64 h-full flex flex-col border-r border-slate-400",
+        !mobile && "rounded-2xl bg-primary/10",
+        mobile && "rounded-r-2xl bg-white"
+      )}
     >
       {/* Header */}
       <div className="p-6">
@@ -62,12 +82,13 @@ export default function Sidebar() {
             <Link
               key={link.id}
               href={link.href}
-              className={`flex items-center gap-3 rounded-lg px-4 py-2 mx-2 my-1 text-sm font-semibold transition-all
-                ${
-                  isActive
-                    ? "bg-primary text-white"
-                    : "text-slate-600 hover:bg-slate-200"
-                }`}
+              onClick={onClose}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-4 py-2 mx-2 my-1 text-sm font-semibold transition-all",
+                isActive
+                  ? "bg-primary text-white"
+                  : "text-slate-600 hover:bg-slate-200"
+              )}
             >
               {Icon && <Icon size={20} strokeWidth={2} />}
               <span>{link.label}</span>

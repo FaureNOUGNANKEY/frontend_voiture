@@ -33,10 +33,7 @@ export default function VehiculesPage() {
 
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
-      <AdminHeader />
-      <Sidebar />
-
-      <main className="md:ml-64 pt-16 min-h-screen">
+      <main className="">
         <div className="p-6 mx-auto">
           <VehiculeHeader />
           <VehiculeKpis cars={cars} />
@@ -48,8 +45,6 @@ export default function VehiculesPage() {
           </div>
         </div>
       </main>
-
-      <AdminFooter />
     </div>
   );
 }
