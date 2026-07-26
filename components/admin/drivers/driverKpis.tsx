@@ -1,53 +1,54 @@
-import { CheckCircle2, CalendarDays, Wrench, TrendingUp, type LucideIcon, CarIcon } from "lucide-react";
-import type { Car } from "@/lib/types";
+import { UserCheck, CalendarDays, Wrench, TrendingUp, type LucideIcon, Users, UserX } from "lucide-react";
+import type { Statistics } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 
 
 const ICONS: Record<string, LucideIcon> = {
-  Car : CarIcon,
-  CheckCircle2,
+  Users,
+  UserCheck,
   CalendarDays,
   Wrench,
+  UserX,
 };
 
-interface CarProps {
-  cars: Car[];
+interface StatisticProps {
+  statistics: Statistics;
 }
 
 
-export default function VehiculeKpis({ cars }: CarProps) {
+export default function DriversKpis({ statistics }: StatisticProps) {
 
-  const total = cars.length;
-  const available = cars.filter((c) => c.status === "disponible").length;
-  const rented = cars.filter((c) => c.status === "loué").length;
-  const broken = cars.filter((c) => c.status === "En Panne").length;
+  const total = statistics.totals.drivers;
+  const available = statistics.totals.availableDrivers;
+  const busy = statistics.totals.busyDrivers;
+  const unAvailable = statistics.totals.unAvailableDrivers;
   const fleetKpis = [
     {
       id: "total",
-      label: "Total de véhicules",
+      label: "Total de conducteurs",
       value: total.toString(),
       delta: "+4.2%",
       trend: "up" as const,
-      icon: "Car",
+      icon: "Users",
     },
     {
       id: "available",
       label: "Disponibles",
       value: available.toString(),
-      icon: "CheckCircle2",
+      icon: "UserCheck",
     },
     {
-      id: "rented",
-      label: "En Location",
-      value: rented.toString(),
+      id: "busy",
+      label: "En Course",
+      value: busy.toString(),
       icon: "CalendarDays",
     },
     {
-      id: "broken",
-      label: "En Panne",
-      value: broken.toString(),
+      id: "unAvailable",
+      label: "Indisponible",
+      value: unAvailable.toString(),
       alert: "Attention",
-      icon: "Wrench",
+      icon: "UserX",
     },
   ];
 

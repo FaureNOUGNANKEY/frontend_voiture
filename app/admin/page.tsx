@@ -4,13 +4,34 @@ import ActivityChart from "@/components/admin/dashboard/activityChart";
 import AdminFooter from "@/components/admin/adminFooter";
 import AlertsList from "@/components/admin/dashboard/alertList";
 import FleetTable from "@/components/admin/dashboard/fleettable";
-import KpiCard, { kpis } from "@/components/admin/dashboard/kpiCard";
+import KpiCard from "@/components/admin/dashboard/kpiCard";
 import Sidebar from "@/components/admin/sidebar";
 import AdminHeader from "@/components/admin/adminHeader";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Download } from "lucide-react";
+import { getStatisticsApi } from "@/api/statistic";
+import { Statistics } from "@/lib/types";
+import { useState, useEffect } from "react";
 
 export default function DashboardPage() {
+
+  const [statistics, setStatistics] = useState<Statistics | null>(null);
+  
+    const getStatistics = async () => {
+      try {
+        const response = await getStatisticsApi();
+        setStatistics(response.data);
+        console.log("Fetched Statistics:", response.data);
+      } catch (error) {
+        console.error("Error fetching Statistics:", error);
+  
+      }
+    }
+    
+    useEffect(() => {
+      getStatistics();
+    }, []);
+  
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <AdminHeader />
@@ -46,15 +67,18 @@ export default function DashboardPage() {
         </header>
 
         {/* KPI Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {kpis.map((kpi) => (
-            <KpiCard key={kpi.id} kpi={kpi} />
-          ))}
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"> */}
+        <div className=" mx-auto">
+          {/* {statistics &&
+            kpis.map((kpi) => (
+              <KpiCard key={kpi.id} kpi={kpi} statistics={statistics} />
+            ))} */}
+          {statistics && <KpiCard statistics={statistics} />}
         </div>
 
         {/* Chart + Alerts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <ActivityChart />
+          {statistics && <ActivityChart statistics={statistics} />}
           <AlertsList />
         </div>
 

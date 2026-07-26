@@ -1,18 +1,36 @@
 "use client";
 
+import { Statistics } from "@/lib/types";
 import { useEffect, useState } from "react";
 
-const weeklyActivity = [
-  { day: "Lun", value: 40, count: 24 },
-  { day: "Mar", value: 65, count: 39 },
-  { day: "Mer", value: 55, count: 33 },
-  { day: "Jeu", value: 90, count: 54 },
-  { day: "Ven", value: 75, count: 45 },
-  { day: "Sam", value: 85, count: 51 },
-  { day: "Dim", value: 60, count: 36 },
-];
 
-export default function ActivityChart() {
+interface StatisticsProps {
+  statistics : Statistics;
+}
+export default function ActivityChart( {statistics}:StatisticsProps ) {
+  const dayTranslations: Record<string, string> = {
+    Monday: "Lun",
+    Tuesday: "Mar",
+    Wednesday: "Mer",
+    Thursday: "Jeu",
+    Friday: "Ven",
+    Saturday: "Sam",
+    Sunday: "Dim",
+  };
+
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  const weeklyActivity = daysOfWeek.map((day) => {
+    const found = statistics.reservationActivity.find((item) => item.day === day);
+    const totalWeek = statistics.reservationActivity.reduce((sum, item) => sum + item.count, 0);
+
+    return {
+      day: dayTranslations[day], // affichage en français
+      value: found ? (found.count/totalWeek) *100 : 0, // hauteur de la barre
+      count: found ? found.count : 0,
+    };
+  });
+
   // Animation d'entrée: les barres partent de 0% puis montent à leur valeur
   const [animated, setAnimated] = useState(false);
 

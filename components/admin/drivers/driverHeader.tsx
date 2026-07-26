@@ -1,16 +1,15 @@
 import { Filter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Car } from "@/lib/types";
 
-export default function VehiculeHeader() {
+export default function DriverHeader() {
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
       <div>
         <h1 className="text-4xl font-bold tracking-tight">
-          Gestion des véhicules
+          Gestion des conducteurs
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          {"Supervisez l'état, la disponibilité et la maintenance de votre parc automobile en temps réel."}
+          {"Supervisez la disponibilité de vos conducteurs en temps réel."}
         </p>
       </div>
       <div className="flex gap-2">
@@ -20,7 +19,7 @@ export default function VehiculeHeader() {
         </Button>
         <Button className="gap-2 p-4">
           <PlusCircle size={18} />
-          Ajouter un véhicule
+          Ajouter un conducteur
         </Button>
       </div>
     </div>

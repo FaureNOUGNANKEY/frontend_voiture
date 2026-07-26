@@ -1,3 +1,5 @@
+type carStatus = "disponible" | "loué" | "en maintenance"|"En Panne";
+
 export interface Car {
     id: number;
     mark: string;
@@ -8,7 +10,7 @@ export interface Car {
     photo_url: string;
     imatriculation: string;
     description?: string;
-    status: string;
+    status: carStatus;
     kmAmount: number;
     dayAmount: number;
     state: string;
@@ -38,16 +40,17 @@ export interface Panne {
     created_at: string,
     updated_at: string 
 }
-
+type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
 export interface Reservation {
     id:number,
     dateStart: string,
     dateBack: string,
     driverAmount: number,
     type: string,
-    status: string,
+    status: ReservationStatus,
     car : Car,
     driver?: Driver,
+    amount?: number,
     user: User,
     created_at: string,
     updated_at: string 
@@ -71,14 +74,15 @@ export interface User {
     created_at: string,
     updated_at: string 
 }
-
+type driverStatus = "disponible" | "affecté" | "indisponible"|"inactif";
 export interface Driver {
     id:number,
     lastname:string,    
     firstname:string,
     photo?: string,
+    phone : string,
     photo_url?: string,
-    status: string,
+    status: driverStatus,
     created_at: string,
     updated_at: string ,
 }
@@ -112,3 +116,36 @@ export interface Payment {
     created_at: string,
     updated_at: string 
 }
+
+export interface Totals {
+  cars: number;                // nombre total de voitures
+  drivers: number;              // nombre total de chauffeurs
+  reservations: number;         // nombre total de réservations
+  clients: number;              // nombre total de clients
+
+  activeReservations: number;  // réservations actives
+
+  availableDrivers: number;    // chauffeurs disponibles
+  unAvailableDrivers: number;  // chauffeurs indisponibles
+  busyDrivers: number;         // chauffeurs en course
+
+  monthlyRevenue: number;      // revenu mensuel
+
+  availableCars: number;       // voitures disponibles
+  unAvailableCars: number;     // voitures indisponibles
+  rentedCars: number;          // voitures louées
+  brokenCars: number;          // voitures en panne
+}
+
+// Activité des réservations par jour
+export interface ReservationActivity {
+  day: string;   
+  count: number; 
+}
+
+// Structure principale
+export interface Statistics {
+  totals: Totals;
+  reservationActivity: ReservationActivity[];
+}
+

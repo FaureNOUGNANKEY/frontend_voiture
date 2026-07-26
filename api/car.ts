@@ -6,6 +6,11 @@ export const getCarsApi = async () => {
   return response.data;  
 };
 
+//recuperer une voiture 
+export const getCarApi = async (id: string) => {
+  const response = await api.get(`/cars/${id}`);
+  return response.data;
+}
 //ajouter une voiture 
 export const addCarApi = async (formData: FormData) => {
   const response = await api.post("/cars", formData, {

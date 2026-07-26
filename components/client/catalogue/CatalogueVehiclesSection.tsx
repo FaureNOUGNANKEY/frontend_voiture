@@ -100,7 +100,7 @@ export default function CatalogueVehiclesSection() {
                   </div>
                 </div>
 
-                <Button onClick={() => router.push("/client/reservation")} className="w-full mt-5">Réserver Maintenant</Button>
+                <Button onClick={() => router.push(`/client/reservation/${car.id}`)} className="w-full mt-5">Réserver Maintenant</Button>
               </div>
             </div>
           ))}
@@ -108,7 +108,7 @@ export default function CatalogueVehiclesSection() {
 
         <div className="flex justify-center mt-12">
           <Button onClick={() => router.push("catalogue/liste")} variant="outline" className="p-6">
-            Voir Tout le Catalogue (42 véhicules)
+            Voir Tout le Catalogue ( {cars.length} véhicules)
           </Button>
         </div>
       </div>
