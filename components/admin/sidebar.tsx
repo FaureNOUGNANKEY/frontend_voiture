@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import CreateReservationModal from "../modals/createReservationModal";
+import { useState } from "react";
 
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -34,14 +36,49 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 const sidebarLinks = [
-  { id: "dashboard", label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    href: "/admin",
+    icon: "LayoutDashboard",
+  },
   { id: "vehicule", label: "Véhicules", href: "/admin/vehicules", icon: "Car" },
-  { id: "reservations", label: "Reservations", href: "/admin/reservations", icon: "CalendarRange" },
-  { id: "drivers", label: "Conducteurs", href: "/admin/drivers", icon: "CarTaxiFront" },
-  { id: "users", label: "Utilisateurs", href: "/admin/users", icon: "UsersRound" },
-  { id: "maintenance", label: "Maintenance (Panne)", href: "/admin/maintenance", icon: "Wrench" },
-  { id: "invoices", label: "Factures", href: "/admin/invoices", icon: "Receipt" },
-  { id: "settings", label: "Paramètres", href: "/admin/settings", icon: "Settings" },
+  {
+    id: "reservations",
+    label: "Reservations",
+    href: "/admin/reservations",
+    icon: "CalendarRange",
+  },
+  {
+    id: "drivers",
+    label: "Conducteurs",
+    href: "/admin/drivers",
+    icon: "CarTaxiFront",
+  },
+  {
+    id: "users",
+    label: "Utilisateurs",
+    href: "/admin/users",
+    icon: "UsersRound",
+  },
+  {
+    id: "maintenance",
+    label: "Maintenance (Panne)",
+    href: "/admin/maintenance",
+    icon: "Wrench",
+  },
+  {
+    id: "invoices",
+    label: "Factures",
+    href: "/admin/invoices",
+    icon: "Receipt",
+  },
+  {
+    id: "settings",
+    label: "Paramètres",
+    href: "/admin/settings",
+    icon: "Settings",
+  },
 ];
 
 interface SidebarProps {
@@ -51,15 +88,16 @@ interface SidebarProps {
 
 export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const pathname = usePathname();
-  
-  if(pathname.includes('login')) return;
+  const [createOpen, setCreateOpen] = useState(false);
+
+  if (pathname.includes("login")) return;
 
   return (
     <aside
       className={cn(
         "w-64 h-full flex flex-col border-r border-slate-400",
         !mobile && "rounded-2xl bg-primary/10",
-        mobile && "rounded-r-2xl bg-white"
+        mobile && "rounded-r-2xl bg-white",
       )}
     >
       {/* Header */}
@@ -87,7 +125,7 @@ export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
                 "flex items-center gap-3 rounded-lg px-4 py-2 mx-2 my-1 text-sm font-semibold transition-all",
                 isActive
                   ? "bg-primary text-white"
-                  : "text-slate-600 hover:bg-slate-200"
+                  : "text-slate-600 hover:bg-slate-200",
               )}
             >
               {Icon && <Icon size={20} strokeWidth={2} />}
@@ -100,6 +138,7 @@ export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
       {/* Footer actions */}
       <div className="p-6 mt-auto border-t border-slate-400">
         <Button
+          onClick={() => setCreateOpen(true)}
           type="button"
           className="w-full text-sm font-semibold py-5 rounded-lg
           flex items-center justify-center gap-2 mb-4 hover:opacity-90 transition-opacity"
@@ -125,6 +164,13 @@ export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
           </button>
         </div>
       </div>
+
+      {/* Modal */}
+      <CreateReservationModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={() => {}}
+      />
     </aside>
   );
 }

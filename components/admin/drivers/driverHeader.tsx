@@ -1,7 +1,11 @@
 import { Filter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import CreateDriverModal from "@/components/modals/createDriverModal";
 
 export default function DriverHeader() {
+  const [createOpen, setCreateOpen] = useState(false);
+
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
       <div>
@@ -17,11 +21,20 @@ export default function DriverHeader() {
           <Filter size={18} />
           Filtres
         </Button>
-        <Button className="gap-2 p-4">
+        <Button onClick={() => setCreateOpen(true)} className="gap-2 p-4">
           <PlusCircle size={18} />
           Ajouter un conducteur
         </Button>
       </div>
+
+      {/* Modal */}
+      <CreateDriverModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={() => {
+          
+        }}
+      />
     </div>
   );
 }

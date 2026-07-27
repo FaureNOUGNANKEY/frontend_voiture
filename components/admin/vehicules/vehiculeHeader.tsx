@@ -1,8 +1,12 @@
 import { Filter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Car } from "@/lib/types";
+import CreateVehiculeModal from "@/components/modals/createVehiculeModal";
+import { useState } from "react";
 
 export default function VehiculeHeader() {
+  const [createOpen, setCreateOpen] = useState(false);
+
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
       <div>
@@ -10,7 +14,9 @@ export default function VehiculeHeader() {
           Gestion des véhicules
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          {"Supervisez l'état, la disponibilité et la maintenance de votre parc automobile en temps réel."}
+          {
+            "Supervisez l'état, la disponibilité et la maintenance de votre parc automobile en temps réel."
+          }
         </p>
       </div>
       <div className="flex gap-2">
@@ -18,11 +24,18 @@ export default function VehiculeHeader() {
           <Filter size={18} />
           Filtres
         </Button>
-        <Button className="gap-2 p-4">
+        <Button onClick={() => setCreateOpen(true)} className="gap-2 p-4">
           <PlusCircle size={18} />
           Ajouter un véhicule
         </Button>
       </div>
+
+      {/* Modal */}
+      <CreateVehiculeModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={() => {}}
+      />
     </div>
   );
 }
