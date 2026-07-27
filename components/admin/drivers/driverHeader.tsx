@@ -24,7 +24,7 @@ export default function DriverHeader() {
         <Button onClick={() => setCreateOpen(true)} className="gap-2 p-4">
           <PlusCircle size={18} />
           Ajouter un conducteur
-        </Button>
+        </Button> */
       </div>
 
       {/* Modal */}

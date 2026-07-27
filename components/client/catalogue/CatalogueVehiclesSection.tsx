@@ -75,7 +75,7 @@ export default function CatalogueVehiclesSection() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cars.map((car, i) => (
+          {cars.slice(-4).map((car, i) => (
             <div key={i} className="group bg-white border rounded-3xl overflow-hidden hover:shadow-xl transition-all">
               <div className="relative h-52">
                 <img src={car.photo_url} alt={car.mark} className="w-full h-full object-cover" />
