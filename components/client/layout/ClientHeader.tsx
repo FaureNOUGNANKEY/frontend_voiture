@@ -44,7 +44,7 @@ export default function ClientHeader() {
   const navLinks = [
     { href: "/client", label: "Accueil", icon: Home },
     { href: "/client/catalogue", label: "Catalogue", icon: Search },
-    { href: "/client/reservations", label: "Réservations", icon: Calendar },
+    { href: "/client/reservation/me", label: "Réservations", icon: Calendar },
     { href: "/client/messages", label: "Messages", icon: MessageSquare },
   ];
 
