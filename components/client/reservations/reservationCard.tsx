@@ -1,0 +1,86 @@
+import { CalendarDays, MapPin } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+export type MyReservationStatus = "À venir" | "En cours" | "Terminée" | "Annulée";
+
+export type MyReservation = {
+  id: string;
+  reference: string;
+  vehicle: {
+    name: string;
+    category: string;
+    imageUrl: string;
+  };
+  dateRange: string;
+  location: string;
+  price: string;
+  status: MyReservationStatus;
+};
+
+export const STATUS_CLASSES: Record<MyReservationStatus, string> = {
+  "À venir": "bg-blue-100 text-blue-800",
+  "En cours": "bg-emerald-100 text-emerald-800",
+  "Terminée": "bg-slate-100 text-slate-600",
+  "Annulée": "bg-red-100 text-red-700",
+};
+
+export default function ReservationCard({ reservation }: { reservation: MyReservation }) {
+  return (
+    <Card className="shadow-sm overflow-hidden">
+      <CardContent className="p-0 flex flex-col sm:flex-row">
+        <div className="sm:w-48 h-40 sm:h-auto shrink-0 bg-slate-100">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={reservation.vehicle.imageUrl}
+            alt={reservation.vehicle.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <div className="flex-1 p-5 flex flex-col justify-between gap-4">
+          <div>
+            <div className="flex justify-between items-start gap-2">
+              <div>
+                <p className="text-xs font-mono text-slate-400">{reservation.reference}</p>
+                <h3 className="text-base font-semibold text-slate-900">
+                  {reservation.vehicle.name}
+                </h3>
+                <p className="text-xs text-slate-500">{reservation.vehicle.category}</p>
+              </div>
+              <Badge className={`${STATUS_CLASSES[reservation.status]} hover:${STATUS_CLASSES[reservation.status]} shrink-0`}>
+                {reservation.status}
+              </Badge>
+            </div>
+
+            <div className="flex flex-col gap-1.5 mt-4 text-sm text-slate-600">
+              <div className="flex items-center gap-2">
+                <CalendarDays size={16} className="text-slate-400" />
+                {reservation.dateRange}
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin size={16} className="text-slate-400" />
+                {reservation.location}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+            <span className="text-base font-semibold text-slate-900">{reservation.price}</span>
+            <div className="flex gap-2">
+              {reservation.status === "À venir" && (
+                <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                  Annuler
+                </Button>
+              )}
+              <Button size="sm" variant="outline">
+                Détails
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
