@@ -1,7 +1,7 @@
 import api from "../lib/api";
 
 //recupérer tous les utilisateurs
-export const getUserApi = async () => {
+export const getUsersApi = async () => {
     const response = await api.get("/users");
     return response.data;
 };

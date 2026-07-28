@@ -23,76 +23,88 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@base-ui/react";
 import { useState } from "react";
+import { User } from "@/lib/types";
 
-export type UserRole = "Client Premium" | "Client Standard" | "Gestionnaire";
 
-export type AppUser = {
-  id: string;
-  name: string;
-  initials: string;
-  avatarColor: string;
-  clientId: string;
-  email: string;
-  role: UserRole;
-  joinedAt: string;
-};
+// export type AppUser = {
+//   id: string;
+//   name: string;
+//   initials: string;
+//   avatarColor: string;
+//   clientId: string;
+//   email: string;
+//   role: UserRole;
+//   joinedAt: string;
+// };
 
-export const users: AppUser[] = [
-  {
-    id: "u1",
-    name: "Jean Dupont",
-    initials: "JD",
-    avatarColor: "bg-blue-100 text-primary",
-    clientId: "#49201",
-    email: "jean.dupont@email.com",
-    role: "Client Premium",
-    joinedAt: "12 Oct 2023",
-  },
-  {
-    id: "u2",
-    name: "Marie Laurent",
-    initials: "ML",
-    avatarColor: "bg-slate-200 text-slate-700",
-    clientId: "#49188",
-    email: "m.laurent@agence.fr",
-    role: "Client Standard",
-    joinedAt: "05 Nov 2023",
-  },
-  {
-    id: "u3",
-    name: "Ahmed Said",
-    initials: "AS",
-    avatarColor: "bg-indigo-100 text-indigo-800",
-    clientId: "#49150",
-    email: "a.said@logix.com",
-    role: "Gestionnaire",
-    joinedAt: "28 Sept 2023",
-  },
-  {
-    id: "u4",
-    name: "Catherine Leroy",
-    initials: "CL",
-    avatarColor: "bg-blue-100 text-primary",
-    clientId: "#49022",
-    email: "cleroy@transp.net",
-    role: "Client Premium",
-    joinedAt: "15 Juil 2023",
-  },
-];
+// export const users: AppUser[] = [
+//   {
+//     id: "u1",
+//     name: "Jean Dupont",
+//     initials: "JD",
+//     avatarColor: "bg-blue-100 text-primary",
+//     clientId: "#49201",
+//     email: "jean.dupont@email.com",
+//     role: "Client Premium",
+//     joinedAt: "12 Oct 2023",
+//   },
+//   {
+//     id: "u2",
+//     name: "Marie Laurent",
+//     initials: "ML",
+//     avatarColor: "bg-slate-200 text-slate-700",
+//     clientId: "#49188",
+//     email: "m.laurent@agence.fr",
+//     role: "Client Standard",
+//     joinedAt: "05 Nov 2023",
+//   },
+//   {
+//     id: "u3",
+//     name: "Ahmed Said",
+//     initials: "AS",
+//     avatarColor: "bg-indigo-100 text-indigo-800",
+//     clientId: "#49150",
+//     email: "a.said@logix.com",
+//     role: "Gestionnaire",
+//     joinedAt: "28 Sept 2023",
+//   },
+//   {
+//     id: "u4",
+//     name: "Catherine Leroy",
+//     initials: "CL",
+//     avatarColor: "bg-blue-100 text-primary",
+//     clientId: "#49022",
+//     email: "cleroy@transp.net",
+//     role: "Client Premium",
+//     joinedAt: "15 Juil 2023",
+//   },
+// ];
+function formatDate(isoDate: string) {
+  const date = new Date(isoDate);
+  return new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "long",
+    timeStyle: "short",
+  }).format(date);
+}
+
+interface UserProps{
+  users: User[];
+}
+export type UserRole = "Client Premium" | "Client" | "admin";
 
 export const ROLE_CLASSES: Record<UserRole, string> = {
-  "Client Premium": "bg-blue-100 text-blue-800",
-  "Client Standard": "bg-slate-100 text-slate-600",
-  Gestionnaire: "bg-indigo-100 text-indigo-800",
+  "Client": "bg-blue-100 text-blue-800",
+  "Client Premium": "bg-slate-100 text-slate-600",
+  "admin": "bg-indigo-100 text-indigo-800",
 };
 
-const clients = users.filter((u) => u.role !== "Gestionnaire");
-const admins = users.filter((u) => u.role === "Gestionnaire");
+// function UsersRows({ data }: { data: typeof users }) {
+function UsersRows({ users }: UserProps) {
 
-function UsersRows({ data }: { data: typeof users }) {
+  
   return (
     <TableBody>
-      {data.map((user) => (
+      {users.map((user) => (
         <TableRow
           key={user.id}
           className="hover:bg-slate-50 transition-colors group"
@@ -100,15 +112,15 @@ function UsersRows({ data }: { data: typeof users }) {
           <TableCell>
             <div className="flex items-center gap-3">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 ${user.avatarColor}`}
+                className={`w-12 h-15 rounded bg-slate-100 overflow-hidden border border-slate-200 "grayscale opacity-70" : "" }`}
               >
-                {user.initials}
+                <img  src={user.photo_url} alt={user.lastname} className="w-full h-full object-cover"/>
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900">
-                  {user.name}
+                  {user.lastname} {user.firstname}
                 </p>
-                <p className="text-xs text-slate-500">ID: {user.clientId}</p>
+                <p className="text-xs text-slate-500">ID: 00000{user.id}</p>
               </div>
             </div>
           </TableCell>
@@ -121,7 +133,7 @@ function UsersRows({ data }: { data: typeof users }) {
             </Badge>
           </TableCell>
           <TableCell className="text-sm text-slate-600">
-            {user.joinedAt}
+            {formatDate(user.created_at)}
           </TableCell>
           <TableCell className="text-right">
             <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -143,7 +155,7 @@ function UsersRows({ data }: { data: typeof users }) {
           </TableCell>
         </TableRow>
       ))}
-      {data.length === 0 && (
+      {users.length === 0 && (
         <TableRow>
           <TableCell
             colSpan={5}
@@ -157,8 +169,24 @@ function UsersRows({ data }: { data: typeof users }) {
   );
 }
 
-export default function UsersTable() {
+export default function UsersTable({ users }: UserProps) {
+
+  const clients = users.filter((u) => u.role !== "admin");
+  const admins = users.filter((u) => u.role === "admin");
   const [search, setSearch] = useState("");
+  // Filtrage dynamique
+  const filteredClients = clients.filter((u) =>
+    [u.lastname,u.firstname, u.email, u.role].some((field) =>
+      field.toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
+  const filteredAdmins = admins.filter((u) =>
+    [u.lastname,u.firstname, u.email, u.role].some((field) =>
+      field.toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
 
   return (
     <Tabs defaultValue="clients">
@@ -197,7 +225,7 @@ export default function UsersTable() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Rechercher par nom, prénoms, statut..."
+                    placeholder="Rechercher par nom, prénoms, rôle..."
                     className="pl-10 w-full rounded-xl py-2"
                   />
                 </div>
@@ -226,7 +254,9 @@ export default function UsersTable() {
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <UsersRows data={tab === "clients" ? clients : admins} />
+                {/* <UsersRows data={tab === "clients" ? clients : admins} /> */}
+                <UsersRows users={tab === "clients" ? filteredClients : filteredAdmins} />
+
               </Table>
             </div>
 

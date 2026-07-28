@@ -57,7 +57,7 @@ export interface Reservation {
     created_at: string,
     updated_at: string 
 }
-
+export type UserRole = "Client Premium" | "Client" | "admin";
 export interface User {
     id:number,
     lastname:string,
@@ -70,7 +70,7 @@ export interface User {
     photo_url?: string,
     phone: string,
     active: boolean,
-    role: string,
+    role: UserRole,
     email:string,
     historic: Historic,
     created_at: string,
@@ -120,23 +120,24 @@ export interface Payment {
 }
 
 export interface Totals {
-  cars: number;                // nombre total de voitures
-  drivers: number;              // nombre total de chauffeurs
-  reservations: number;         // nombre total de réservations
-  clients: number;              // nombre total de clients
+  cars: number;               
+  drivers: number;             
+  reservations: number;      
+  clients: number;              
+  admins: number;              
 
-  activeReservations: number;  // réservations actives
+  activeReservations: number;  
 
-  availableDrivers: number;    // chauffeurs disponibles
-  unAvailableDrivers: number;  // chauffeurs indisponibles
-  busyDrivers: number;         // chauffeurs en course
+  availableDrivers: number;   
+  unAvailableDrivers: number;  
+  busyDrivers: number;        
 
-  monthlyRevenue: number;      // revenu mensuel
+  monthlyRevenue: number;     
 
-  availableCars: number;       // voitures disponibles
-  unAvailableCars: number;     // voitures indisponibles
-  rentedCars: number;          // voitures louées
-  brokenCars: number;          // voitures en panne
+  availableCars: number;      
+  unAvailableCars: number;     
+  rentedCars: number;        
+  brokenCars: number;      
 }
 
 // Activité des réservations par jour

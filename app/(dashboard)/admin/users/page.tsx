@@ -1,19 +1,56 @@
+"use client"
+
+import { getStatisticsApi } from "@/api/statistic";
+import { getUsersApi } from "@/api/user";
 import AdminFooter from "@/components/admin/adminFooter";
 import AdminHeader from "@/components/admin/adminHeader";
 import Sidebar from "@/components/admin/sidebar";
 import UsersHeader from "@/components/admin/users/usersHeader";
 import UsersStats from "@/components/admin/users/usersStats";
 import UsersTable from "@/components/admin/users/usersTable";
+import { Statistics, User } from "@/lib/types";
+import { useEffect, useState } from "react";
+
 
 
 export default function UsersPage() {
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [statistics, setStatistics] = useState<Statistics | null>(null)
+
+  const getUsers = async () => {
+    try {
+      const response = await getUsersApi();
+      setUsers(response.data);
+      console.log("Fetched users :", response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+
+  const getStatistics = async () => {
+    try {
+      const response = await getStatisticsApi();
+      setStatistics(response.data);
+      console.log(" Fetched Statistics :", response.data);
+    } catch (error){
+      console.error("Error fetching Statistics:",error)
+    }
+  }
+
+  useEffect(() => {
+    getUsers();
+    getStatistics();
+  },[]);
+
+
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 max-w-7xl mx-auto space-y-8">
           <UsersHeader />
-          <UsersStats />
-          <UsersTable />
+          {statistics && <UsersStats statistics={statistics}/>}
+          <UsersTable users={users}  />
         </div>
       </main>
     </div>
