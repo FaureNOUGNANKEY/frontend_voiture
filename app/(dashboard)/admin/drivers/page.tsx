@@ -50,7 +50,7 @@ export default function ConducteursPage() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          <DriverHeader />
+          <DriverHeader onSuccess={getDrivers} />
           {statistics && <DriversKpis statistics={statistics} />}
           {/* <DriversKpis statistics={statistics} /> */}
           <DriversTable drivers={drivers}/>

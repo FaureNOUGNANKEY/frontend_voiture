@@ -27,13 +27,13 @@ import { Car } from "@/lib/types";
 //   imageUrl: string;
 // };
 
-type carStatus = "disponible" | "loué" | "en maintenance"|"En Panne";
+type carStatus = "disponible" | "loué" | "en maintenance"|"en Panne";
 
 const STATUS_CLASSES: Record<carStatus, string> = {
   disponible: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
   loué: "bg-blue-100 text-blue-900 hover:bg-blue-100",
   "en maintenance": "bg-blue-100 text-blue-900 hover:bg-blue-100",
-  "En Panne": "bg-amber-100 text-amber-700 hover:bg-amber-100",
+  "en Panne": "bg-amber-100 text-amber-700 hover:bg-amber-100",
 };
 
 // export const vehicles: Vehicle[] = [
@@ -136,14 +136,14 @@ export default function VehiclesTable({ cars }: CarProps) {
               <TableRow
                 key={car.id}
                 className={`hover:bg-slate-50 transition-colors ${
-                  car.status === "En Panne" ? "bg-red-50/40" : ""
+                  car.status === "en Panne" ? "bg-red-50/40" : ""
                 }`}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-12 h-8 rounded bg-slate-100 overflow-hidden border border-slate-200 ${
-                        car.status === "En Panne" ? "grayscale opacity-70" : ""
+                        car.status === "en Panne" ? "grayscale opacity-70" : ""
                       }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -179,7 +179,7 @@ export default function VehiclesTable({ cars }: CarProps) {
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
                       <Pencil size={18} />
                     </Button>
-                    {car.status === "En Panne" ? (
+                    {car.status === "en Panne" ? (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
                         <Eye size={18} />
                       </Button>

@@ -10,11 +10,26 @@ import VehiculeKpis from "@/components/admin/vehicules/vehiculeKpis";
 import VehiclesTable from "@/components/admin/vehicules/vehiculeTable";
 import { useEffect, useState } from "react";
 import { getCarsApi } from "@/api/car";
-import { Car } from "@/lib/types";
+import { Car, Category, Statistics } from "@/lib/types";
+import { getCategoriesApi } from "@/api/category";
+import { getStatisticsApi } from "@/api/statistic";
 
 export default function VehiculesPage() {
   const [cars, setCars] = useState<Car[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [statistics, setStatistics] = useState<Statistics|null>(null);
 
+  const getCategories = async () => {
+    try {
+      const response = await getCategoriesApi();
+      setCategories(response.data);
+      console.log("Fetched Categories:", response.data);
+    } catch (error) {
+      console.error("Error fetching Categories:", error);
+
+    }
+  }
+   
   const getCars = async () => {
     try {
       const response = await getCarsApi();
@@ -25,18 +40,30 @@ export default function VehiculesPage() {
 
     }
   }
-  
+
+  const getStatistics = async () => {
+    try {
+      const response = await getStatisticsApi();
+      setStatistics(response.data);
+      console.log("Fetched Statistics:", response.data);
+    } catch (error) {
+      console.error("Error fetching Statistics:", error);
+
+    }
+  }
 
   useEffect(() => {
     getCars();
+    getCategories();
+    getStatistics();
   }, []);
 
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          <VehiculeHeader />
-          <VehiculeKpis cars={cars} />
+          <VehiculeHeader categories={categories}/>
+          {statistics && <VehiculeKpis statistics={statistics} />}
           <VehiclesTable cars={cars}/>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">

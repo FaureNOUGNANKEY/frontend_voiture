@@ -21,39 +21,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Category } from "@/lib/types";
+import { addCarApi } from "@/api/car";
 
 interface CarFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   initialData?: any; // pour l'édition
+  categories :Category[];
 }
+
 
 export default function CreateVehiculeModal({
   open,
   onOpenChange,
   onSuccess,
   initialData,
+  categories,
 }: CarFormModalProps) {
   const [formData, setFormData] = useState({
-    marque: initialData?.marque || "",
+    mark: initialData?.mark || "",
     model: initialData?.model || "",
-    couleur: initialData?.couleur || "",
+    category_id: initialData?.category_id || "",
+    color: initialData?.color || "",
     photo: null as File | null,
-    immatriculation: initialData?.immatriculation || "",
+    imatriculation: initialData?.imatriculation || "",
     description: initialData?.description || "",
-    prix_par_jour: initialData?.prix_par_jour || "",
-    prix_au_kilometre: initialData?.prix_au_kilometre || "",
-    etat: initialData?.etat || "Disponible",
-    nombre_places: initialData?.nombre_places || "",
-    nombre_portes: initialData?.nombre_portes || "",
+    dayAmount: initialData?.dayAmount || "",
+    kmAmount: initialData?.kmAmount || "",
+    state: initialData?.state || "Disponible",
+    place: initialData?.place || "",
+    door: initialData?.door || "",
     kilometrage: initialData?.kilometrage || "",
-    niveau_carburant: initialData?.niveau_carburant || "Plein",
+    niveauCarburant: initialData?.niveauCarburant || "Plein",
     dommage: initialData?.dommage || "",
   });
 
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,36 +83,36 @@ export default function CreateVehiculeModal({
     });
 
     try {
-      // Remplace par ton vrai appel API
-      const response = await fetch("/api/cars", {
-        method: "POST",
-        body: data,
+      await addCarApi(data);
+      
+      onSuccess?.();
+      onOpenChange(false);
+      // Reset form
+      setFormData({
+        mark: "",
+        model: "",
+        category_id : "",
+        color: "",
+        photo: null,
+        imatriculation: "",
+        description: "",
+        dayAmount: "",
+        kmAmount: "",
+        state: "Disponible",
+        place: "",
+        door: "",
+        kilometrage: "",
+        niveauCarburant: "Plein",
+        dommage: "",
       });
-
-      if (response.ok) {
-        onSuccess?.();
-        onOpenChange(false);
-        // Reset form
-        setFormData({
-          marque: "",
-          model: "",
-          couleur: "",
-          photo: null,
-          immatriculation: "",
-          description: "",
-          prix_par_jour: "",
-          prix_au_kilometre: "",
-          etat: "Disponible",
-          nombre_places: "",
-          nombre_portes: "",
-          kilometrage: "",
-          niveau_carburant: "Plein",
-          dommage: "",
-        });
-        setPreview(null);
+      setPreview(null);
+    } catch (error: any) {
+      if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /cars :", error.response?.data || error.message);
       }
-    } catch (error) {
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -170,9 +177,9 @@ export default function CreateVehiculeModal({
               <Label htmlFor="marque">Marque <span className="text-red-600">*</span></Label>
               <Input
                 id="marque"
-                value={formData.marque}
+                value={formData.mark}
                 onChange={(e) =>
-                  setFormData({ ...formData, marque: e.target.value })
+                  setFormData({ ...formData, mark: e.target.value })
                 }
                 placeholder="Ex: Toyota"
                 required
@@ -198,9 +205,9 @@ export default function CreateVehiculeModal({
               <Label htmlFor="couleur">Couleur</Label>
               <Input
                 id="couleur"
-                value={formData.couleur}
+                value={formData.color}
                 onChange={(e) =>
-                  setFormData({ ...formData, couleur: e.target.value })
+                  setFormData({ ...formData, color: e.target.value })
                 }
                 placeholder="Ex: Blanc"
               />
@@ -209,11 +216,11 @@ export default function CreateVehiculeModal({
               <Label htmlFor="immatriculation">Immatriculation *</Label>
               <Input
                 id="immatriculation"
-                value={formData.immatriculation}
+                value={formData.imatriculation}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    immatriculation: e.target.value.toUpperCase(),
+                    imatriculation: e.target.value.toUpperCase(),
                   })
                 }
                 placeholder="Ex: AA-123-BB"
@@ -243,9 +250,9 @@ export default function CreateVehiculeModal({
               <Input
                 id="prix_par_jour"
                 type="number"
-                value={formData.prix_par_jour}
+                value={formData.dayAmount}
                 onChange={(e) =>
-                  setFormData({ ...formData, prix_par_jour: e.target.value })
+                  setFormData({ ...formData, dayAmount: e.target.value })
                 }
                 placeholder="Ex: 25000"
                 required
@@ -258,11 +265,11 @@ export default function CreateVehiculeModal({
               <Input
                 id="prix_au_kilometre"
                 type="number"
-                value={formData.prix_au_kilometre}
+                value={formData.kmAmount}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    prix_au_kilometre: e.target.value,
+                    kmAmount: e.target.value,
                   })
                 }
                 placeholder="Ex: 150"
@@ -270,34 +277,52 @@ export default function CreateVehiculeModal({
             </div>
           </div>
 
-          {/* État + Carburant */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* État + Categorie + Carburant */}
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <Label>État</Label>
               <Select
-                value={formData.etat}
+                value={formData.state}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, etat: value })
+                  setFormData({ ...formData, state: value })
                 }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Sélectionner l'état" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Disponible">Disponible</SelectItem>
-                  <SelectItem value="Loué">Loué</SelectItem>
-                  <SelectItem value="En maintenance">En maintenance</SelectItem>
-                  <SelectItem value="Hors service">Hors service</SelectItem>
+                  <SelectItem value="Bon">Bon</SelectItem>
+                  <SelectItem value="usée">usée</SelectItem>
+                  <SelectItem value="Neuve">Neuve</SelectItem>
+                  <SelectItem value="très usée">Très usée</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
+            <div >
+                <Label >Catégorie</Label>
+                <Select value={formData.category_id}
+            onValueChange={(value) => setFormData({ ...formData,category_id: Number(value) })}
+            >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionner une catégorie..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
             <div>
               <Label>Niveau de carburant</Label>
               <Select
-                value={formData.niveau_carburant}
+                value={formData.niveauCarburant}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, niveau_carburant: value })
+                  setFormData({ ...formData, niveauCarburant: value })
                 }
               >
                 <SelectTrigger className="w-full">
@@ -305,7 +330,7 @@ export default function CreateVehiculeModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Vide">Vide</SelectItem>
-                  <SelectItem value="1/4">1/4</SelectItem>
+                  <SelectItem value="14">14</SelectItem>
                   <SelectItem value="1/2">1/2</SelectItem>
                   <SelectItem value="3/4">3/4</SelectItem>
                   <SelectItem value="Plein">Plein</SelectItem>
@@ -321,9 +346,9 @@ export default function CreateVehiculeModal({
               <Input
                 id="nombre_places"
                 type="number"
-                value={formData.nombre_places}
+                value={formData.place}
                 onChange={(e) =>
-                  setFormData({ ...formData, nombre_places: e.target.value })
+                  setFormData({ ...formData, place: e.target.value })
                 }
                 placeholder="5"
               />
@@ -333,9 +358,9 @@ export default function CreateVehiculeModal({
               <Input
                 id="nombre_portes"
                 type="number"
-                value={formData.nombre_portes}
+                value={formData.door}
                 onChange={(e) =>
-                  setFormData({ ...formData, nombre_portes: e.target.value })
+                  setFormData({ ...formData, door: e.target.value })
                 }
                 placeholder="4"
               />

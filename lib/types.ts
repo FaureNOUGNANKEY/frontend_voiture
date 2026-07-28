@@ -1,4 +1,4 @@
-type carStatus = "disponible" | "loué" | "en maintenance"|"En Panne";
+type carStatus = "disponible" | "loué" | "en maintenance"|"en Panne";
 
 export interface Car {
     id: number;
@@ -32,14 +32,16 @@ export interface Category {
 }
 
 export interface Panne {
-    id:number,
-    name:string,
-    description:string,
-    panneAmount: number,
-    car : Car,
-    created_at: string,
-    updated_at: string 
+  id: number;
+  description: string;
+  priority: "Urgente" | "Moyenne" | "Faible";
+  status: "En attente" | "En réparation" | "Réparé";
+  panneAmount: number;
+  car : Car,
+  created_at: string;
+  updated_at: string;
 }
+
 type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
 export interface Reservation {
     id:number,

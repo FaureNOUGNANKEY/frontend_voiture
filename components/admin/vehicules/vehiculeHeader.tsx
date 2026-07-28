@@ -1,10 +1,13 @@
 import { Filter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Car } from "@/lib/types";
+import { Car, Category } from "@/lib/types";
 import CreateVehiculeModal from "@/components/modals/createVehiculeModal";
 import { useState } from "react";
 
-export default function VehiculeHeader() {
+interface CategoryProps{
+  categories :Category[];
+}
+export default function VehiculeHeader( {categories} : CategoryProps ) {
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
@@ -32,6 +35,7 @@ export default function VehiculeHeader() {
 
       {/* Modal */}
       <CreateVehiculeModal
+        categories={categories}
         open={createOpen}
         onOpenChange={setCreateOpen}
         onSuccess={() => {}}

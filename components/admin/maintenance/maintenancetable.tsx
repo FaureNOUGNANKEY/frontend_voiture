@@ -13,62 +13,67 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Panne } from "@/lib/types";
 
 
 export type Priority = "Urgente" | "Moyenne" | "Faible";
 
-export type MaintenanceTicket = {
-  id: string;
-  vehicle: string;
-  plate: string;
-  fuelType: string;
-  icon: string;
-  description: string;
-  priority: Priority;
-  cost: string;
-  progress: number;
-  progressLabel: string;
-};
+// export type MaintenanceTicket = {
+//   id: string;
+//   vehicle: string;
+//   plate: string;
+//   fuelType: string;
+//   icon: string;
+//   description: string;
+//   priority: Priority;
+//   cost: string;
+//   progress: number;
+//   progressLabel: string;
+// };
  
-export const maintenanceTickets: MaintenanceTicket[] = [
-  {
-    id: "m1",
-    vehicle: "Mercedes-Benz Actros",
-    plate: "AA-123-BB",
-    fuelType: "Diesel",
-    icon: "Car",
-    description:
-      "Surchauffe moteur et perte de puissance sur autoroute. Fuite de liquide de refroidissement détectée.",
-    priority: "Urgente",
-    cost: "3 450 €",
-    progress: 15,
-    progressLabel: "Diagnostic terminé",
-  },
-  {
-    id: "m2",
-    vehicle: "Iveco Daily",
-    plate: "CK-982-PL",
-    fuelType: "GNV",
-    icon: "Truck",
-    description: "Révision périodique des 50 000km + Remplacement des plaquettes de frein avant.",
-    priority: "Moyenne",
-    cost: "850 €",
-    progress: 75,
-    progressLabel: "En cours de remontage",
-  },
-  {
-    id: "m3",
-    vehicle: "Renault Zoe E-Tech",
-    plate: "EV-444-ZZ",
-    fuelType: "Électrique",
-    icon: "Zap",
-    description: "Défaut système de charge. Le véhicule ne prend plus la charge sur bornes rapides.",
-    priority: "Faible",
-    cost: "1 100 €",
-    progress: 40,
-    progressLabel: "Attente pièces",
-  },
-];
+// export const maintenanceTickets: MaintenanceTicket[] = [
+//   {
+//     id: "m1",
+//     vehicle: "Mercedes-Benz Actros",
+//     plate: "AA-123-BB",
+//     fuelType: "Diesel",
+//     icon: "Car",
+//     description:
+//       "Surchauffe moteur et perte de puissance sur autoroute. Fuite de liquide de refroidissement détectée.",
+//     priority: "Urgente",
+//     cost: "3 450 €",
+//     progress: 15,
+//     progressLabel: "Diagnostic terminé",
+//   },
+//   {
+//     id: "m2",
+//     vehicle: "Iveco Daily",
+//     plate: "CK-982-PL",
+//     fuelType: "GNV",
+//     icon: "Truck",
+//     description: "Révision périodique des 50 000km + Remplacement des plaquettes de frein avant.",
+//     priority: "Moyenne",
+//     cost: "850 €",
+//     progress: 75,
+//     progressLabel: "En cours de remontage",
+//   },
+//   {
+//     id: "m3",
+//     vehicle: "Renault Zoe E-Tech",
+//     plate: "EV-444-ZZ",
+//     fuelType: "Électrique",
+//     icon: "Zap",
+//     description: "Défaut système de charge. Le véhicule ne prend plus la charge sur bornes rapides.",
+//     priority: "Faible",
+//     cost: "1 100 €",
+//     progress: 40,
+//     progressLabel: "Attente pièces",
+//   },
+// ];
+
+interface PanneProps{
+  pannes : Panne[],
+}
 
 export const PRIORITY_CLASSES: Record<Priority, { badge: string; dot: string; bar: string }> = {
   Urgente: { badge: "bg-red-100 text-red-700", dot: "bg-red-600 animate-pulse", bar: "bg-red-600" },
@@ -79,11 +84,11 @@ export const PRIORITY_CLASSES: Record<Priority, { badge: string; dot: string; ba
 
 const ICONS: Record<string, LucideIcon> = { Car, Truck, Zap };
 
-export default function MaintenanceTable() {
+export default function MaintenanceTable( {pannes}  : PanneProps) {
   const [search, setSearch] = useState("");
 
-  const filtered = maintenanceTickets.filter((t) =>
-    `${t.vehicle} ${t.plate}`.toLowerCase().includes(search.toLowerCase())
+  const filtered = pannes.filter((p) =>
+    `${p.car?.mark} ${p.car?.model} ${p.car?.imatriculation}`.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -120,40 +125,43 @@ export default function MaintenanceTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((ticket) => {
-              const Icon = ICONS[ticket.icon];
-              const priority = PRIORITY_CLASSES[ticket.priority];
+            {filtered.map((p) => {
+              // const Icon = ICONS[p.car?.photo_url];
+              const priority = PRIORITY_CLASSES[p.priority];
 
               return (
-                <TableRow key={ticket.id} className="hover:bg-slate-50 transition-colors">
+                <TableRow key={p.id} className="hover:bg-slate-50 transition-colors">
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
-                        {Icon && <Icon size={20} className="text-primary" />}
+                        <img src={p.car.photo_url} alt={p.car.mark}/>
+                        {/* {Icon && <Icon size={20} className="text-primary" />} */}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">{ticket.vehicle}</p>
+                        <p className="text-sm font-semibold text-slate-900">{p.car.mark} {p.car.model} </p>
                         <p className="text-xs text-slate-500 font-mono">
-                          {ticket.plate} • {ticket.fuelType}
+                          {p.car.imatriculation} • {p.car.mark} 
+                          {/* {ticket.fuelType} */}
                         </p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-xs">
-                    <p className="text-sm text-slate-700 line-clamp-2">{ticket.description}</p>
+                    <p className="text-sm text-slate-700 line-clamp-2">{p.description}</p>
                   </TableCell>
                   <TableCell>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit ${priority.badge}`}>
                       <span className={`w-2 h-2 rounded-full ${priority.dot}`} />
-                      {ticket.priority}
+                      {p.priority}
                     </span>
                   </TableCell>
-                  <TableCell className="font-semibold text-primary">{ticket.cost}</TableCell>
+                  <TableCell className="font-semibold text-primary">{p.panneAmount}</TableCell>
                   <TableCell className="min-w-[160px]">
-                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-1">
-                      <div className={`h-full ${priority.bar}`} style={{ width: `${ticket.progress}%` }} />
-                    </div>
-                    <span className="text-xs text-slate-500">{ticket.progressLabel}</span>
+                    {/* <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-1"> */}
+                      {/* <div className={`h-full ${priority.bar}`} style={{ width: `${ticket.progress}%` }} /> */}
+                      <div className={`h-full `}  >{p.status} </div>
+                    {/* </div> */}
+                    {/* <span className="text-xs text-slate-500">{ticket.progressLabel}</span> */}
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">

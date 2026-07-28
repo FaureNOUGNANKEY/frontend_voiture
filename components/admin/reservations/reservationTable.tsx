@@ -217,7 +217,7 @@ function getInitials(firstname: string, lastname: string) {
               <TableRow key={r.id} className="hover:bg-slate-50 transition-colors group">
                 <TableCell>
                   <span className="font-mono text-xs text-primary bg-blue-50 px-2 py-1 rounded">
-                    {/* {r.reference} */}
+                    RES-000000{r.id}
                   </span>
                 </TableCell>
 
