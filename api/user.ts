@@ -6,10 +6,15 @@ export const getUsersApi = async () => {
     return response.data;
 };
 
+// Récupérer un utilisateur
+export const getUserApi = async (id: string) => {
+  const response = await api.get(`/users/${id}`);
+  return response.data;
+}
 //ajouter un utilisateur
-export const addUserApi = async (formDate :FormData)=>{
-    const response = await api.post("/users",FormData,{
-        headers:{
+export const addUserApi = async (formData : FormData)=> {
+    const response = await api.post("/users", formData,{
+        headers: {
             "Content-Type": "multipart/form-data",
         },
     });

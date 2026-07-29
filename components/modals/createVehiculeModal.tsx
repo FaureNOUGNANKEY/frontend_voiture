@@ -134,7 +134,7 @@ export default function CreateVehiculeModal({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Photo */}
           <div>
-            <Label>Photo du véhicule</Label>
+            <Label>Photo du véhicule <span className="text-red-600">*</span></Label>
             <div className="mt-2">
               {preview ? (
                 <div className="relative w-full h-48 rounded-xl overflow-hidden border">
@@ -168,13 +168,14 @@ export default function CreateVehiculeModal({
                   />
                 </label>
               )}
+              {errors.photo && <p className="text-red-600 text-sm">{errors.photo[0]}</p>}
             </div>
           </div>
 
           {/* Marque + Modèle */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="marque">Marque <span className="text-red-600">*</span></Label>
+              <Label htmlFor="marque">Marque<span className="text-red-600">*</span></Label>
               <Input
                 id="marque"
                 value={formData.mark}
@@ -184,6 +185,7 @@ export default function CreateVehiculeModal({
                 placeholder="Ex: Toyota"
                 required
               />
+              {errors.mark && <p className="text-red-600 text-sm">{errors.mark[0]}</p>}
             </div>
             <div>
               <Label htmlFor="model">Modèle <span className="text-red-600">*</span></Label>
@@ -196,13 +198,14 @@ export default function CreateVehiculeModal({
                 placeholder="Ex: Corolla"
                 required
               />
+              {errors.model && <p className="text-red-600 text-sm">{errors.model[0]}</p>}
             </div>
           </div>
 
           {/* Couleur + Immatriculation */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="couleur">Couleur</Label>
+              <Label htmlFor="couleur">Couleur<span className="text-red-600">*</span></Label>
               <Input
                 id="couleur"
                 value={formData.color}
@@ -211,9 +214,10 @@ export default function CreateVehiculeModal({
                 }
                 placeholder="Ex: Blanc"
               />
+               {errors.color && <p className="text-red-600 text-sm">{errors.color[0]}</p>}
             </div>
             <div>
-              <Label htmlFor="immatriculation">Immatriculation *</Label>
+              <Label htmlFor="immatriculation">Immatriculation<span className="text-red-600">*</span></Label>
               <Input
                 id="immatriculation"
                 value={formData.imatriculation}
@@ -226,6 +230,7 @@ export default function CreateVehiculeModal({
                 placeholder="Ex: AA-123-BB"
                 required
               />
+              {errors.imatriculation && <p className="text-red-600 text-sm">{errors.imatriculation[0]}</p>}
             </div>
           </div>
 
@@ -241,6 +246,7 @@ export default function CreateVehiculeModal({
               placeholder="Description du véhicule..."
               rows={3}
             />
+            {errors.description && <p className="text-red-600 text-sm">{errors.description[0]}</p>}
           </div>
 
           {/* Prix */}
@@ -257,10 +263,11 @@ export default function CreateVehiculeModal({
                 placeholder="Ex: 25000"
                 required
               />
+              {errors.dayAmount && <p className="text-red-600 text-sm">{errors.dayAmount[0]}</p>}
             </div>
             <div>
               <Label htmlFor="prix_au_kilometre">
-                Prix au kilomètre (FCFA)
+                Prix au kilomètre (FCFA)<span className="text-red-600">*</span>
               </Label>
               <Input
                 id="prix_au_kilometre"
@@ -274,13 +281,14 @@ export default function CreateVehiculeModal({
                 }
                 placeholder="Ex: 150"
               />
+              {errors.kmAmount && <p className="text-red-600 text-sm">{errors.kmAmount[0]}</p>}
             </div>
           </div>
 
           {/* État + Categorie + Carburant */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label>État</Label>
+              <Label>État<span className="text-red-600">*</span></Label>
               <Select
                 value={formData.state}
                 onValueChange={(value) =>
@@ -300,7 +308,7 @@ export default function CreateVehiculeModal({
             </div>
 
             <div >
-                <Label >Catégorie</Label>
+                <Label >Catégorie<span className="text-red-600">*</span></Label>
                 <Select value={formData.category_id}
             onValueChange={(value) => setFormData({ ...formData,category_id: Number(value) })}
             >
@@ -315,10 +323,11 @@ export default function CreateVehiculeModal({
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.category_id && <p className="text-red-600 text-sm">{errors.category_id[0]}</p>}
               </div>
 
             <div>
-              <Label>Niveau de carburant</Label>
+              <Label>Niveau de carburant<span className="text-red-600">*</span></Label>
               <Select
                 value={formData.niveauCarburant}
                 onValueChange={(value) =>
@@ -336,13 +345,14 @@ export default function CreateVehiculeModal({
                   <SelectItem value="Plein">Plein</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.niveauCarburant && <p className="text-red-600 text-sm">{errors.niveauCarburant[0]}</p>}
             </div>
           </div>
 
           {/* Places + Portes + Kilométrage */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="nombre_places">Nombre de places</Label>
+              <Label htmlFor="nombre_places">Nombre de places<span className="text-red-600">*</span></Label>
               <Input
                 id="nombre_places"
                 type="number"
@@ -351,10 +361,12 @@ export default function CreateVehiculeModal({
                   setFormData({ ...formData, place: e.target.value })
                 }
                 placeholder="5"
+                required
               />
+              {errors.place && <p className="text-red-600 text-sm">{errors.place[0]}</p>}
             </div>
             <div>
-              <Label htmlFor="nombre_portes">Nombre de portes</Label>
+              <Label htmlFor="nombre_portes">Nombre de portes<span className="text-red-600">*</span></Label>
               <Input
                 id="nombre_portes"
                 type="number"
@@ -363,10 +375,12 @@ export default function CreateVehiculeModal({
                   setFormData({ ...formData, door: e.target.value })
                 }
                 placeholder="4"
+                required
               />
+              {errors.door && <p className="text-red-600 text-sm">{errors.door[0]}</p>}
             </div>
             <div>
-              <Label htmlFor="kilometrage">Kilométrage</Label>
+              <Label htmlFor="kilometrage">Kilométrage<span className="text-red-600">*</span></Label>
               <Input
                 id="kilometrage"
                 type="number"
@@ -375,7 +389,9 @@ export default function CreateVehiculeModal({
                   setFormData({ ...formData, kilometrage: e.target.value })
                 }
                 placeholder="45000"
+                required
               />
+              {errors.kilometrage && <p className="text-red-600 text-sm">{errors.kilometrage[0]}</p>}
             </div>
           </div>
 
@@ -391,6 +407,7 @@ export default function CreateVehiculeModal({
               placeholder="Ex: Rayure légère sur l'aile avant gauche..."
               rows={2}
             />
+            {errors.dommage && <p className="text-red-600 text-sm">{errors.dommage[0]}</p>}
           </div>
 
           <DialogFooter>

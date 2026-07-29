@@ -1,7 +1,10 @@
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CreateUserModal from "@/components/modals/createUserModal";
+import { useState } from "react";
 
-export default function UsersHeader() {
+export default function UsersHeader({ onSuccess }: { onSuccess?: () => void }) {
+  const [createOpen, setCreateOpen] = useState(false);
   return (
     <div className="flex justify-between items-end">
       <div>
@@ -13,10 +16,16 @@ export default function UsersHeader() {
           administrative.
         </p>
       </div>
-      <Button className="gap-2 p-4 shadow-sm">
+      <Button onClick={() => setCreateOpen(true)}  className="gap-2 p-4 shadow-sm">
         <UserPlus size={18} />
         Ajouter un utilisateur
       </Button>
+
+      <CreateUserModal 
+      open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={onSuccess}
+      />
     </div>
   );
 }

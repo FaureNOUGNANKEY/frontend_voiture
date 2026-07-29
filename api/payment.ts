@@ -5,6 +5,11 @@ export const getPaymentsApi = async () => {
   const response = await api.get("/payments");
   return response.data;
 };
+// Récupérer un paiement
+export const getPaymentApi = async (id: string) => {
+  const response = await api.get(`/payments/${id}`);
+  return response.data;
+};
 
 // Ajouter un paiement
 export const addPaymentApi = async (formData: FormData) => {

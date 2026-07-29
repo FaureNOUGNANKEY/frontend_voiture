@@ -31,9 +31,6 @@ export default function DriverHeader({ onSuccess }: { onSuccess?: () => void }) 
       <CreateDriverModal
         open={createOpen}
         onOpenChange={setCreateOpen}
-        // onSuccess={() => {
-          
-        // }}
         onSuccess={onSuccess}
       />
     </div>

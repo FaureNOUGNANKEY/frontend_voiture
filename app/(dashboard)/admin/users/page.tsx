@@ -48,9 +48,9 @@ export default function UsersPage() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 max-w-7xl mx-auto space-y-8">
-          <UsersHeader />
+          <UsersHeader onSuccess={getUsers}/>
           {statistics && <UsersStats statistics={statistics}/>}
-          <UsersTable users={users}  />
+          <UsersTable users={users} onSuccess={getUsers} />
         </div>
       </main>
     </div>

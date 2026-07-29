@@ -6,6 +6,11 @@ export const getInvoicesApi = async () => {
   return response.data;
 };
 
+// Récupérer une facture (invoice)
+export const getInvoiceApi = async (id: string) => {
+  const response = await api.get(`/invoices/${id}`);
+  return response.data;
+}
 // Ajouter une facture
 export const addInvoiceApi = async (formData: FormData) => {
   const response = await api.post("/invoices", formData, {

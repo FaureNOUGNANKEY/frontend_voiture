@@ -6,6 +6,12 @@ export const getDriversApi = async () => {
   return response.data;
 };
 
+// Récupérer un chauffeur (driver)
+export const getDriverApi = async (id: string) => {
+  const response = await api.get(`/drivers/${id}`);
+  return response.data;
+}
+
 // Ajouter un chauffeur
 export const addDriverApi = async (formData: FormData) => {
   const response = await api.post("/drivers", formData, {

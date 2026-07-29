@@ -62,17 +62,16 @@ export default function CreateDriverModal({
     try {
       await addDriverApi(data);
 
-      // if (response.ok) {
-        onSuccess?.();
-        onOpenChange(false);
-        setFormData({
-          lastname: "",
-          firstname: "",
-          phone: "",
-          photo: null,
-        });
-        setPreview(null);
-       }
+      onSuccess?.();
+      onOpenChange(false);
+      setFormData({
+        lastname: "",
+        firstname: "",
+        phone: "",
+        photo: null,
+      });
+      setPreview(null);
+    }
     // } catch (error) {
     //   console.error(error);
     catch (error: any) {
@@ -170,10 +169,10 @@ export default function CreateDriverModal({
                 placeholder="Ex: Jean"
                 required
               />
-              
+              {errors.firstname && <p className="text-red-600 text-sm">{errors.firstname[0]}</p>}
             </div>
           </div>
-
+              
           {/* Téléphone */}
           <div>
             <Label htmlFor="telephone">

@@ -24,61 +24,8 @@ import {
 import { Input } from "@base-ui/react";
 import { useState } from "react";
 import { User } from "@/lib/types";
+import CreateUserModal from "@/components/modals/createUserModal";
 
-
-// export type AppUser = {
-//   id: string;
-//   name: string;
-//   initials: string;
-//   avatarColor: string;
-//   clientId: string;
-//   email: string;
-//   role: UserRole;
-//   joinedAt: string;
-// };
-
-// export const users: AppUser[] = [
-//   {
-//     id: "u1",
-//     name: "Jean Dupont",
-//     initials: "JD",
-//     avatarColor: "bg-blue-100 text-primary",
-//     clientId: "#49201",
-//     email: "jean.dupont@email.com",
-//     role: "Client Premium",
-//     joinedAt: "12 Oct 2023",
-//   },
-//   {
-//     id: "u2",
-//     name: "Marie Laurent",
-//     initials: "ML",
-//     avatarColor: "bg-slate-200 text-slate-700",
-//     clientId: "#49188",
-//     email: "m.laurent@agence.fr",
-//     role: "Client Standard",
-//     joinedAt: "05 Nov 2023",
-//   },
-//   {
-//     id: "u3",
-//     name: "Ahmed Said",
-//     initials: "AS",
-//     avatarColor: "bg-indigo-100 text-indigo-800",
-//     clientId: "#49150",
-//     email: "a.said@logix.com",
-//     role: "Gestionnaire",
-//     joinedAt: "28 Sept 2023",
-//   },
-//   {
-//     id: "u4",
-//     name: "Catherine Leroy",
-//     initials: "CL",
-//     avatarColor: "bg-blue-100 text-primary",
-//     clientId: "#49022",
-//     email: "cleroy@transp.net",
-//     role: "Client Premium",
-//     joinedAt: "15 Juil 2023",
-//   },
-// ];
 function formatDate(isoDate: string) {
   const date = new Date(isoDate);
   return new Intl.DateTimeFormat("fr-FR", {
@@ -89,6 +36,7 @@ function formatDate(isoDate: string) {
 
 interface UserProps{
   users: User[];
+  onSuccess?: () => void;
 }
 export type UserRole = "Client Premium" | "Client" | "admin";
 
@@ -99,7 +47,8 @@ export const ROLE_CLASSES: Record<UserRole, string> = {
 };
 
 // function UsersRows({ data }: { data: typeof users }) {
-function UsersRows({ users }: UserProps) {
+function UsersRows({ users, onSuccess }: UserProps) {
+  const [createOpen, setCreateOpen] = useState(false);
 
   
   return (
@@ -125,6 +74,7 @@ function UsersRows({ users }: UserProps) {
             </div>
           </TableCell>
           <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
+          <TableCell className="text-sm text-slate-600">{user.phone}</TableCell>
           <TableCell>
             <Badge
               className={`${ROLE_CLASSES[user.role]} font-bold hover:${ROLE_CLASSES[user.role]}`}
@@ -137,13 +87,21 @@ function UsersRows({ users }: UserProps) {
           </TableCell>
           <TableCell className="text-right">
             <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div>
               <Button
+                onClick={() => setCreateOpen(true)}
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-blue-900"
               >
                 <Pencil size={18} />
               </Button>
+              <CreateUserModal 
+                    open={createOpen}
+                      onOpenChange={setCreateOpen}
+                      onSuccess={onSuccess}
+                    />
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
@@ -169,7 +127,7 @@ function UsersRows({ users }: UserProps) {
   );
 }
 
-export default function UsersTable({ users }: UserProps) {
+export default function UsersTable({ users,onSuccess }: UserProps) {
 
   const clients = users.filter((u) => u.role !== "admin");
   const admins = users.filter((u) => u.role === "admin");
@@ -242,6 +200,9 @@ export default function UsersTable({ users }: UserProps) {
                     </TableHead>
                     <TableHead className="text-xs font-semibold uppercase">
                       Email
+                    </TableHead>
+                    <TableHead className="text-xs font-semibold uppercase">
+                      Télephone
                     </TableHead>
                     <TableHead className="text-xs font-semibold uppercase">
                       Rôle

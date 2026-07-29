@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Car } from "@/lib/types";
+import { Car, Category } from "@/lib/types";
+import CreateVehiculeModal from "@/components/modals/createVehiculeModal";
 
 // export type Vehicle = {
 //   id: string;
@@ -85,10 +86,13 @@ const STATUS_CLASSES: Record<carStatus, string> = {
 
 interface CarProps {
   cars: Car[];
+  categories :Category[];
 }
 
-export default function VehiclesTable({ cars }: CarProps) {
+export default function VehiclesTable({ cars,categories }: CarProps) {
   const [search, setSearch] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+
 
   const filtered = cars.filter((c) =>
     `${c.mark} ${c.model} ${c.imatriculation}`.toLowerCase().includes(search.toLowerCase())
@@ -176,13 +180,27 @@ export default function VehiclesTable({ cars }: CarProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
+                    <div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary" onClick={() => setCreateOpen(true)} >
                       <Pencil size={18} />
-                    </Button>
+                    </Button >
+
+                    {/* Modal */}
+                      <CreateVehiculeModal
+                        open={createOpen}
+                        onOpenChange={setCreateOpen} 
+                        categories={categories}                              onSuccess={() => {}}
+                          // onSuccess={onSuccess}
+                        />
+
+                    </div>
                     {car.status === "en Panne" ? (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
                         <Eye size={18} />
                       </Button>
+                      
+                      
+
                     ) : (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
                         <TriangleAlert size={18} />

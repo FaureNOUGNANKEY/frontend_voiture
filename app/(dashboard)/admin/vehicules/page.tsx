@@ -64,7 +64,7 @@ export default function VehiculesPage() {
         <div className="p-6 mx-auto">
           <VehiculeHeader categories={categories}/>
           {statistics && <VehiculeKpis statistics={statistics} />}
-          <VehiclesTable cars={cars}/>
+          <VehiclesTable cars={cars} categories={categories}/>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <IncidentsList />

@@ -34,6 +34,7 @@ export const priorityOptions: Priority[] = ["Faible", "Moyenne", "Urgente"];
 
 export default function MaintenanceHeader( {cars, onSuccess} : CarProps ) {
   const [open, setOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
 
   const [formData, setFormData] = useState<{
     car_id: number;
@@ -60,9 +61,17 @@ export default function MaintenanceHeader( {cars, onSuccess} : CarProps ) {
         description: "",
         panneAmount: 0,
       });
-    } catch (error) {
-      console.error("Erreur lors de la création de la panne:", error);
+    }catch (error: any) {
+    if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /pannes :", error.response?.data || error.message);
+      }
     }
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   return (
@@ -135,7 +144,10 @@ export default function MaintenanceHeader( {cars, onSuccess} : CarProps ) {
             <div className="space-y-1.5">
               <Label className="text-slate-500">Description de la panne</Label>
               <Textarea rows={4} placeholder="Décrivez les symptômes et circonstances..." 
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}/>
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              required
+              />
+               {errors.description && <p className="text-red-600 text-sm">{errors.description[0]}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -144,7 +156,10 @@ export default function MaintenanceHeader( {cars, onSuccess} : CarProps ) {
                 <Input type="number" placeholder="0.00" 
                 onChange={(e) =>
                 setFormData({ ...formData, panneAmount: parseFloat(e.target.value) ||0})
-              }/>
+              }
+              required
+              />
+               {errors.panneAmount && <p className="text-red-600 text-sm">{errors.panneAmount[0]}</p>}
               </div>
               {/* <div className="space-y-1.5">
                 <Label className="text-slate-500">Lieu d&apos;immobilisation</Label>
