@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, Car, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,14 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Category } from "@/lib/types";
-import { addCarApi } from "@/api/car";
+import { addCarApi, updateCarApi } from "@/api/car";
 
 interface CarFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   initialData?: any; // pour l'édition
-  categories :Category[];
+  categories: Category[];
 }
 
 
@@ -45,7 +45,7 @@ export default function CreateVehiculeModal({
     model: initialData?.model || "",
     category_id: initialData?.category_id || "",
     color: initialData?.color || "",
-    photo: null as File | null,
+    photo: initialData?.photo || null,
     imatriculation: initialData?.imatriculation || "",
     description: initialData?.description || "",
     dayAmount: initialData?.dayAmount || "",
@@ -62,6 +62,31 @@ export default function CreateVehiculeModal({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        mark: initialData.mark || "",
+        model: initialData.model || "",
+        category_id: initialData.category.id || "",
+        color: initialData.color || "",
+        photo: null,
+        imatriculation: initialData.imatriculation || "",
+        description: initialData.description || "",
+        dayAmount: initialData.dayAmount || "",
+        kmAmount: initialData.kmAmount || "",
+        state: initialData.state || "",
+        place: initialData.place || "",
+        door: initialData.door || "",
+        kilometrage: initialData.kilometrage || "",
+        niveauCarburant: initialData.niveauCarburant || "Plein",
+        dommage: initialData.dommage || "",
+      });
+      setPreview(initialData.photo_url || null);
+      console.log("initial data : ", initialData);
+    }
+  }, [initialData]);
+
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -74,24 +99,33 @@ export default function CreateVehiculeModal({
     e.preventDefault();
     setIsLoading(true);
 
-    // Prépare FormData si tu as une photo
+
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        data.append(key, value as any);
+        if (key === "photo") {
+          if (value instanceof File) {
+            data.append(key, value);
+          }
+        } else {
+          data.append(key, value as any);
+        }
       }
     });
 
     try {
-      await addCarApi(data);
-      
+      if (initialData) {
+        await updateCarApi(initialData.id, data);
+      } else {
+        await addCarApi(data);
+      }
       onSuccess?.();
       onOpenChange(false);
       // Reset form
       setFormData({
         mark: "",
         model: "",
-        category_id : "",
+        category_id: "",
         color: "",
         photo: null,
         imatriculation: "",
@@ -136,10 +170,10 @@ export default function CreateVehiculeModal({
           <div>
             <Label>Photo du véhicule <span className="text-red-600">*</span></Label>
             <div className="mt-2">
-              {preview ? (
+              {preview || formData?.photo ? (
                 <div className="relative w-full h-48 rounded-xl overflow-hidden border">
                   <img
-                    src={preview}
+                    src={preview || formData?.photo}
                     alt="Preview"
                     className="w-full h-full object-cover"
                   />
@@ -214,7 +248,7 @@ export default function CreateVehiculeModal({
                 }
                 placeholder="Ex: Blanc"
               />
-               {errors.color && <p className="text-red-600 text-sm">{errors.color[0]}</p>}
+              {errors.color && <p className="text-red-600 text-sm">{errors.color[0]}</p>}
             </div>
             <div>
               <Label htmlFor="immatriculation">Immatriculation<span className="text-red-600">*</span></Label>
@@ -308,23 +342,27 @@ export default function CreateVehiculeModal({
             </div>
 
             <div >
-                <Label >Catégorie<span className="text-red-600">*</span></Label>
-                <Select value={formData.category_id}
-            onValueChange={(value) => setFormData({ ...formData,category_id: Number(value) })}
-            >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Sélectionner une catégorie..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
+              <Label >Catégorie<span className="text-red-600">*</span></Label>
+              <Select
+                // defaultValue={categories.findLast((e) => e.id === formData.category_id)?.name}
+                value={formData.category_id ? String(formData.category_id) : undefined}
+                onValueChange={(value) => setFormData({ ...formData, category_id: Number(value) })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner une catégorie...">
+                    {categories.findLast((e) => e.id === formData.category_id)?.name}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
                       {c.name}
                     </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.category_id && <p className="text-red-600 text-sm">{errors.category_id[0]}</p>}
-              </div>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.category_id && <p className="text-red-600 text-sm">{errors.category_id[0]}</p>}
+            </div>
 
             <div>
               <Label>Niveau de carburant<span className="text-red-600">*</span></Label>

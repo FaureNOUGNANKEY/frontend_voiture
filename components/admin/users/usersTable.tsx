@@ -37,6 +37,7 @@ function formatDate(isoDate: string) {
 interface UserProps{
   users: User[];
   onSuccess?: () => void;
+  onEdit: (id: number) => void;
 }
 export type UserRole = "Client Premium" | "Client" | "admin";
 
@@ -46,9 +47,9 @@ export const ROLE_CLASSES: Record<UserRole, string> = {
   "admin": "bg-indigo-100 text-indigo-800",
 };
 
-// function UsersRows({ data }: { data: typeof users }) {
-function UsersRows({ users, onSuccess }: UserProps) {
+function UsersRows({ users, onSuccess,onEdit }: UserProps) {
   const [createOpen, setCreateOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   
   return (
@@ -86,19 +87,25 @@ function UsersRows({ users, onSuccess }: UserProps) {
             {formatDate(user.created_at)}
           </TableCell>
           <TableCell className="text-right">
-            <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex justify-end gap-1 opacity-100 transition-opacity">
               <div>
               <Button
-                onClick={() => setCreateOpen(true)}
+                onClick={() => {
+                  setCreateOpen(true);
+                  setSelectedUser(user);
+                  onEdit(user.id);
+                }}
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-blue-900"
               >
                 <Pencil size={18} />
               </Button>
+              {/* Modal */}
               <CreateUserModal 
-                    open={createOpen}
+                      open={createOpen}
                       onOpenChange={setCreateOpen}
+                      initialData={selectedUser}
                       onSuccess={onSuccess}
                     />
               </div>
@@ -127,7 +134,7 @@ function UsersRows({ users, onSuccess }: UserProps) {
   );
 }
 
-export default function UsersTable({ users,onSuccess }: UserProps) {
+export default function UsersTable({ users,onSuccess,onEdit }: UserProps) {
 
   const clients = users.filter((u) => u.role !== "admin");
   const admins = users.filter((u) => u.role === "admin");
@@ -216,7 +223,11 @@ export default function UsersTable({ users,onSuccess }: UserProps) {
                   </TableRow>
                 </TableHeader>
                 {/* <UsersRows data={tab === "clients" ? clients : admins} /> */}
-                <UsersRows users={tab === "clients" ? filteredClients : filteredAdmins} />
+                <UsersRows
+                  users={tab === "clients" ? filteredClients : filteredAdmins}
+                  onSuccess={onSuccess}
+                  onEdit={onEdit}
+                />
 
               </Table>
             </div>

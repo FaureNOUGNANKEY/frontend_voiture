@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Car, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addUserApi } from "@/api/user";
+import { addUserApi, updateUserApi } from "@/api/user";
 
 interface CreateUserModalProps {
   open: boolean;
@@ -51,16 +51,36 @@ export default function CreateUserModal({
     pieceType: initialData?.pieceType || "",
     pieceNumber: initialData?.pieceNumber || "",
     address: initialData?.address || "",
-    photo: initialData?.photo || "",
+    photo: initialData?.photo || null,
     phone: initialData?.phone || "",
     role: initialData?.role|| "",
     email: initialData?.email || "",
-    password: initialData?.password || "",
+    password: initialData?.password || "00000000",
   });
 
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+
+  useEffect(() => {
+    if (initialData){
+      setFormData({
+      lastname: initialData?.lastname|| "",
+      firstname: initialData?.firstname || "",
+      type: initialData?.type || "",
+      pieceType: initialData?.pieceType || "",
+      pieceNumber: initialData?.pieceNumber || "",
+      address: initialData?.address || "",
+      photo: initialData?.photo || "",
+      phone: initialData?.phone || "",
+      role: initialData?.role|| "",
+      email: initialData?.email || "",
+      password: initialData?.password || "00000000",
+    });
+    setPreview(initialData.photo_url || null);
+    console.log("initial data : ", initialData);
+    }
+  },[initialData])
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,30 +97,39 @@ export default function CreateUserModal({
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        data.append(key, value as any);
+        if (key === "photo") {
+          if (value instanceof File) {
+            data.append(key, value);
+          }
+        } else {
+          data.append(key, value as any);
+        }
       }
     });
 
     try {
-        await addUserApi(data);
-
-        onSuccess?.();
-        onOpenChange(false);
-        setFormData({
-          lastname: "",
-          firstname: "",
-          type: "",
-          pieceType: "",
-          pieceNumber:"",
-          address: "",
-          photo: null,
-          phone: "",
-          role: "",
-          email: "",
-          password:"12345678",
-        });
-        setPreview(null);
+      if(initialData){
+        await updateUserApi(initialData.id,data)
+      }else{
+         await addUserApi(data);
       }
+      onSuccess?.();
+      onOpenChange(false);
+      setFormData({
+        lastname: "",
+        firstname: "",
+        type: "",
+        pieceType: "",
+        pieceNumber:"",
+        address: "",
+        photo: null,
+        phone: "",
+        role: "",
+        email: "",
+        password:"00000000",
+      });
+      setPreview(null);
+    }
     catch (error: any) {
     if (error.response && error.response.data.errors) {
         // récupèration des erreurs de validation
@@ -119,7 +148,7 @@ export default function CreateUserModal({
         <DialogHeader>
           <DialogTitle className="text-lg flex items-center gap-2">
             <User className="w-6 h-6" />
-            {initialData ? "Modifier un utilisateur" : "Nouveau utilisateur"}
+            {initialData ? "Modifier l'utilisateur" : "Nouveau utilisateur"}
           </DialogTitle>
           <DialogDescription>
             Remplissez les informations de l'utilisateur
@@ -131,10 +160,10 @@ export default function CreateUserModal({
           <div>
             <Label>Photo de l'utilisateur</Label>
             <div className="mt-2">
-              {preview ? (
+              {preview ||formData?.photo ?(
                 <div className="relative w-full h-48 rounded-xl overflow-hidden border">
                   <img
-                    src={preview}
+                    src={preview||formData?.photo }
                     alt="Preview"
                     className="w-full h-full object-cover"
                   />
@@ -163,6 +192,7 @@ export default function CreateUserModal({
                   />
                 </label>
               )}
+              {errors.photo && <p className="text-red-600 text-sm">{errors.photo[0]}</p>}
             </div>
           </div>
           
@@ -342,9 +372,9 @@ export default function CreateUserModal({
                     </SelectContent>
                 </Select>
                 </div>
-                <div>
+                {/* <div>
                     <Label htmlFor="password">
-                        Mots de passe par défaut <span className="text-red-600">*</span>
+                        Mot de passe par défaut <span className="text-red-600">*</span>
                     </Label>
                     <Input
                         id="password"
@@ -356,7 +386,7 @@ export default function CreateUserModal({
                         required
                     />
                     {errors.password && <p className="text-red-600 text-sm">{errors.password[0]}</p>}
-                    </div>
+                    </div> */}
             </div>
           <DialogFooter>
             <Button

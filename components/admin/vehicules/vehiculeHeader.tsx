@@ -6,8 +6,9 @@ import { useState } from "react";
 
 interface CategoryProps{
   categories :Category[];
+   onSuccess?: () => void;
 }
-export default function VehiculeHeader( {categories} : CategoryProps ) {
+export default function VehiculeHeader( {categories, onSuccess} : CategoryProps ) {
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
@@ -38,7 +39,7 @@ export default function VehiculeHeader( {categories} : CategoryProps ) {
         categories={categories}
         open={createOpen}
         onOpenChange={setCreateOpen}
-        onSuccess={() => {}}
+        onSuccess={onSuccess}
       />
     </div>
   );

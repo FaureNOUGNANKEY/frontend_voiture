@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { addDriverApi } from "@/api/driver";
+import { addDriverApi, updateDriverApi } from "@/api/driver";
 
 interface CreateDriverModalProps {
   open: boolean;
@@ -32,12 +32,25 @@ export default function CreateDriverModal({
     lastname: initialData?.lastname || "",
     firstname: initialData?.firstname || "",
     phone: initialData?.phone || "",
-    photo: null as File | null,
+    photo: initialData?.photo || null,
   });
 
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+
+  useEffect(() => {
+    if (initialData){
+      setFormData({
+        lastname: initialData.lastname || "",
+        firstname: initialData.firstname || "",
+        phone: initialData.phone || "",
+        photo: null,
+      });
+      setPreview(initialData.photo_url || null);
+      console.log("initial data : ", initialData);
+    }
+  },[initialData]);
 
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,13 +68,23 @@ export default function CreateDriverModal({
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        data.append(key, value as any);
+        if (key === "photo") {
+          if (value instanceof File) {
+            data.append(key, value);
+          }
+        } else {
+          data.append(key, value as any);
+        }
       }
     });
 
     try {
-      await addDriverApi(data);
-
+      if (initialData){
+        await updateDriverApi(initialData.id, data)
+        console.log("data",data)
+      }else{
+        await addDriverApi(data);
+      }
       onSuccess?.();
       onOpenChange(false);
       setFormData({
@@ -71,10 +94,7 @@ export default function CreateDriverModal({
         photo: null,
       });
       setPreview(null);
-    }
-    // } catch (error) {
-    //   console.error(error);
-    catch (error: any) {
+    }catch (error: any) {
     if (error.response && error.response.data.errors) {
         // récupèration des erreurs de validation
         setErrors(error.response.data.errors);
@@ -104,10 +124,10 @@ export default function CreateDriverModal({
           <div>
             <Label>Photo du chauffeur</Label>
             <div className="mt-2">
-              {preview ? (
+              {preview || formData?.photo ? (
                 <div className="relative w-full h-48 rounded-xl overflow-hidden border">
                   <img
-                    src={preview}
+                    src={preview || formData?.photo}
                     alt="Preview"
                     className="w-full h-full object-cover"
                   />

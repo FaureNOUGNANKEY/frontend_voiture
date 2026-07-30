@@ -45,7 +45,7 @@ export default function DriversKpis({ statistics }: StatisticProps) {
     },
     {
       id: "unAvailable",
-      label: "Indisponible",
+      label: "Indisponibles",
       value: unAvailable.toString(),
       alert: "Attention",
       icon: "UserX",

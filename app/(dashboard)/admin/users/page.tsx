@@ -1,7 +1,7 @@
 "use client"
 
 import { getStatisticsApi } from "@/api/statistic";
-import { getUsersApi } from "@/api/user";
+import { getUserApi, getUsersApi } from "@/api/user";
 import AdminFooter from "@/components/admin/adminFooter";
 import AdminHeader from "@/components/admin/adminHeader";
 import Sidebar from "@/components/admin/sidebar";
@@ -17,6 +17,7 @@ export default function UsersPage() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [statistics, setStatistics] = useState<Statistics | null>(null)
+  const [selecteduser, setSelectedUser] = useState<User | null>(null)
 
   const getUsers = async () => {
     try {
@@ -38,6 +39,16 @@ export default function UsersPage() {
     }
   }
 
+  const getUser = async (id: string | number) => {
+    try {
+      const response = await getUserApi(String(id));
+      setSelectedUser(response.data);
+      console.log(" Fetched User :", response.data);
+    } catch (error){
+      console.error("Error fetching User:",error)
+    }
+  }
+
   useEffect(() => {
     getUsers();
     getStatistics();
@@ -50,7 +61,7 @@ export default function UsersPage() {
         <div className="p-6 max-w-7xl mx-auto space-y-8">
           <UsersHeader onSuccess={getUsers}/>
           {statistics && <UsersStats statistics={statistics}/>}
-          <UsersTable users={users} onSuccess={getUsers} />
+          <UsersTable users={users} onEdit={(id: number | string) => getUser(id)} onSuccess={getUsers} />
         </div>
       </main>
     </div>

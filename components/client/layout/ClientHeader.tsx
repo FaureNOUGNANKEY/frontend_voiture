@@ -103,12 +103,8 @@ export default function ClientHeader() {
           {/* Desktop Profile */}
           <div className="hidden md:block">
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-full"
-                >
-                  <Avatar className="h-8 w-8 border-2 border-primary/20">
+              <DropdownMenuTrigger className={"flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-full"}>
+                <Avatar className="h-8 w-8 border-2 border-primary/20">
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                       {user.initials}
@@ -123,7 +119,6 @@ export default function ClientHeader() {
                     </p>
                   </div>
                   <ChevronDown className="h-4 w-4 text-gray-400 hidden lg:block" />
-                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem onClick={() => router.push('/client/profile')} className="cursor-pointer">
@@ -145,14 +140,8 @@ export default function ClientHeader() {
 
           {/* ==================== MOBILE MENU ==================== */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger>
-              <Button
-                variant="outline"
-                size="icon"
-                className="md:hidden border-gray-200 hover:bg-gray-50"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
+            <SheetTrigger className={"md:hidden border-gray-200 hover:bg-gray-50"}>
+              <Menu className="h-5 w-5" />
             </SheetTrigger>
 
             <SheetContent side="right" className="w-80 sm:w-96 bg-white p-0">

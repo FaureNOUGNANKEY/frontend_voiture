@@ -7,7 +7,7 @@ import IncidentsList from "@/components/admin/vehicules/incidentList";
 import UpcomingMaintenance from "@/components/admin/vehicules/upcomingMaintenance";
 import VehiculeKpis from "@/components/admin/drivers/driverKpis";
 import { useEffect, useState } from "react";
-import { getDriversApi } from "@/api/driver";
+import { getDriverApi, getDriversApi } from "@/api/driver";
 import { Driver, Statistics } from "@/lib/types";
 import DriversTable from "@/components/admin/drivers/driverTable";
 import DriverHeader from "@/components/admin/drivers/driverHeader";
@@ -16,6 +16,8 @@ import { getStatisticsApi } from "@/api/statistic";
 
 export default function ConducteursPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [statistics, setStatistics] = useState<Statistics | null>(null);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
 
   const getDrivers = async () => {
     try {
@@ -27,7 +29,6 @@ export default function ConducteursPage() {
 
     }
   }
-  const [statistics, setStatistics] = useState<Statistics | null>(null);
 
   const getStatistics = async () => {
     try {
@@ -40,6 +41,15 @@ export default function ConducteursPage() {
     }
   }
   
+  const getDriver = async (id:string | number) => {
+    try {
+      const response = await getDriverApi(String(id));
+      setSelectedDriver(response.data);
+      console.log(" Fetched Driver:", response.data);
+    }catch (error){
+      console.error("Error fetching Driver:",error)
+    }
+  }; 
 
   useEffect(() => {
     getDrivers();
@@ -53,7 +63,7 @@ export default function ConducteursPage() {
           <DriverHeader onSuccess={getDrivers} />
           {statistics && <DriversKpis statistics={statistics} />}
           {/* <DriversKpis statistics={statistics} /> */}
-          <DriversTable drivers={drivers}/>
+          <DriversTable drivers={drivers} onEdit={(id: number | string) =>getDriver(id)} onSuccess={getDrivers}/>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* <IncidentsList /> */}

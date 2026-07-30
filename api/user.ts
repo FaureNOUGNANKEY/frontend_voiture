@@ -22,7 +22,7 @@ export const addUserApi = async (formData : FormData)=> {
 }
 //mettre à jour un utilisateur
 export const updateUserApi = async (id : number, formDate :FormData)=>{
-    const response = await api.post(`/users/${id}?_method=PUT`,FormData,{
+    const response = await api.post(`/users/${id}?_method=PUT`,formDate,{
         headers:{
             "Content-Type": "multipart/form-data",
         },

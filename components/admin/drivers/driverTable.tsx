@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Driver } from "@/lib/types";
+import CreateDriverModal from "@/components/modals/createDriverModal";
 
 
 type driverStatus = "disponible" | "affecté" | "indisponible"|"inactif";
@@ -28,10 +29,15 @@ const STATUS_CLASSES: Record<driverStatus, string> = {
 
 interface DriverProps {
   drivers: Driver[];
+  onSuccess?: () => void;
+  onEdit: (id: number) => void;
 }
 
-export default function DriversTable({ drivers }: DriverProps) {
+export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) {
   const [search, setSearch] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  
 
   const filtered = drivers.filter((d) =>
     `${d.lastname} ${d.firstname} ${d.status}`.toLowerCase().includes(search.toLowerCase())
@@ -119,24 +125,31 @@ export default function DriversTable({ drivers }: DriverProps) {
                     {car.imatriculation}
                   </code> */}
                 </TableCell>
-                <TableCell className="text-right font-mono text-sm text-slate-700">
-                  {/* {car.kilometrage} */}
-                </TableCell>
+                {/* <TableCell className="text-right font-mono text-sm text-slate-700">
+                  {car.kilometrage}
+                </TableCell> */}
                 <TableCell>
-                  {/* <div className="flex justify-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
-                      <Pencil size={18} />
-                    </Button>
-                    {car.status === "En Panne" ? (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
-                        <Eye size={18} />
+                  <div className="flex justify-center gap-1">
+                    <div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary" onClick={()=>{
+                        setSelectedDriver(driver);
+                        setCreateOpen(true);
+                        onEdit(driver.id);
+                      }}>
+                        <Pencil size={18} />
                       </Button>
-                    ) : (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
-                        <TriangleAlert size={18} />
-                      </Button>
-                    )}
-                  </div> */}
+                      <CreateDriverModal open={createOpen} 
+                      onOpenChange={setCreateOpen}
+                      initialData={selectedDriver}
+                      onSuccess={onSuccess}                     
+                      />
+
+                    </div>
+
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
+                      <TriangleAlert size={18} />
+                    </Button> 
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

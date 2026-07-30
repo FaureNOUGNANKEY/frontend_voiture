@@ -22,15 +22,21 @@ export const addDriverApi = async (formData: FormData) => {
   return response.data;
 };
 
-// Mettre à jour un chauffeur
+//Mettre à jour un chauffeur
 export const updateDriverApi =  async (id: number, formData: FormData) => {
-  const response = await api.post(`/cars/${id}?_method=PUT`, formData, {
+  const response = await api.post(`/drivers/${id}?_method=PUT`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
   return response.data;
 };
+
+
+// export const updateDriverApi = async (id: number, formData: FormData) => {
+//   const response = await api.post(`/drivers/${id}?_method=PUT`, formData);
+//   return response.data;
+// };
 
 // Supprimer un chauffeur
 export const deleteDriverApi = async (id: number) => {
