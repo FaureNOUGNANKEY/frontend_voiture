@@ -52,13 +52,31 @@ export interface Reservation {
     status: ReservationStatus,
     car : Car,
     driver?: Driver,
-    amount?: number,
+    totalAmount?: number,
     user: User,
     created_at: string,
     updated_at: string 
 }
 export type UserRole = "Client Premium" | "Client" | "admin";
 export interface User {
+    id:number,
+    lastname:string,
+    firstname:string,
+    type: string,
+    pieceType: string,
+    pieceNumber: string,
+    address: string,
+    photo?: string,
+    photo_url?: string,
+    phone: string,
+    active: boolean,
+    role: UserRole,
+    email:string,
+    historic: Historic,
+    created_at: string,
+    updated_at: string 
+}
+export interface Client {
     id:number,
     lastname:string,
     firstname:string,

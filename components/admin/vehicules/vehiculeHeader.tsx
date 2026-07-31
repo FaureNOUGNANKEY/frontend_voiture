@@ -6,7 +6,7 @@ import { useState } from "react";
 
 interface CategoryProps{
   categories :Category[];
-   onSuccess?: () => void;
+  onSuccess?: () => void;
 }
 export default function VehiculeHeader( {categories, onSuccess} : CategoryProps ) {
   const [createOpen, setCreateOpen] = useState(false);

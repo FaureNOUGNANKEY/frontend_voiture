@@ -345,7 +345,7 @@ export default function CreateVehiculeModal({
               <Label >Catégorie<span className="text-red-600">*</span></Label>
               <Select
                 // defaultValue={categories.findLast((e) => e.id === formData.category_id)?.name}
-                value={formData.category_id ? String(formData.category_id) : undefined}
+                value={formData.category_id ? String(formData.category_id) : ""}
                 onValueChange={(value) => setFormData({ ...formData, category_id: Number(value) })}
               >
                 <SelectTrigger className="w-full">

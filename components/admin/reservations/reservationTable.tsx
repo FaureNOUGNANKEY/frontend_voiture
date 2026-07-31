@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, Download, Eye, Pencil, Receipt, History, ShieldCheck, TriangleAlert, BadgeCheck } from "lucide-react";
+import { Search, Filter, Download, Eye, Pencil, Receipt, History, ShieldCheck, TriangleAlert, BadgeCheck, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,112 +21,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { Driver, Reservation } from "@/lib/types";
+import { Car, Driver, Reservation,Client } from "@/lib/types";
+import CreateReservationModal from "@/components/modals/createReservationModal";
 
 type PaymentStatus = "paid" | "pending" | "loyalty";
 type ReservationTimelineState = "active" | "upcoming" | "completed";
-
-/*type Reservation = {
-  id: string;
-  reference: string;
-  client: {
-    name: string;
-    initials: string;
-    subtitle: string;
-    avatarColor: string;
-  };
-  vehicle: {
-    name: string;
-    subtitle: string;
-  };
-  timeline: {
-    range: string;
-    state: ReservationTimelineState;
-    label: string;
-  };
-  financials: {
-    amount: string;
-    note: string;
-    status: PaymentStatus;
-  };
-  driverAssignment:
-    | { type: "select"; current: string; options: Driver[] }
-    | { type: "unassigned"; options: Driver[] }
-    | { type: "confirmed"; name: string };
-};*/
-
-
-/*const reservations: Reservation[] = [
-  {
-    id: "r1",
-    reference: "#RES-2024-901",
-    client: {
-      name: "Jean Dupont",
-      initials: "JD",
-      subtitle: "Membre Fidélité Niv 4",
-      avatarColor: "bg-emerald-100 text-emerald-700",
-    },
-    vehicle: { name: "BMW X5 M-Sport", subtitle: "SUV • AB-123-XY" },
-    timeline: { range: "24 Oct - 28 Oct", state: "active", label: "4 Jours (Actif)" },
-    financials: { amount: "540,00 €", note: "-10% Fidélité appliqué", status: "loyalty" },
-    driverAssignment: {
-      type: "select",
-      current: "Marc Lefebvre (Actif)",
-      options: [
-        { name: "Marc Lefebvre", status: "Active" },
-        { name: "Sarah Benamra", status: "Standby" },
-        { name: "Kevin Dubois", status: "Standby" },
-      ],
-    },
-  },
-  {
-    id: "r2",
-    reference: "#RES-2024-902",
-    client: {
-      name: "Sophie Martin",
-      initials: "SM",
-      subtitle: "Nouveau Client",
-      avatarColor: "bg-slate-100 text-slate-600",
-    },
-    vehicle: { name: "Tesla Model 3", subtitle: "Électrique • EV-555-EL" },
-    timeline: { range: "26 Oct - 27 Oct", state: "upcoming", label: "Demain (En attente)" },
-    financials: { amount: "120,00 €", note: "En attente de paiement", status: "pending" },
-    driverAssignment: {
-      type: "unassigned",
-      options: [
-        { name: "Marc Lefebvre", status: "Standby" },
-        { name: "Sarah Benamra", status: "Available" },
-        { name: "Kevin Dubois", status: "Available" },
-      ],
-    },
-  },
-  {
-    id: "r3",
-    reference: "#RES-2024-885",
-    client: {
-      name: "Thomas Leroy",
-      initials: "TL",
-      subtitle: "Compte Entreprise",
-      avatarColor: "bg-amber-100 text-amber-700",
-    },
-    vehicle: { name: "Peugeot 3008 Hybrid", subtitle: "SUV Compact • FR-777-GH" },
-    timeline: { range: "20 Oct - 25 Oct", state: "completed", label: "Terminé" },
-    financials: { amount: "1 450,00 €", note: "Payé (Stripe)", status: "paid" },
-    driverAssignment: { type: "confirmed", name: "Kevin Dubois" },
-  },
-];
-
-const TIMELINE_CLASSES: Record<Reservation["timeline"]["state"], string> = {
-  active: "text-emerald-600",
-  upcoming: "text-blue-900",
-  completed: "text-slate-400",
-};
-
-const FINANCIAL_CLASSES: Record<Reservation["financials"]["status"], string> = {
-  paid: "text-emerald-600",
-  pending: "text-red-600 italic",
-  loyalty: "text-emerald-600",
-};*/
 
 // 1. Définir les états possibles
 type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
@@ -146,7 +45,7 @@ const AVATAR_COLORS = [
   "bg-pink-100 text-pink-700",
 ];
 
-//calculer et etribut des couleur au avatar dinamiquement 
+//calculer et etribution des couleurs au avatar dinamiquement 
 function getAvatarColor(userName: string) {
   const hash = userName
     .split("")
@@ -156,14 +55,19 @@ function getAvatarColor(userName: string) {
 interface ReservationProps {
   reservations: Reservation[];
   drivers: Driver[];
+  clients:Client[];
+  cars:Car[];
+  onSuccess?: () => void;
+  onEdit: (id: number) => void;
 }
 
-export default function ReservationsTable({ reservations, drivers}: ReservationProps ) {
+export default function ReservationsTable({ reservations, drivers,onEdit,onSuccess,cars,clients}: ReservationProps ) {
   const [search, setSearch] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   const filtered = reservations.filter((r) =>
     `${r.user.lastname}  ${r.car.mark}`
-    // `${r.user.lastname} ${r.reference} ${r.car.mark}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
@@ -255,7 +159,7 @@ function getInitials(firstname: string, lastname: string) {
                     {r.financials.status === "loyalty" && <BadgeCheck size={12} />}
                     {r.financials.note}
                   </div> */}
-                  <div className="font-bold text-slate-900 text-sm">{r.amount}</div>
+                  <div className="font-bold text-slate-900 text-sm">{r.totalAmount}</div>
                   {/* <div className={`flex items-center gap-1 text-[11px] font-semibold ${FINANCIAL_CLASSES[r.financials.status]}`}>
                     {r.financials.status === "loyalty" && <BadgeCheck size={12} />}
                     {r.financials.note}
@@ -263,6 +167,9 @@ function getInitials(firstname: string, lastname: string) {
                 </TableCell>
 
                 <TableCell>
+                  <div className="font-semibold text-slate-900 text-sm">{r.driver?.lastname}</div>
+                  <div className="text-[11px] text-slate-500"> {r.driver?.firstname } </div>
+
                   {/* {r.driverAssignment.type === "select" && (
                     <Select defaultValue={r.driverAssignment.current}>
                       <SelectTrigger className="w-full bg-white">
@@ -305,11 +212,22 @@ function getInitials(firstname: string, lastname: string) {
                 </TableCell>
 
                 <TableCell>
-                  {/* <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {r.timeline.state === "completed" ? (
+                  <div className="flex justify-center gap-1 opacity-100 transition-opacity">
+                    {r.status === "terminée" ? (
                       <>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" 
+                        >
                           <Receipt size={18} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
+                          <History size={18} />
+                        </Button>
+                      </>
+                    ) : r.status === "annulée" ? (
+                      <>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" 
+                        >
+                          <X size={18} />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
                           <History size={18} />
@@ -317,15 +235,27 @@ function getInitials(firstname: string, lastname: string) {
                       </>
                     ) : (
                       <>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500"
+                        onClick={() => {
+                          setCreateOpen(true);
+                          setSelectedReservation(r);
+                          onEdit(r.id);
+                        }}
+                        >
+                          <Pencil size={18} />
+                        </Button>
+                        {/* Modal */}
+                        <CreateReservationModal 
+                            open={createOpen}
+                            onOpenChange={setCreateOpen}
+                            initialData={selectedReservation}
+                            onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}                        />
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
                           <Eye size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                          <Pencil size={18} />
-                        </Button>
                       </>
                     )}
-                  </div> */}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

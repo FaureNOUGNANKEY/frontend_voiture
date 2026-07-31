@@ -46,7 +46,7 @@ export default function KpiCard({ statistics}:StatisticProps ) {
     {
       id: "reservations",
       label: "Réservations Actives",
-      value: statistics.totals.cars,
+      value: statistics.totals.activeReservations,
       delta: "+12%",
       trend: "up",
       icon: "CalendarRange",
