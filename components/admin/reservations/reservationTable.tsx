@@ -146,7 +146,7 @@ function getInitials(firstname: string, lastname: string) {
 
                 <TableCell>
                   <div className="flex flex-col text-[13px]">
-                    <span className="text-slate-900">{r.dateStart} {r.dateBack} </span>
+                    <span className="text-slate-900">{r.dateStart} à {r.dateBack} </span>
                     <span className={`${RESERVATION_CLASSES[r.status]} text-[11px]  font-semibold `}>
                       {r.status}
                     </span>
@@ -233,6 +233,27 @@ function getInitials(firstname: string, lastname: string) {
                           <History size={18} />
                         </Button>
                       </>
+                    ) :  r.driverAmount !== 0 && r.driver == null ? (
+                      <>
+                        <Button variant="ghost" size="icon" className="h-8 w-8  bg-red-300 animate-pulse" 
+                        onClick={() => {
+                          setCreateOpen(true);
+                          setSelectedReservation(r);
+                          onEdit(r.id);
+                        }}
+                        >
+                          <Pencil size={18} />
+                        {/* Modal */}
+                        <CreateReservationModal 
+                            open={createOpen}
+                            onOpenChange={setCreateOpen}
+                            initialData={selectedReservation}
+                            onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
+                          <History size={18} />
+                        </Button>
+                      </>
                     ) : (
                       <>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500"
@@ -249,7 +270,7 @@ function getInitials(firstname: string, lastname: string) {
                             open={createOpen}
                             onOpenChange={setCreateOpen}
                             initialData={selectedReservation}
-                            onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}                        />
+                            onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
                           <Eye size={18} />
                         </Button>

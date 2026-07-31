@@ -170,3 +170,13 @@ export interface Statistics {
   reservationActivity: ReservationActivity[];
 }
 
+export interface Estimate {
+  days: number;
+  driverDailyRate: number;
+  carAmount: number;
+  reductionAmount: number;
+  driverAmount: number;
+  tvaAmount: number;
+  totalAmount: number;
+}
+

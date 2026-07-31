@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import {
   Calendar,
   User,
@@ -20,10 +20,14 @@ import { Input } from "@/components/ui/input";
 import Stepper from "@/components/ui/stepper";
 import router from "next/router";
 import { useParams } from "next/navigation";
+import { getCarApi } from "@/api/car";
+import { Car, Estimate } from "@/lib/types";
+import { estimateReservationApi } from "@/api/estimate";
+import { addReservationApi } from "@/api/seservation";
 
 export default function ReservationDetails() {
-  const [driveOption, setDriveOption] = useState<"self" | "professional">(
-    "self",
+  const [driveOption, setDriveOption] = useState<"reservation" | "leasing">(
+    "reservation",
   );
   const [pickupDate, setPickupDate] = useState("2024-11-20T10:00");
   const [returnDate, setReturnDate] = useState("2024-11-25T10:00");
@@ -38,11 +42,119 @@ export default function ReservationDetails() {
   const [saveCard, setSaveCard] = useState(false);
   const {id} = useParams();
 
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+
+  const getCar = async (id: string | number) => {
+      try {
+        const response = await getCarApi(String(id));
+        setSelectedCar(response.data);
+        console.log("Fetched car:", response.data);
+      } catch (error) {
+        console.error("Error fetching car:", error);
+      }
+    };
+
+  useEffect(() => {
+    if (id) {
+      getCar(id as string);
+    }
+  }, [id]);
   
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   
-  const total = 489000;
+  const reservationData = {
+    car_id: selectedCar?.id,
+    dateStart: pickupDate,
+    dateBack: returnDate,
+    type: driveOption,
+  };
+
+  const buildReservationFormData = (): FormData => {
+    const data = new FormData();
+    if (reservationData.car_id !== undefined) {
+      data.append("car_id", String(reservationData.car_id));
+    }
+    // data.append("user_id",String(reservationData.user_id))
+    data.append("user_id",String(4))// récupéré depuis login ou localStorage
+    data.append("dateStart", reservationData.dateStart);
+    data.append("dateBack", reservationData.dateBack);
+    data.append("type", reservationData.type);
+    return data;
+  };
+   
+  const [formData, setFormData] = useState({
+    user_id: 7, // récupéré depuis login ou localStorage
+    car_id: "",
+    driver_id: "",
+    dateStart: "",
+    dateBack: "",
+    type: "leasing",
+  });
+  
+  const [estimate, setEstimate] = useState<Estimate | null>(null);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const fetchEstimate = async () => {
+    try {
+      const response = await estimateReservationApi(formData);
+      setEstimate(response);
+      console.log("estimate reçu :", response);
+    } catch (error: any) {
+      if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /reservations/estimate:", error.response?.data || error.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCar?.id && pickupDate && returnDate) {
+      setFormData({
+        user_id: 7,
+        car_id: String(selectedCar.id),
+        driver_id: "", // ou null si pas de chauffeur
+        dateStart: pickupDate,
+        dateBack: returnDate,
+        type: driveOption,
+      });
+    }
+  }, [selectedCar, pickupDate, returnDate, driveOption]);
+
+
+  useEffect(() => {
+    if (formData.car_id && formData.dateStart && formData.dateBack) {
+      fetchEstimate();
+    }
+  }, [formData]);
+  console.log(reservationData);
+
+  //créer la reservation 
+  const handleConfirm = async () => {
+    try {
+      const response = await addReservationApi(buildReservationFormData());
+      console.log("Réservation créée :", response);
+      alert("Votre réservation a été confirmée !");
+      setCurrentStep(3); 
+    } catch (error: any) {
+      if (error.response && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /reservations:", error.response?.data || error.message);
+      }
+    }
+  };
+
 
   return (
+    
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-6xl mx-auto px-6">
         {/* Stepper */}
@@ -105,9 +217,9 @@ export default function ReservationDetails() {
                   <div className="grid md:grid-cols-2 gap-4">
                     {/* Card Conduite Autonome */}
                     <div
-                      onClick={() => setDriveOption("self")}
+                      onClick={() => setDriveOption("reservation")}
                       className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                        driveOption === "self"
+                        driveOption === "reservation"
                           ? "border-primary bg-blue-50"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
@@ -123,12 +235,12 @@ export default function ReservationDetails() {
                         </div>
                         <div
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            driveOption === "self"
+                            driveOption === "reservation"
                               ? "border-primary"
                               : "border-gray-300"
                           }`}
                         >
-                          {driveOption === "self" && (
+                          {driveOption === "reservation" && (
                             <div className="w-3 h-3 bg-primary rounded-full" />
                           )}
                         </div>
@@ -137,9 +249,9 @@ export default function ReservationDetails() {
 
                     {/* Card Chauffeur Professionnel */}
                     <div
-                      onClick={() => setDriveOption("professional")}
+                      onClick={() => setDriveOption("leasing")}
                       className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                        driveOption === "professional"
+                        driveOption === "leasing"
                           ? "border-primary bg-blue-50"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
@@ -150,17 +262,17 @@ export default function ReservationDetails() {
                             Chauffeur Professionnel
                           </h3>
                           <p className="text-sm text-gray-600 mt-1">
-                            Ajoutez un chauffeur certifié (+45 000 FCFA/jour)
+                            Ajoutez un chauffeur certifié (+ {estimate?.driverDailyRate} FCFA/jour)
                           </p>
                         </div>
                         <div
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            driveOption === "professional"
+                            driveOption === "leasing"
                               ? "border-primary"
                               : "border-gray-300"
                           }`}
                         >
-                          {driveOption === "professional" && (
+                          {driveOption === "leasing" && (
                             <div className="w-3 h-3 bg-primary rounded-full" />
                           )}
                         </div>
@@ -190,7 +302,7 @@ export default function ReservationDetails() {
                         </div>
                       </div>
                       <p className="font-medium text-green-600">
-                        15 000 FCFA /jour
+                        {selectedCar?.dayAmount} FCFA /jour
                       </p>
                     </div>
 
@@ -215,9 +327,9 @@ export default function ReservationDetails() {
                 <Card className="overflow-hidden">
                   <div className="h-64 bg-gray-100 relative">
                     <img
-                      src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d"
-                      //src={car?.photo_url}
-                      //alt={`${car?.mark} ${car?.model}`}
+                      // src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d"
+                      src={selectedCar?.photo_url}
+                      alt={`${selectedCar?.mark} ${selectedCar?.model}`}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -227,7 +339,7 @@ export default function ReservationDetails() {
                       PREMIUM EXECUTIVE
                     </div>
                     <h3 className="text-2xl font-bold mt-1">
-                      {/* {car?.mark} {car?.model} */}
+                      {selectedCar?.mark} {selectedCar?.model}
                     </h3>
                     <p className="text-gray-500">
                       100% Électrique • Transmission Intégrale
@@ -236,11 +348,11 @@ export default function ReservationDetails() {
                     <div className="mt-8 space-y-4 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Tarif journalier</span>
-                        {/* <span className="font-medium"> {car?.dayAmount} FCFA </span> */}
+                        <span className="font-medium"> {selectedCar?.dayAmount} FCFA </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Durée</span>
-                        <span className="font-medium">5 jours</span>
+                        <span className="font-medium"> {estimate?.days} jours </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Assurance</span>
@@ -252,7 +364,7 @@ export default function ReservationDetails() {
                       <div className="flex justify-between items-end">
                         <div>
                           <p className="text-sm text-gray-500">TOTAL ESTIMÉ</p>
-                          <p className="text-4xl font-bold">675 000 FCFA</p>
+                          <p className="text-4xl font-bold"> {estimate?.totalAmount} FCFA</p>
                         </div>
                         <p className="text-sm text-gray-500">TTC</p>
                       </div>
@@ -273,7 +385,8 @@ export default function ReservationDetails() {
                 Retour au catalogue
               </Button>
 
-              <Button onClick={() => setCurrentStep(3)} size="lg" className="px-12 py-7 text-lg">
+              {/* <Button onClick={() => setCurrentStep(3) } size="lg" className="px-12 py-7 text-lg"> */}
+              <Button onClick={handleConfirm } size="lg" className="px-12 py-7 text-lg">
                 Confirmer &amp; Payer
               </Button>
             </div>
@@ -411,9 +524,9 @@ export default function ReservationDetails() {
                     <div className="space-y-4">
                       <div className="flex justify-between">
                         <span className="text-gray-600">
-                          Location (5 jours)
+                          Location ( {estimate?.days} jours)
                         </span>
-                        <span>345 000 FCFA</span>
+                        <span> {estimate?.carAmount} FCFA</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Assurance Premium</span>
@@ -421,13 +534,17 @@ export default function ReservationDetails() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">TVA (20%)</span>
-                        <span>81 500 FCFA</span>
+                        <span> {estimate?.tvaAmount} FCFA</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Réduction</span>
+                        <span> {estimate?.reductionAmount} FCFA</span>
                       </div>
 
                       <div className="border-t pt-6 mt-6">
                         <div className="flex justify-between text-xl font-semibold">
                           <span>Total à payer</span>
-                          <span className="text-primary">489 000 FCFA</span>
+                          <span className="text-primary"> {estimate?.totalAmount} FCFA</span>
                         </div>
                       </div>
                     </div>
