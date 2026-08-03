@@ -13,7 +13,7 @@ type Status = "idle" | "loading" | "success";
 export default function UserLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
-   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -61,6 +61,7 @@ export default function UserLoginForm() {
   return (
     <div className="bg-white border border-slate-200 p-8 rounded-xl shadow-sm">
       <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+        {globalError && ( <p className="text-red-600 text-sm text-center mt-2">{globalError}</p>)}
         <div className="space-y-2">
           <Label htmlFor="email" className="text-slate-500">
             Adresse e-mail
@@ -138,7 +139,7 @@ export default function UserLoginForm() {
             </>
           )}
         </Button>
-        {globalError && ( <p className="text-red-600 text-sm text-center mt-2">{globalError}</p>)}
+        
 
       </form>
     </div>
