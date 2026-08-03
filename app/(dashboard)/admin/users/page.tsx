@@ -19,6 +19,19 @@ export default function UsersPage() {
   const [statistics, setStatistics] = useState<Statistics | null>(null)
   const [selecteduser, setSelectedUser] = useState<User | null>(null)
 
+// Quand un client s’inscrit :
+  const handleSuccess = async (newUser?: User) => {
+  if (newUser) {
+    // Ajout direct au state si on reçoit un utilisateur
+    setUsers((prev) => [...prev, newUser]);
+  }
+
+  // Re-fetch pour être sûr que la liste est à jour
+  await getUsers();
+};
+
+
+
   const getUsers = async () => {
     try {
       const response = await getUsersApi();
@@ -61,7 +74,7 @@ export default function UsersPage() {
         <div className="p-6 max-w-7xl mx-auto space-y-8">
           <UsersHeader onSuccess={getUsers}/>
           {statistics && <UsersStats statistics={statistics}/>}
-          <UsersTable users={users} onEdit={(id: number | string) => getUser(id)} onSuccess={getUsers} />
+          <UsersTable users={users} onEdit={(id: number | string) => getUser(id)} onSuccess={handleSuccess}  />
         </div>
       </main>
     </div>

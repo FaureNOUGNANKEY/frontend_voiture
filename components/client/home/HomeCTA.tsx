@@ -1,7 +1,10 @@
 // components/home/CTA.tsx
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function HomeCTA() {
+  const router = useRouter();
+  
   return (
     <section className="bg-primary text-white py-16">
       <div className="max-w-4xl mx-auto text-center px-6">
@@ -13,10 +16,11 @@ export default function HomeCTA() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="xl" variant="secondary" className="text-primary font-bold text-lg px-10">
+          <Button size="lg" variant="secondary" className="text-primary font-bold text-lg px-10"
+          onClick={() => router.push("/register-client")}>
             Créer un compte
           </Button>
-          <Button size="xl" variant="outline" className="text-lg px-10 border-white text-white hover:bg-white">
+          <Button size="lg" variant="outline" className="text-lg px-10 border-white text-white hover:bg-white">
             Aide & Support
           </Button>
         </div>
