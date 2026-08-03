@@ -6,6 +6,12 @@ export const getReservationsApi = async () => {
   return response.data;  
 };
 
+// Récupérer une réservation
+export const getReservationApi = async (id: string) => {
+  const response = await api.get(`/reservations/${id}`);
+  return response.data;
+}
+
 // Ajouter une réservation
 export const addReservationApi = async (formData: FormData) => {
   const response = await api.post("/reservations", formData, {

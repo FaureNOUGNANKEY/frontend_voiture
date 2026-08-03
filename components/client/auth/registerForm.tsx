@@ -27,6 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { clientType } from "@/components/modals/createUserModal";
+import { registerApi } from "@/api/authApi";
 
 type Status = "idle" | "loading" | "success";
 
@@ -35,31 +37,98 @@ export const identityDocumentTypes = [
   "Passeport",
   "Permis de conduire",
 ];
- 
-export const userRoles = ["Client", "Chauffeur", "Agent"];
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+
+  const [formData, setFormData] = useState({
+    lastname: "",
+    firstname: "",
+    email: "",
+    phone: "",
+    password: "",
+    pieceType: "",
+    pieceNumber: "",
+    address: "",
+    type: "",
+    role: "client",
+    photo: null as File | null,
+  });
+
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPhotoPreview(url);
+    if (file) {
+      setFormData({ ...formData, photo: file });
+      setPhotoPreview(URL.createObjectURL(file));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock : à remplacer par un vrai appel API de création de compte.
-    setStatus("loading");
-    setTimeout(() => {
-      setStatus("success");
-      setTimeout(() => setStatus("idle"), 1500);
-    }, 1500);
-  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setStatus("loading");
+
+  const data = new FormData();
+  Object.entries(formData).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      if (key === "photo") {
+        if (value instanceof File) {
+          data.append(key, value);
+        }
+      } else {
+        data.append(key, value as any);
+      }
+    }
+  });
+console.log("Données du formulaire :", Object.fromEntries(data.entries()));
+  try {
+    const response = await registerApi(data);
+    console.log("Compte créé :", response.data);
+
+    setStatus("success");
+    setTimeout(() => setStatus("idle"), 1500);
+
+    // Reset du formulaire
+    setFormData({
+      lastname: "",
+      firstname: "",
+      type: "",
+      pieceType: "",
+      pieceNumber: "",
+      address: "",
+      photo: null,
+      phone: "",
+      role: "client",
+      email: "",
+      password: "",
+    });
+    setPhotoPreview(null);
+  }catch (error: any) {
+    if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+        setStatus("idle");
+      } else {
+        console.error("Erreur API /register :", error.response?.data || error.message);
+      }
+    }
+};
+
+
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // Mock : à remplacer par un vrai appel API de création de compte.
+  //   setStatus("loading");
+  //   setTimeout(() => {
+  //     setStatus("success");
+  //     setTimeout(() => setStatus("idle"), 1500);
+  //   }, 1500);
+  // };
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
@@ -99,7 +168,11 @@ export default function RegisterForm() {
             </Label>
             <div className="relative">
               <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="lastName" required placeholder="Dupont" className="pl-10" />
+              <Input id="lastName"
+              value={formData.lastname}
+  onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
+               required placeholder="Dupont" className="pl-10" />
+              {errors.lastname && <p className="text-red-600 text-sm">{errors.lastname[0]}</p>} 
             </div>
           </div>
           <div className="space-y-1.5">
@@ -108,7 +181,11 @@ export default function RegisterForm() {
             </Label>
             <div className="relative">
               <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="firstName" required placeholder="Jean Pierre" className="pl-10" />
+              <Input id="firstName" 
+              value={formData.firstname}
+  onChange={(e) => setFormData({ ...formData, firstname: e.target.value })}
+              required placeholder="Jean Pierre" className="pl-10" />
+              {errors.firstname && <p className="text-red-600 text-sm">{errors.firstname[0]}</p>}
             </div>
           </div>
         </div>
@@ -121,7 +198,11 @@ export default function RegisterForm() {
             </Label>
             <div className="relative">
               <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="email" type="email" required placeholder="jean.dupont@email.com" className="pl-10" />
+              <Input id="email" type="email"
+              value={formData.email} 
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required placeholder="jean.dupont@email.com" className="pl-10" />
+              {errors.email && <p className="text-red-600 text-sm">{errors.email[0]}</p>}
             </div>
           </div>
           <div className="space-y-1.5">
@@ -130,7 +211,12 @@ export default function RegisterForm() {
             </Label>
             <div className="relative">
               <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="phone" type="tel" required placeholder="+33 6 12 34 56 78" className="pl-10" />
+              <Input id="phone" 
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              required placeholder="+33 6 12 34 56 78" className="pl-10" />
+              {errors.phone && <p className="text-red-600 text-sm">{errors.phone[0]}</p>}
             </div>
           </div>
         </div>
@@ -145,10 +231,13 @@ export default function RegisterForm() {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
               placeholder="••••••••"
               className="pl-10 pr-10"
             />
+            {errors.password && <p className="text-red-600 text-sm">{errors.password[0]}</p>}
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
@@ -163,7 +252,10 @@ export default function RegisterForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-slate-500">Type de pièce d&apos;identité</Label>
-            <Select required>
+            <Select 
+            value={formData.pieceType}
+            onValueChange={(value) => setFormData({ ...formData, pieceType: value ?? "" })}
+            required>
               <SelectTrigger className={"w-full"}>
                 <SelectValue placeholder="Sélectionner un type..." />
               </SelectTrigger>
@@ -182,7 +274,10 @@ export default function RegisterForm() {
             </Label>
             <div className="relative">
               <IdCard size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="documentNumber" required placeholder="Ex: 123456789" className="pl-10" />
+              <Input id="documentNumber" 
+              value={formData.pieceNumber}
+  onChange={(e) => setFormData({ ...formData, pieceNumber: e.target.value })}
+              required placeholder="Ex: 123456789" className="pl-10" />
             </div>
           </div>
         </div>
@@ -196,6 +291,8 @@ export default function RegisterForm() {
             <MapPin size={18} className="absolute left-3 top-3 text-slate-400" />
             <Textarea
               id="address"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               required
               rows={2}
               placeholder="15 Avenue des Champs-Élysées, 75008 Paris"
@@ -204,17 +301,20 @@ export default function RegisterForm() {
           </div>
         </div>
 
-        {/* Rôle */}
+        {/* Type de client */}
         <div className="space-y-1.5">
-          <Label className="text-slate-500">Rôle</Label>
-          <Select required>
+          <Label className="text-slate-500">Type de client</Label>
+          <Select 
+          value={formData.type}
+          onValueChange={(value) => setFormData({ ...formData, type: value ?? "" })}
+          required>
             <SelectTrigger className={"w-full"}>
-              <SelectValue placeholder="Sélectionner un rôle..." />
+              <SelectValue placeholder="Sélectionner un type..." />
             </SelectTrigger>
             <SelectContent>
-              {userRoles.map((role) => (
-                <SelectItem key={role} value={role}>
-                  {role}
+              {clientType.map((type) => (
+                <SelectItem key={type} value={type}>
+                  Client {type}
                 </SelectItem>
               ))}
             </SelectContent>

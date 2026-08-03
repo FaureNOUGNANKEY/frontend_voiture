@@ -6,13 +6,20 @@ export const getPannesApi = async () => {
   return response.data;
 };
 
+// Récupérer une panne
+export const getPanneApi = async (id: string) => {
+  const response = await api.get(`/pannes/${id}`);
+  return response.data;
+}
+
 // Ajouter une panne
-export const addPanneApi = async (formData: FormData) => {
-  const response = await api.post("/pannes", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const addPanneApi = async (data: {
+  car_id: number;
+  priority: string;
+  description: string;
+  panneAmount: number;
+}) => {
+  const response = await api.post("/pannes", data);
   return response.data;
 };
 

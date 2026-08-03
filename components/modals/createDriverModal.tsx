@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { addDriverApi, updateDriverApi } from "@/api/driver";
 
 interface CreateDriverModalProps {
   open: boolean;
@@ -28,14 +29,29 @@ export default function CreateDriverModal({
   initialData,
 }: CreateDriverModalProps) {
   const [formData, setFormData] = useState({
-    nom: initialData?.nom || "",
-    prenom: initialData?.prenom || "",
-    telephone: initialData?.telephone || "",
-    photo: null as File | null,
+    lastname: initialData?.lastname || "",
+    firstname: initialData?.firstname || "",
+    phone: initialData?.phone || "",
+    photo: initialData?.photo || null,
   });
 
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+
+  useEffect(() => {
+    if (initialData){
+      setFormData({
+        lastname: initialData.lastname || "",
+        firstname: initialData.firstname || "",
+        phone: initialData.phone || "",
+        photo: null,
+      });
+      setPreview(initialData.photo_url || null);
+      console.log("initial data : ", initialData);
+    }
+  },[initialData]);
+
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,29 +68,39 @@ export default function CreateDriverModal({
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        data.append(key, value as any);
+        if (key === "photo") {
+          if (value instanceof File) {
+            data.append(key, value);
+          }
+        } else {
+          data.append(key, value as any);
+        }
       }
     });
 
     try {
-      const response = await fetch("/api/drivers", {
-        method: "POST",
-        body: data,
-      });
-
-      if (response.ok) {
-        onSuccess?.();
-        onOpenChange(false);
-        setFormData({
-          nom: "",
-          prenom: "",
-          telephone: "",
-          photo: null,
-        });
-        setPreview(null);
+      if (initialData){
+        await updateDriverApi(initialData.id, data)
+        console.log("data",data)
+      }else{
+        await addDriverApi(data);
       }
-    } catch (error) {
-      console.error(error);
+      onSuccess?.();
+      onOpenChange(false);
+      setFormData({
+        lastname: "",
+        firstname: "",
+        phone: "",
+        photo: null,
+      });
+      setPreview(null);
+    }catch (error: any) {
+    if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /drivers :", error.response?.data || error.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -98,10 +124,10 @@ export default function CreateDriverModal({
           <div>
             <Label>Photo du chauffeur</Label>
             <div className="mt-2">
-              {preview ? (
+              {preview || formData?.photo ? (
                 <div className="relative w-full h-48 rounded-xl overflow-hidden border">
                   <img
-                    src={preview}
+                    src={preview || formData?.photo}
                     alt="Preview"
                     className="w-full h-full object-cover"
                   />
@@ -141,13 +167,14 @@ export default function CreateDriverModal({
               </Label>
               <Input
                 id="nom"
-                value={formData.nom}
+                value={formData.lastname}
                 onChange={(e) =>
-                  setFormData({ ...formData, nom: e.target.value })
+                  setFormData({ ...formData, lastname: e.target.value })
                 }
                 placeholder="Ex: Dupont"
                 required
               />
+              {errors.lastname && <p className="text-red-600 text-sm">{errors.lastname[0]}</p>}
             </div>
             <div>
               <Label htmlFor="prenom">
@@ -155,16 +182,17 @@ export default function CreateDriverModal({
               </Label>
               <Input
                 id="prenom"
-                value={formData.prenom}
+                value={formData.firstname}
                 onChange={(e) =>
-                  setFormData({ ...formData, prenom: e.target.value })
+                  setFormData({ ...formData, firstname: e.target.value })
                 }
                 placeholder="Ex: Jean"
                 required
               />
+              {errors.firstname && <p className="text-red-600 text-sm">{errors.firstname[0]}</p>}
             </div>
           </div>
-
+              
           {/* Téléphone */}
           <div>
             <Label htmlFor="telephone">
@@ -173,13 +201,14 @@ export default function CreateDriverModal({
             <Input
               id="telephone"
               type="tel"
-              value={formData.telephone}
+              value={formData.phone}
               onChange={(e) =>
-                setFormData({ ...formData, telephone: e.target.value })
+                setFormData({ ...formData, phone: e.target.value })
               }
               placeholder="Ex: +228 90 12 34 56"
               required
             />
+            
           </div>
 
           <DialogFooter>

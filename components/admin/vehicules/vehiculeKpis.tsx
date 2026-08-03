@@ -1,5 +1,5 @@
 import { CheckCircle2, CalendarDays, Wrench, TrendingUp, type LucideIcon, CarIcon } from "lucide-react";
-import type { Car } from "@/lib/types";
+import type { Car, Statistics } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 
 
@@ -10,17 +10,17 @@ const ICONS: Record<string, LucideIcon> = {
   Wrench,
 };
 
-interface CarProps {
-  cars: Car[];
+interface StatisticsProps {
+  statistics: Statistics;
 }
 
 
-export default function VehiculeKpis({ cars }: CarProps) {
+export default function VehiculeKpis({ statistics }: StatisticsProps) {
 
-  const total = cars.length;
-  const available = cars.filter((c) => c.status === "disponible").length;
-  const rented = cars.filter((c) => c.status === "loué").length;
-  const broken = cars.filter((c) => c.status === "En Panne").length;
+  const total = statistics.totals.cars;
+  const available = statistics.totals.availableCars;
+  const rented = statistics.totals.rentedCars;
+  const broken = statistics.totals.brokenCars;
   const fleetKpis = [
     {
       id: "total",

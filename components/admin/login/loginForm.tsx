@@ -6,26 +6,63 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { loginApi } from "@/api/authApi";
 
 type Status = "idle" | "loading" | "success";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [globalError, setGlobalError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock : simule un appel API puis un succès, à remplacer par un vrai call auth.
-    setStatus("loading");
-    setTimeout(() => {
-      setStatus("success");
-      setTimeout(() => setStatus("idle"), 1200);
-    }, 1500);
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // Mock : simule un appel API puis un succès, à remplacer par un vrai call auth.
+  //   setStatus("loading");
+  //   setTimeout(() => {
+  //     setStatus("success");
+  //     setTimeout(() => setStatus("idle"), 1200);
+  //   }, 1500);
+  // };
+
+   const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setStatus("loading");
+      
+      try {
+        const response = await loginApi({ email, password });
+        console.log("Connexion réussie :", response.data);
+  
+        // Sauvegarde du token dans localStorage
+        // localStorage.setItem("token", response.data.access_token);
+  
+        setStatus("success");
+        // setTimeout(() => setStatus("idle"), 1200);
+      } catch (error: any) {
+      if (error.response?.status === 422 && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+        setGlobalError(null);
+        setStatus("idle");
+      } else if (error.response?.status === 401) {
+        setGlobalError(error.response.data.message || "Identifiants invalides");
+        setErrors({});
+        setStatus("idle");
+      } 
+      // else {
+      //   console.error("Erreur API /login :", error.response?.data || error.message);
+      //   setGlobalError("Une erreur inattendue est survenue. Réessayez plus tard.");
+      //   setStatus("idle");
+      // }
+    }
   };
 
   return (
     <div className="bg-white/95 backdrop-blur border border-slate-200 p-8 rounded-xl shadow-2xl">
       <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+        {globalError && ( <p className="text-red-600 text-sm text-center mt-2">{globalError}</p>)}
         <div className="space-y-2">
           <Label htmlFor="email" className="px-1 text-slate-500">
             Adresse Email Professionnelle
@@ -35,8 +72,10 @@ export default function LoginForm() {
             <Input
               id="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="admin@autologix.com"
+              placeholder="admin@easycarrental.com"
               className="pl-10"
             />
           </div>
@@ -56,6 +95,8 @@ export default function LoginForm() {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
               className="pl-10 pr-10"
@@ -105,6 +146,7 @@ export default function LoginForm() {
             </>
           )}
         </Button>
+        
       </form>
 
       <div className="mt-8 pt-6 border-t border-slate-200 text-center">

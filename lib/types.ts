@@ -1,4 +1,4 @@
-type carStatus = "disponible" | "loué" | "en maintenance"|"En Panne";
+type carStatus = "disponible" | "loué" | "en maintenance"|"en Panne";
 
 export interface Car {
     id: number;
@@ -32,14 +32,16 @@ export interface Category {
 }
 
 export interface Panne {
-    id:number,
-    name:string,
-    description:string,
-    panneAmount: number,
-    car : Car,
-    created_at: string,
-    updated_at: string 
+  id: number;
+  description: string;
+  priority: "Urgente" | "Moyenne" | "Faible";
+  status: "En attente" | "En réparation" | "Réparé";
+  panneAmount: number;
+  car : Car,
+  created_at: string;
+  updated_at: string;
 }
+
 type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
 export interface Reservation {
     id:number,
@@ -50,12 +52,12 @@ export interface Reservation {
     status: ReservationStatus,
     car : Car,
     driver?: Driver,
-    amount?: number,
+    totalAmount?: number,
     user: User,
     created_at: string,
     updated_at: string 
 }
-
+export type UserRole = "Client Premium" | "Client" | "admin";
 export interface User {
     id:number,
     lastname:string,
@@ -68,7 +70,25 @@ export interface User {
     photo_url?: string,
     phone: string,
     active: boolean,
-    role: string,
+    role: UserRole,
+    email:string,
+    historic: Historic,
+    created_at: string,
+    updated_at: string 
+}
+export interface Client {
+    id:number,
+    lastname:string,
+    firstname:string,
+    type: string,
+    pieceType: string,
+    pieceNumber: string,
+    address: string,
+    photo?: string,
+    photo_url?: string,
+    phone: string,
+    active: boolean,
+    role: UserRole,
     email:string,
     historic: Historic,
     created_at: string,
@@ -118,23 +138,24 @@ export interface Payment {
 }
 
 export interface Totals {
-  cars: number;                // nombre total de voitures
-  drivers: number;              // nombre total de chauffeurs
-  reservations: number;         // nombre total de réservations
-  clients: number;              // nombre total de clients
+  cars: number;               
+  drivers: number;             
+  reservations: number;      
+  clients: number;              
+  admins: number;              
 
-  activeReservations: number;  // réservations actives
+  activeReservations: number;  
 
-  availableDrivers: number;    // chauffeurs disponibles
-  unAvailableDrivers: number;  // chauffeurs indisponibles
-  busyDrivers: number;         // chauffeurs en course
+  availableDrivers: number;   
+  unAvailableDrivers: number;  
+  busyDrivers: number;        
 
-  monthlyRevenue: number;      // revenu mensuel
+  monthlyRevenue: number;     
 
-  availableCars: number;       // voitures disponibles
-  unAvailableCars: number;     // voitures indisponibles
-  rentedCars: number;          // voitures louées
-  brokenCars: number;          // voitures en panne
+  availableCars: number;      
+  unAvailableCars: number;     
+  rentedCars: number;        
+  brokenCars: number;      
 }
 
 // Activité des réservations par jour
@@ -147,5 +168,15 @@ export interface ReservationActivity {
 export interface Statistics {
   totals: Totals;
   reservationActivity: ReservationActivity[];
+}
+
+export interface Estimate {
+  days: number;
+  driverDailyRate: number;
+  carAmount: number;
+  reductionAmount: number;
+  driverAmount: number;
+  tvaAmount: number;
+  totalAmount: number;
 }
 

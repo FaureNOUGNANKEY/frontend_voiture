@@ -1,3 +1,4 @@
+"use client";
 // components/home/Hero.tsx
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Star } from "lucide-react";
@@ -12,7 +13,7 @@ export default function HomeHero() {
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
           <div className="inline-flex items-center rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700">
-            SOLUTION ELITE DRIVELOGIX
+            SOLUTION Easy Car Rental
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold leading-tight text-gray-900">

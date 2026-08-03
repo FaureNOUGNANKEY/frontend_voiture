@@ -20,24 +20,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Car } from "@/lib/types";
+import { addPanneApi } from "@/api/panne";
+
+interface CarProps {
+  cars: Car[];
+  onSuccess?: () => void;
+}
 
 export type Priority = "Urgente" | "Moyenne" | "Faible";
-
-export const vehicleOptions = [
-  "Mercedes-Benz Actros (AA-123-BB)",
-  "Iveco Daily (CK-982-PL)",
-  "Renault Zoe E-Tech (EV-444-ZZ)",
-];
  
 export const priorityOptions: Priority[] = ["Faible", "Moyenne", "Urgente"];
 
-export default function MaintenanceHeader() {
+export default function MaintenanceHeader( {cars, onSuccess} : CarProps ) {
   const [open, setOpen] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
 
-  const handleCreate = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState<{
+    car_id: number;
+    priority: Priority;
+    description: string;
+    panneAmount: number;
+  }>({
+    car_id: 0,
+    priority: "Faible",
+    description: "",
+    panneAmount: 0,
+  });
+
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock : à remplacer par la création réelle du ticket (API / server action).
-    setOpen(false);
+    try {
+      const response = await addPanneApi(formData);
+      console.log("Panne créée:", response);
+      setOpen(false);
+      onSuccess?.();
+      setFormData({
+        car_id: 0,
+        priority: "Faible",
+        description: "",
+        panneAmount: 0,
+      });
+    }catch (error: any) {
+    if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /pannes :", error.response?.data || error.message);
+      }
+    }
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   return (
@@ -67,14 +101,15 @@ export default function MaintenanceHeader() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-slate-500">Véhicule</Label>
-                <Select>
+                <Select value={formData.car_id ? String(formData.car_id) : ""}
+                  onValueChange={(val) => setFormData({ ...formData, car_id: Number(val) })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un véhicule..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {vehicleOptions.map((v) => (
-                      <SelectItem key={v} value={v}>
-                        {v}
+                    {cars.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.mark}-{c.model}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -83,7 +118,15 @@ export default function MaintenanceHeader() {
 
               <div className="space-y-1.5">
                 <Label className="text-slate-500">Priorité</Label>
-                <Select defaultValue="Faible">
+                <Select
+                  value={formData.priority}
+                  onValueChange={(val) =>
+                    setFormData({
+                      ...formData,
+                      priority: (val as Priority) || "Faible",
+                    })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -100,18 +143,28 @@ export default function MaintenanceHeader() {
 
             <div className="space-y-1.5">
               <Label className="text-slate-500">Description de la panne</Label>
-              <Textarea rows={4} placeholder="Décrivez les symptômes et circonstances..." />
+              <Textarea rows={4} placeholder="Décrivez les symptômes et circonstances..." 
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              required
+              />
+               {errors.description && <p className="text-red-600 text-sm">{errors.description[0]}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-slate-500">Coût estimé (€)</Label>
-                <Input type="number" placeholder="0.00" />
+                <Label className="text-slate-500">Coût estimé (CFA)</Label>
+                <Input type="number" placeholder="0.00" 
+                onChange={(e) =>
+                setFormData({ ...formData, panneAmount: parseFloat(e.target.value) ||0})
+              }
+              required
+              />
+               {errors.panneAmount && <p className="text-red-600 text-sm">{errors.panneAmount[0]}</p>}
               </div>
-              <div className="space-y-1.5">
+              {/* <div className="space-y-1.5">
                 <Label className="text-slate-500">Lieu d&apos;immobilisation</Label>
                 <Input type="text" placeholder="Ville ou Atelier" />
-              </div>
+              </div> */}
             </div>
 
             <DialogFooter>

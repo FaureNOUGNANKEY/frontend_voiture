@@ -247,7 +247,7 @@ export default function CataloguePage() {
                           FCFA/jour
                         </span>
                       </div>
-                      <Button onClick={() => router.push("/client/reservation")} className={"px-6 py-4"}>Réserver</Button>
+                      <Button onClick={() => router.push(`/client/reservation/${car.id}`)} className={"px-6 py-4"}>Réserver</Button>
                     </div>
                   </div>
                 </div>

@@ -15,7 +15,7 @@ export const maintenanceOverview = {
 export default function MaintenanceOverview() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      {/* Véhicules immobilisés */}
+      {/* Véhicules En panne */}
       <Card className="shadow-sm">
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-2">
@@ -24,7 +24,7 @@ export default function MaintenanceOverview() {
               Critique
             </span>
           </div>
-          <p className="text-xs font-semibold text-slate-500">VÉHICULES IMMOBILISÉS</p>
+          <p className="text-xs font-semibold text-slate-500">VÉHICULES EN PANNE</p>
           <h2 className="text-4xl font-bold text-slate-900">{maintenanceOverview.immobilized.value}</h2>
           <p className="text-xs text-slate-500 mt-2">{maintenanceOverview.immobilized.trend}</p>
         </CardContent>

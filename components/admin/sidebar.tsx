@@ -88,7 +88,6 @@ interface SidebarProps {
 
 export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const [createOpen, setCreateOpen] = useState(false);
 
   if (pathname.includes("login")) return;
 
@@ -137,16 +136,6 @@ export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
 
       {/* Footer actions */}
       <div className="p-6 mt-auto border-t border-slate-400">
-        <Button
-          onClick={() => setCreateOpen(true)}
-          type="button"
-          className="w-full text-sm font-semibold py-5 rounded-lg
-          flex items-center justify-center gap-2 mb-4 hover:opacity-90 transition-opacity"
-        >
-          <Plus size={18} />
-          New Reservation
-        </Button>
-
         <div className="space-y-2">
           <Link
             href="/help"
@@ -165,12 +154,6 @@ export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
         </div>
       </div>
 
-      {/* Modal */}
-      <CreateReservationModal
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onSuccess={() => {}}
-      />
     </aside>
   );
 }

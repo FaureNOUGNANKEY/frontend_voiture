@@ -27,7 +27,7 @@ export const logoutApi = async () => {
 };
 
 //récupérer les utilisateurs protégés avec token
-export const getUsersApi = async (token: string) => {
+export const getUserstokenApi = async (token: string) => {
   const response = await api.get("/users", {
     headers: {
       Authorization: `Bearer ${token}`,

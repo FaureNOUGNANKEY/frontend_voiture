@@ -1,6 +1,7 @@
 import { TrendingUp, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Statistics } from "@/lib/types";
 
 
 export const userStats = {
@@ -16,9 +17,13 @@ export const userAdminAvatars = [
   "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=64&h=64&fit=crop",
   "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=64&h=64&fit=crop",
 ];
+
+interface StatisticsProps{
+  statistics : Statistics;
+}
  
 
-export default function UsersStats() {
+export default function UsersStats( {statistics}: StatisticsProps ) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {/* Total Clients */}
@@ -28,7 +33,7 @@ export default function UsersStats() {
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Total Clients
             </p>
-            <p className="text-4xl font-bold text-primary">{userStats.totalClients}</p>
+            <p className="text-4xl font-bold text-primary">{statistics.totals.clients}</p>
           </div>
           <div className="mt-4 flex items-center text-emerald-600 text-sm font-semibold">
             <TrendingUp size={16} />
@@ -44,7 +49,7 @@ export default function UsersStats() {
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               Administrateurs Actifs
             </p>
-            <p className="text-4xl font-bold text-slate-900">{userStats.activeAdmins}</p>
+            <p className="text-4xl font-bold text-slate-900">{statistics.totals.admins}</p>
           </div>
           <div className="mt-4 flex -space-x-2">
             {userAdminAvatars.map((src, i) => (

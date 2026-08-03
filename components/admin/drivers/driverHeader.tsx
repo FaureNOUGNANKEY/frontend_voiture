@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import CreateDriverModal from "@/components/modals/createDriverModal";
 
-export default function DriverHeader() {
+export default function DriverHeader({ onSuccess }: { onSuccess?: () => void }) {
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
@@ -24,16 +24,14 @@ export default function DriverHeader() {
         <Button onClick={() => setCreateOpen(true)} className="gap-2 p-4">
           <PlusCircle size={18} />
           Ajouter un conducteur
-        </Button>
+        </Button> 
       </div>
 
       {/* Modal */}
       <CreateDriverModal
         open={createOpen}
         onOpenChange={setCreateOpen}
-        onSuccess={() => {
-          
-        }}
+        onSuccess={onSuccess}
       />
     </div>
   );
