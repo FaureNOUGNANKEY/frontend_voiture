@@ -1,5 +1,12 @@
 type carStatus = "disponible" | "loué" | "en maintenance"|"en Panne";
 
+export interface AuthState {
+  token: string | null;
+  currentUser: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
 export interface Car {
     id: number;
     mark: string;

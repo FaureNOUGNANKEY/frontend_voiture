@@ -1,22 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, LogIn, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  LogIn,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { loginApi } from "@/api/authApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 type Status = "idle" | "loading" | "success";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [status, setStatus] = useState<Status>("idle");
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const { login } = useAuth();
 
   // const handleSubmit = (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -28,47 +39,50 @@ export default function LoginForm() {
   //   }, 1500);
   // };
 
-   const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setStatus("loading");
-      
-      try {
-        const response = await loginApi({ email, password });
-        console.log("Connexion réussie :", response.data);
-  
-        // Sauvegarde du token dans localStorage
-        // localStorage.setItem("token", response.data.access_token);
-  
-        setStatus("success");
-        // setTimeout(() => setStatus("idle"), 1200);
-      } catch (error: any) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await loginApi({ email, password });
+      console.log("Connexion réussie :", response.data);
+
+      toast.success("Bienvenue ! Connexion réussie.");
+
+      login(response.data.token, true);
+    } catch (error: any) {
       if (error.response?.status === 422 && error.response.data.errors) {
         setErrors(error.response.data.errors);
         setGlobalError(null);
-        setStatus("idle");
       } else if (error.response?.status === 401) {
         setGlobalError(error.response.data.message || "Identifiants invalides");
         setErrors({});
-        setStatus("idle");
-      } 
+      }
       // else {
       //   console.error("Erreur API /login :", error.response?.data || error.message);
       //   setGlobalError("Une erreur inattendue est survenue. Réessayez plus tard.");
       //   setStatus("idle");
       // }
+    }finally{
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="bg-white/95 backdrop-blur border border-slate-200 p-8 rounded-xl shadow-2xl">
       <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-        {globalError && ( <p className="text-red-600 text-sm text-center mt-2">{globalError}</p>)}
+        {globalError && (
+          <p className="text-red-600 text-sm text-center mt-2">{globalError}</p>
+        )}
         <div className="space-y-2">
           <Label htmlFor="email" className="px-1 text-slate-500">
             Adresse Email Professionnelle
           </Label>
           <div className="relative">
-            <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Mail
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <Input
               id="email"
               type="email"
@@ -86,12 +100,18 @@ export default function LoginForm() {
             <Label htmlFor="password" className="text-slate-500">
               Mot de passe
             </Label>
-            <a href="#" className="text-xs font-semibold text-primary hover:underline">
+            <a
+              href="#"
+              className="text-xs font-semibold text-primary hover:underline"
+            >
               Oublié ?
             </a>
           </div>
           <div className="relative">
-            <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Lock
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -113,40 +133,35 @@ export default function LoginForm() {
 
         <div className="flex items-center gap-2 px-1">
           <Checkbox id="remember" />
-          <Label htmlFor="remember" className="text-slate-500 font-normal cursor-pointer">
+          <Label
+            htmlFor="remember"
+            className="text-slate-500 font-normal cursor-pointer"
+          >
             Se souvenir de cet appareil
           </Label>
         </div>
 
         <Button
           type="submit"
-          disabled={status !== "idle"}
+          disabled={isLoading}
           className={`w-full py-6 text-base font-semibold gap-2 transition-all ${
-            status === "success"
+            isLoading
               ? "bg-emerald-600 hover:bg-emerald-600"
               : "bg-blue-100 text-primary hover:bg-primary hover:text-white"
           }`}
         >
-          {status === "idle" && (
+          {isLoading ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Chargement...
+            </>
+          ) : (   
             <>
               Se connecter
               <LogIn size={18} />
             </>
           )}
-          {status === "loading" && (
-            <>
-              <Loader2 size={18} className="animate-spin" />
-              Chargement...
-            </>
-          )}
-          {status === "success" && (
-            <>
-              <CheckCircle2 size={18} />
-              Accès Autorisé
-            </>
-          )}
         </Button>
-        
       </form>
 
       <div className="mt-8 pt-6 border-t border-slate-200 text-center">

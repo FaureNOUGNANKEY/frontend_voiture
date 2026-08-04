@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/select";
 import { clientType } from "@/components/modals/createUserModal";
 import { registerApi } from "@/api/authApi";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Status = "idle" | "loading" | "success";
 
@@ -40,10 +42,11 @@ export const identityDocumentTypes = [
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [status, setStatus] = useState<Status>("idle");
+  const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     lastname: "",
@@ -59,7 +62,6 @@ export default function RegisterForm() {
     photo: null as File | null,
   });
 
-
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -68,57 +70,61 @@ export default function RegisterForm() {
     }
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setStatus("loading");
+    e.preventDefault();
+    setIsLoading(true);
 
-  const data = new FormData();
-  Object.entries(formData).forEach(([key, value]) => {
-    if (value !== null && value !== undefined) {
-      if (key === "photo") {
-        if (value instanceof File) {
-          data.append(key, value);
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        if (key === "photo") {
+          if (value instanceof File) {
+            data.append(key, value);
+          }
+        } else {
+          data.append(key, value as any);
         }
-      } else {
-        data.append(key, value as any);
       }
-    }
-  });
-console.log("Données du formulaire :", Object.fromEntries(data.entries()));
-  try {
-    const response = await registerApi(data);
-    console.log("Compte créé :", response.data);
-
-    setStatus("success");
-    setTimeout(() => setStatus("idle"), 1500);
-
-    // Reset du formulaire
-    setFormData({
-      lastname: "",
-      firstname: "",
-      type: "",
-      pieceType: "",
-      pieceNumber: "",
-      address: "",
-      photo: null,
-      phone: "",
-      role: "client",
-      email: "",
-      password: "",
     });
-    setPhotoPreview(null);
-  }catch (error: any) {
-    if (error.response && error.response.data.errors) {
+    console.log("Données du formulaire :", Object.fromEntries(data.entries()));
+    try {
+      const response = await registerApi(data);
+      console.log("Compte créé :", response.data);
+
+      toast.success("Bienvenue ! Votre compte a été créé avec succès.");
+
+      login(response.data.token, false);
+
+
+      // Reset du formulaire
+      setFormData({
+        lastname: "",
+        firstname: "",
+        type: "",
+        pieceType: "",
+        pieceNumber: "",
+        address: "",
+        photo: null,
+        phone: "",
+        role: "client",
+        email: "",
+        password: "",
+      });
+      setPhotoPreview(null);
+    } catch (error: any) {
+      if (error.response && error.response.data.errors) {
         // récupèration des erreurs de validation
         setErrors(error.response.data.errors);
-        setStatus("idle");
       } else {
-        console.error("Erreur API /register :", error.response?.data || error.message);
+        console.error(
+          "Erreur API /register :",
+          error.response?.data || error.message,
+        );
       }
+    }finally{
+      setIsLoading(false);
     }
-};
-
+  };
 
   // const handleSubmit = (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -136,7 +142,10 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
         {/* Photo */}
         <div className="flex flex-col items-center gap-3">
           <Avatar className="w-24 h-24 border-4 border-slate-100">
-            <AvatarImage src={photoPreview ?? undefined} alt="Photo de profil" />
+            <AvatarImage
+              src={photoPreview ?? undefined}
+              alt="Photo de profil"
+            />
             <AvatarFallback className="bg-slate-100 text-slate-400">
               <User size={32} />
             </AvatarFallback>
@@ -167,12 +176,23 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
               Nom
             </Label>
             <div className="relative">
-              <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="lastName"
-              value={formData.lastname}
-  onChange={(e) => setFormData({ ...formData, lastname: e.target.value })}
-               required placeholder="Dupont" className="pl-10" />
-              {errors.lastname && <p className="text-red-600 text-sm">{errors.lastname[0]}</p>} 
+              <User
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <Input
+                id="lastName"
+                value={formData.lastname}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastname: e.target.value })
+                }
+                required
+                placeholder="Dupont"
+                className="pl-10"
+              />
+              {errors.lastname && (
+                <p className="text-red-600 text-sm">{errors.lastname[0]}</p>
+              )}
             </div>
           </div>
           <div className="space-y-1.5">
@@ -180,12 +200,23 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
               Prénoms
             </Label>
             <div className="relative">
-              <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="firstName" 
-              value={formData.firstname}
-  onChange={(e) => setFormData({ ...formData, firstname: e.target.value })}
-              required placeholder="Jean Pierre" className="pl-10" />
-              {errors.firstname && <p className="text-red-600 text-sm">{errors.firstname[0]}</p>}
+              <User
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <Input
+                id="firstName"
+                value={formData.firstname}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstname: e.target.value })
+                }
+                required
+                placeholder="Jean Pierre"
+                className="pl-10"
+              />
+              {errors.firstname && (
+                <p className="text-red-600 text-sm">{errors.firstname[0]}</p>
+              )}
             </div>
           </div>
         </div>
@@ -197,12 +228,24 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
               E-mail
             </Label>
             <div className="relative">
-              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="email" type="email"
-              value={formData.email} 
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required placeholder="jean.dupont@email.com" className="pl-10" />
-              {errors.email && <p className="text-red-600 text-sm">{errors.email[0]}</p>}
+              <Mail
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+                placeholder="jean.dupont@email.com"
+                className="pl-10"
+              />
+              {errors.email && (
+                <p className="text-red-600 text-sm">{errors.email[0]}</p>
+              )}
             </div>
           </div>
           <div className="space-y-1.5">
@@ -210,13 +253,24 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
               Téléphone
             </Label>
             <div className="relative">
-              <Phone size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="phone" 
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              required placeholder="+33 6 12 34 56 78" className="pl-10" />
-              {errors.phone && <p className="text-red-600 text-sm">{errors.phone[0]}</p>}
+              <Phone
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                required
+                placeholder="+33 6 12 34 56 78"
+                className="pl-10"
+              />
+              {errors.phone && (
+                <p className="text-red-600 text-sm">{errors.phone[0]}</p>
+              )}
             </div>
           </div>
         </div>
@@ -227,17 +281,24 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
             Mot de passe
           </Label>
           <div className="relative">
-            <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Lock
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               required
               placeholder="••••••••"
               className="pl-10 pr-10"
             />
-            {errors.password && <p className="text-red-600 text-sm">{errors.password[0]}</p>}
+            {errors.password && (
+              <p className="text-red-600 text-sm">{errors.password[0]}</p>
+            )}
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
@@ -251,11 +312,16 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
         {/* Pièce d'identité */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-slate-500">Type de pièce d&apos;identité</Label>
-            <Select 
-            value={formData.pieceType}
-            onValueChange={(value) => setFormData({ ...formData, pieceType: value ?? "" })}
-            required>
+            <Label className="text-slate-500">
+              Type de pièce d&apos;identité
+            </Label>
+            <Select
+              value={formData.pieceType}
+              onValueChange={(value) =>
+                setFormData({ ...formData, pieceType: value ?? "" })
+              }
+              required
+            >
               <SelectTrigger className={"w-full"}>
                 <SelectValue placeholder="Sélectionner un type..." />
               </SelectTrigger>
@@ -273,11 +339,20 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
               Numéro de la pièce
             </Label>
             <div className="relative">
-              <IdCard size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input id="documentNumber" 
-              value={formData.pieceNumber}
-  onChange={(e) => setFormData({ ...formData, pieceNumber: e.target.value })}
-              required placeholder="Ex: 123456789" className="pl-10" />
+              <IdCard
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <Input
+                id="documentNumber"
+                value={formData.pieceNumber}
+                onChange={(e) =>
+                  setFormData({ ...formData, pieceNumber: e.target.value })
+                }
+                required
+                placeholder="Ex: 123456789"
+                className="pl-10"
+              />
             </div>
           </div>
         </div>
@@ -288,11 +363,16 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
             Adresse
           </Label>
           <div className="relative">
-            <MapPin size={18} className="absolute left-3 top-3 text-slate-400" />
+            <MapPin
+              size={18}
+              className="absolute left-3 top-3 text-slate-400"
+            />
             <Textarea
               id="address"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
               required
               rows={2}
               placeholder="15 Avenue des Champs-Élysées, 75008 Paris"
@@ -304,10 +384,13 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
         {/* Type de client */}
         <div className="space-y-1.5">
           <Label className="text-slate-500">Type de client</Label>
-          <Select 
-          value={formData.type}
-          onValueChange={(value) => setFormData({ ...formData, type: value ?? "" })}
-          required>
+          <Select
+            value={formData.type}
+            onValueChange={(value) =>
+              setFormData({ ...formData, type: value ?? "" })
+            }
+            required
+          >
             <SelectTrigger className={"w-full"}>
               <SelectValue placeholder="Sélectionner un type..." />
             </SelectTrigger>
@@ -323,29 +406,22 @@ console.log("Données du formulaire :", Object.fromEntries(data.entries()));
 
         <Button
           type="submit"
-          disabled={status !== "idle"}
+          disabled={isLoading}
           className={`w-full py-6 text-base font-semibold gap-2 mt-2 transition-colors ${
-            status === "success"
+            isLoading
               ? "bg-emerald-600 hover:bg-emerald-600"
               : "bg-primary hover:bg-primary/90"
           }`}
         >
-          {status === "idle" && (
-            <>
-              <UserPlus size={18} />
-              Créer le compte
-            </>
-          )}
-          {status === "loading" && (
+          {isLoading ? (
             <>
               <Loader2 size={18} className="animate-spin" />
               Création en cours...
             </>
-          )}
-          {status === "success" && (
-            <>
-              <CheckCircle2 size={18} />
-              Compte créé !
+          ) : (
+             <>
+              <UserPlus size={18} />
+              Créer le compte
             </>
           )}
         </Button>
