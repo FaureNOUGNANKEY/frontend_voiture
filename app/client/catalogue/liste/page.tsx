@@ -10,69 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { getCarsApi } from "@/api/car";
 import { Car } from "@/lib/types";
-
-const vehicles = [
-  {
-    id: 1,
-    name: "Luxe Elite Sedan",
-    type: "Berline",
-    price: 85000, // en FCFA
-    places: 5,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-    badge: "Populaire",
-  },
-  {
-    id: 2,
-    name: "Titan X7 Voyager",
-    type: "SUV",
-    price: 120000,
-    places: 7,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1533473359334-0135d6f3e2c0",
-    badge: "Nouveauté",
-  },
-  {
-    id: 3,
-    name: "E-Spark Compact",
-    type: "Électrique",
-    price: 65000,
-    places: 4,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1593941707882-5f0f3a5f3a0e",
-  },
-  {
-    id: 4,
-    name: "Transporter Pro Max",
-    type: "Utilitaire",
-    price: 95000,
-    places: 3,
-    transmission: "Manuelle",
-    image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24",
-  },
-  {
-    id: 5,
-    name: "Urban Explorer",
-    type: "SUV",
-    price: 110000,
-    places: 5,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1556189250-72cc5f5a5f5d",
-  },
-  {
-    id: 6,
-    name: "Premier Executive",
-    type: "Berline",
-    price: 150000,
-    places: 5,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1549317666-7d1e0b3b9d2a",
-  },
-];
+import RequireClient from "@/contexts/RequireClient";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function CataloguePage() {
   const [priceRange, setPriceRange] = useState([30000, 500000]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(["SUV"]);
+  const { isAuthenticated, currentUser } = useAuth();
   const router = useRouter();
 
   const formatPrice = (price: number) => {
@@ -247,7 +191,17 @@ export default function CataloguePage() {
                           FCFA/jour
                         </span>
                       </div>
-                      <Button onClick={() => router.push(`/client/reservation/${car.id}`)} className={"px-6 py-4"}>Réserver</Button>
+                     
+                      <Button 
+                      onClick={() => {
+                        if (currentUser?.role?.toString().toLowerCase() === "client") {
+                          router.push(`/client/reservation/${car.id}`);
+                        } else {
+                          router.push("/login-client");
+                        }
+                      }}
+                      className={"px-6 py-4"}>Réserver</Button>
+                    
                     </div>
                   </div>
                 </div>

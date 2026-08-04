@@ -33,11 +33,14 @@ export default function UserLoginForm() {
 
     try {
       const response = await loginApi({ email, password });
-      console.log("Connexion réussie :", response.data);
+      console.log("Connexion réussie :", response);
 
       toast.success("Bienvenue ! Vous êtes connecté avec succès.");
 
-      login(response.data.token, false);
+      // Stocker l'utilisateur courant
+      getCurrentUser(response.user);
+  
+      login(response.access_token, false,response.user);
     } catch (error: any) {
       if (error.response?.status === 422 && error.response.data.errors) {
         setErrors(error.response.data.errors);

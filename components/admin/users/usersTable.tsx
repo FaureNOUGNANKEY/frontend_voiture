@@ -25,6 +25,7 @@ import { Input } from "@base-ui/react";
 import { useState } from "react";
 import { User } from "@/lib/types";
 import CreateUserModal from "@/components/modals/createUserModal";
+import ConfirmModal from "@/components/modals/confirmModal";
 
 function formatDate(isoDate: string) {
   const date = new Date(isoDate);
@@ -50,6 +51,8 @@ export const ROLE_CLASSES: Record<UserRole, string> = {
 function UsersRows({ users, onSuccess,onEdit }: UserProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   
   return (
@@ -101,22 +104,24 @@ function UsersRows({ users, onSuccess,onEdit }: UserProps) {
               >
                 <Pencil size={18} />
               </Button>
-              {/* Modal */}
-              <CreateUserModal 
-                      open={createOpen}
-                      onOpenChange={setCreateOpen}
-                      initialData={selectedUser}
-                      onSuccess={onSuccess}
-                    />
+              
               </div>
-              <Button
+              <div> 
+                <Button
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-red-600"
+                onClick={() => {
+                  setUserToDelete(user);
+                  setDeleteOpen(true);
+                }}
               >
                 <Trash2 size={18} />
               </Button>
+              
+              </div>  
             </div>
+            
           </TableCell>
         </TableRow>
       ))}
@@ -130,9 +135,30 @@ function UsersRows({ users, onSuccess,onEdit }: UserProps) {
           </TableCell>
         </TableRow>
       )}
+
+      {/* Modal */}
+      <CreateUserModal 
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        initialData={selectedUser}
+        onSuccess={onSuccess}
+      />
+
+      {/* modal suppression */}
+      {/* <ConfirmModal
+        message="Voulez-vous vraiment supprimer cet utilisateur ?"
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        // onConfirm={handleDelete}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+      /> */}
     </TableBody>
+
+    
   );
 }
+
 
 export default function UsersTable({ users,onSuccess,onEdit }: UserProps) {
 

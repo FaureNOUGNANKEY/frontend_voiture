@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getCarsApi } from "@/api/car";
 import { Car } from "@/lib/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 const vehicles = [
   {
@@ -44,6 +45,8 @@ const vehicles = [
 export default function CatalogueVehiclesSection() {
   const router = useRouter();
   const [cars, setCars] = useState<Car[]>([]);
+  const { isAuthenticated, currentUser } = useAuth();
+  
 
   const getCars = async () => {
     try {
@@ -100,7 +103,18 @@ export default function CatalogueVehiclesSection() {
                   </div>
                 </div>
 
-                <Button onClick={() => router.push(`/client/reservation/${car.id}`)} className="w-full mt-5">Réserver Maintenant</Button>
+                <Button
+                  onClick={() => {
+                    if (currentUser?.role?.toString().toLowerCase() === "client") {
+                      router.push(`/client/reservation/${car.id}`);
+                    } else {
+                      router.push("/login-client");
+                    }
+                  }}
+                  className="w-full mt-5"
+                >
+                  Réserver Maintenant
+                </Button>
               </div>
             </div>
           ))}

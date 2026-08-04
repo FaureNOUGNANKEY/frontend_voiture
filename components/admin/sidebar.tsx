@@ -22,6 +22,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import CreateReservationModal from "../modals/createReservationModal";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -88,6 +89,7 @@ interface SidebarProps {
 
 export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { isAuthenticated, currentUser,logout } = useAuth();
 
   if (pathname.includes("login")) return;
 
@@ -146,6 +148,7 @@ export default function Sidebar({ mobile = false, onClose }: SidebarProps) {
           </Link>
           <button
             type="button"
+            onClick={logout}
             className="flex items-center gap-3 text-red-600 hover:opacity-80 py-1 text-sm font-semibold transition-opacity"
           >
             <LogOut size={18} />

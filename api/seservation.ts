@@ -1,14 +1,23 @@
 import api from "../lib/api";
+import Cookies from "js-cookie";
 
 // Récupérer toutes les réservations
 export const getReservationsApi = async () => {
-  const response = await api.get("/reservations");
+  const response = await api.get("/reservations",{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
   return response.data;  
 };
 
 // Récupérer une réservation
 export const getReservationApi = async (id: string) => {
-  const response = await api.get(`/reservations/${id}`);
+  const response = await api.get(`/reservations/${id}`,{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
   return response.data;
 }
 
@@ -17,6 +26,7 @@ export const addReservationApi = async (formData: FormData) => {
   const response = await api.post("/reservations", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
   });
   return response.data;
@@ -27,6 +37,7 @@ export const updateReservationApi = async (id: number, formData: FormData) => {
   const response = await api.post(`/reservations/${id}?_method=PUT`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
   });
   return response.data;
@@ -34,6 +45,10 @@ export const updateReservationApi = async (id: number, formData: FormData) => {
 
 // Supprimer une réservation
 export const deleteReservationApi = async (id: number) => {
-  const response = await api.delete(`/reservations/${id}`);
+  const response = await api.delete(`/reservations/${id}`,{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
   return response.data;
 };

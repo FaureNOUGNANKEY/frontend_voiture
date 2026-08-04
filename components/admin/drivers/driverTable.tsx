@@ -138,11 +138,7 @@ export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) 
                       }}>
                         <Pencil size={18} />
                       </Button>
-                      <CreateDriverModal open={createOpen} 
-                      onOpenChange={setCreateOpen}
-                      initialData={selectedDriver}
-                      onSuccess={onSuccess}                     
-                      />
+                      
 
                     </div>
 
@@ -163,6 +159,11 @@ export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) 
           </TableBody>
         </Table>
       </div>
+      <CreateDriverModal open={createOpen} 
+        onOpenChange={setCreateOpen}
+        initialData={selectedDriver}
+        onSuccess={onSuccess}                     
+      />
 
       <div className="p-6 bg-slate-50 flex items-center justify-between">
         <p className="text-sm text-slate-500">

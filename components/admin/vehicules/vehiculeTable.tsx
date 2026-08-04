@@ -133,23 +133,11 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
                         <Pencil size={18} />
                       </Button >
 
-                      {/* Modal */}
-                      <CreateVehiculeModal
-                        open={createOpen}
-                        onOpenChange={setCreateOpen}
-                        categories={categories} 
-                        initialData={selectedCar}
-                        onSuccess={onSuccess}
-                      />
-
                     </div>
                     {car.status === "en Panne" ? (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
                         <Eye size={18} />
                       </Button>
-
-
-
                     ) : (
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
                         <TriangleAlert size={18} />
@@ -168,6 +156,14 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
             )}
           </TableBody>
         </Table>
+        {/* Modal */}
+        <CreateVehiculeModal
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          categories={categories} 
+          initialData={selectedCar}
+          onSuccess={onSuccess}
+        />
       </div>
 
       <div className="p-6 bg-slate-50 flex items-center justify-between">

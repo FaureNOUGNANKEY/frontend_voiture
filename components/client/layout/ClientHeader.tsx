@@ -41,7 +41,8 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function ClientHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, currentUser, token } = useAuth();
+  const { isAuthenticated, currentUser,logout } = useAuth();
+  
 
   const navLinks = [
     { href: "/client", label: "Accueil", icon: Home },
@@ -50,14 +51,6 @@ export default function ClientHeader() {
     { href: "/client/messages", label: "Messages", icon: MessageSquare },
   ];
 
-  // Simuler un utilisateur connecté
-  const user = {
-    name: "Jean Dupont",
-    email: "jean.dupont@email.com",
-    avatar:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop",
-    initials: "JD",
-  };
 
   return (
     <header className="shadow-lg bg-white sticky top-0 z-50 border-b border-gray-100">
@@ -98,9 +91,9 @@ export default function ClientHeader() {
           </Button>
 
           {/* Help */}
-          <Button variant="ghost" size="icon" className="hidden md:flex">
+          {/* <Button variant="ghost" size="icon" className="hidden md:flex">
             <HelpCircle className="h-5 w-5 text-gray-600" />
-          </Button>
+          </Button> */}
 
           {isAuthenticated && currentUser ? (
             <div className="hidden md:block">
@@ -112,17 +105,17 @@ export default function ClientHeader() {
                   }
                 >
                   <Avatar className="h-8 w-8 border-2 border-primary/20">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={currentUser.photo_url} alt={currentUser.lastname} />
                     <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                      {user.initials}
+                     {currentUser.lastname.charAt(0).toUpperCase()}{currentUser.firstname.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-semibold text-gray-700 leading-tight">
-                      {user.name}
+                      {currentUser.lastname} {currentUser.firstname}
                     </p>
                     <p className="text-xs text-gray-400 leading-tight">
-                      {user.email}
+                      {currentUser.email}
                     </p>
                   </div>
                   <ChevronDown className="h-4 w-4 text-gray-400 hidden lg:block" />
@@ -140,7 +133,9 @@ export default function ClientHeader() {
                     <span>Paramètres</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer text-red-600 hover:text-red-700">
+                  <DropdownMenuItem 
+                  onClick={logout}
+                  className="cursor-pointer text-red-600 hover:text-red-700">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Déconnexion</span>
                   </DropdownMenuItem>
@@ -184,17 +179,17 @@ export default function ClientHeader() {
                 >
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16 border-2 border-white shadow-lg">
-                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarImage src={currentUser?.photo_url} alt={currentUser?.lastname} />
                       <AvatarFallback className="bg-primary text-white text-xl font-semibold">
-                        {user.initials}
+                        {currentUser?.lastname.charAt(0).toUpperCase()}{currentUser?.firstname.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-lg font-semibold text-gray-900 truncate">
-                        {user.name}
+                        {currentUser?.lastname} {currentUser?.firstname}
                       </p>
                       <p className="text-sm text-gray-500 truncate">
-                        {user.email}
+                        {currentUser?.email}
                       </p>
                     </div>
                   </div>

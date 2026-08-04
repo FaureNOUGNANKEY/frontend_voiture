@@ -243,12 +243,6 @@ function getInitials(firstname: string, lastname: string) {
                         }}
                         >
                           <Pencil size={18} />
-                        {/* Modal */}
-                        <CreateReservationModal 
-                            open={createOpen}
-                            onOpenChange={setCreateOpen}
-                            initialData={selectedReservation}
-                            onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
                           <History size={18} />
@@ -265,12 +259,7 @@ function getInitials(firstname: string, lastname: string) {
                         >
                           <Pencil size={18} />
                         </Button>
-                        {/* Modal */}
-                        <CreateReservationModal 
-                            open={createOpen}
-                            onOpenChange={setCreateOpen}
-                            initialData={selectedReservation}
-                            onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
+
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
                           <Eye size={18} />
                         </Button>
@@ -290,7 +279,15 @@ function getInitials(firstname: string, lastname: string) {
             )}
           </TableBody>
         </Table>
+
+        
       </div>
+      {/* Modal */}
+        <CreateReservationModal 
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          initialData={selectedReservation}
+          onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
 
       <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-sm">
         <span className="text-slate-500">Affichage de 1 à {filtered.length} sur 42 résultats</span>

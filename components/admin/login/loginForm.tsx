@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import { useState } from "react";
 import {
@@ -27,7 +28,8 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const { login } = useAuth();
+  // const { login } = useAuth();
+  const { login, getCurrentUser,  } = useAuth();
 
   // const handleSubmit = (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -45,11 +47,17 @@ export default function LoginForm() {
 
     try {
       const response = await loginApi({ email, password });
-      console.log("Connexion réussie :", response.data);
+      console.log("Connexion réussie :", response);
 
       toast.success("Bienvenue ! Connexion réussie.");
 
-      login(response.data.token, true);
+      login(response.access_token, true);
+
+      // Stocker l'utilisateur courant
+      getCurrentUser(response.user);
+      // console.log("token",login(response.access_token, true))
+      // console.log("token",Cookies.get("token"))
+      
     } catch (error: any) {
       if (error.response?.status === 422 && error.response.data.errors) {
         setErrors(error.response.data.errors);

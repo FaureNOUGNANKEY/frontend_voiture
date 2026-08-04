@@ -1,4 +1,5 @@
 import api from "../lib/api";
+import Cookies from "js-cookie";
 
 //Inscription (Register) 
 export const registerApi = async (formData: FormData) => {
@@ -15,6 +16,7 @@ export const loginApi = async (data: { email: string; password: string }) => {
   const response = await api.post("/login", data, {
     headers: {
       "Content-Type": "application/json",
+
     },
   });
   return response.data;
@@ -30,7 +32,7 @@ export const logoutApi = async () => {
 export const getUserstokenApi = async (token: string) => {
   const response = await api.get("/users", {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
   });
   return response.data;
