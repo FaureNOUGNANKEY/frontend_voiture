@@ -57,10 +57,13 @@ export interface Reservation {
     driverAmount: number,
     type: string,
     status: ReservationStatus,
+    computed_status: "à venir" | "en cours" | "terminée" ,
     car : Car,
+    days: number,
     driver?: Driver,
     totalAmount?: number,
     user: User,
+    invoice?: invoice,
     created_at: string,
     updated_at: string 
 }

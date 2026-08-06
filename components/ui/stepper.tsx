@@ -12,7 +12,7 @@ export default function Stepper({ currentStep, setCurrentStep }: StepperProps) {
   const steps = [
     { id: 1, label: "Véhicule" },
     { id: 2, label: "Détails" },
-    { id: 3, label: "Paiement" },
+    // { id: 3, label: "Paiement" },
   ];
 
   return (

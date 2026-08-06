@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addReservationApi, updateReservationApi } from "@/api/seservation";
+import { addReservationApi, updateReservationApi } from "@/api/reservation";
 import {User, Car, Client, Driver} from "@/lib/types";
 
 interface CreateReservationModalProps {
@@ -258,8 +258,7 @@ export default function CreateReservationModal({
                 <SelectContent>
                   <SelectItem value="en cours">En cours</SelectItem>
                   <SelectItem value="terminée">Terminée</SelectItem>
-                  <SelectItem value="En attente">En attente</SelectItem>
-                  <SelectItem value="annulée">Annulée</SelectItem>
+                  {/* <SelectItem value="En attente">En attente</SelectItem> */}
                   <SelectItem value="refusée">Refusée</SelectItem>
                   <SelectItem value="validé">Validé</SelectItem>
                 </SelectContent>

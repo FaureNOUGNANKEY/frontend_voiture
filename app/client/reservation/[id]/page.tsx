@@ -18,12 +18,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Stepper from "@/components/ui/stepper";
-import router from "next/router";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getCarApi } from "@/api/car";
 import { Car, Estimate } from "@/lib/types";
 import { estimateReservationApi } from "@/api/estimate";
-import { addReservationApi } from "@/api/seservation";
+import { addReservationApi } from "@/api/reservation";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ReservationDetails() {
   const [driveOption, setDriveOption] = useState<"reservation" | "leasing">(
@@ -32,15 +33,9 @@ export default function ReservationDetails() {
   const [pickupDate, setPickupDate] = useState("2024-11-20T10:00");
   const [returnDate, setReturnDate] = useState("2024-11-25T10:00");
   const [currentStep, setCurrentStep] = useState(2);
-  const [selectedMethod, setSelectedMethod] = useState<
-    "card" | "paypal" | "agency"
-  >("card");
-  const [cardName, setCardName] = useState("JEAN DUPONT");
-  const [cardNumber, setCardNumber] = useState("0000 0000 0000 0000");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [saveCard, setSaveCard] = useState(false);
   const {id} = useParams();
+  const router = useRouter();
+  const { isAuthenticated, currentUser,logout } = useAuth();
 
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
@@ -63,6 +58,7 @@ export default function ReservationDetails() {
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
   
   const reservationData = {
+    user_id: currentUser?.id ,
     car_id: selectedCar?.id,
     dateStart: pickupDate,
     dateBack: returnDate,
@@ -74,8 +70,8 @@ export default function ReservationDetails() {
     if (reservationData.car_id !== undefined) {
       data.append("car_id", String(reservationData.car_id));
     }
-    // data.append("user_id",String(reservationData.user_id))
-    data.append("user_id",String(4))// récupéré depuis login ou localStorage
+    data.append("user_id",String(reservationData.user_id))
+    // data.append("user_id", String(currentUser?.id));
     data.append("dateStart", reservationData.dateStart);
     data.append("dateBack", reservationData.dateBack);
     data.append("type", reservationData.type);
@@ -83,7 +79,7 @@ export default function ReservationDetails() {
   };
    
   const [formData, setFormData] = useState({
-    user_id: 7, // récupéré depuis login ou localStorage
+    user_id: currentUser?.id ,
     car_id: "",
     driver_id: "",
     dateStart: "",
@@ -115,10 +111,11 @@ export default function ReservationDetails() {
     }
   };
 
+
   useEffect(() => {
     if (selectedCar?.id && pickupDate && returnDate) {
       setFormData({
-        user_id: 7,
+        user_id: currentUser?.id,
         car_id: String(selectedCar.id),
         driver_id: "", // ou null si pas de chauffeur
         dateStart: pickupDate,
@@ -138,11 +135,14 @@ export default function ReservationDetails() {
 
   //créer la reservation 
   const handleConfirm = async () => {
+    if (!currentUser) {
+  toast.error("Vous devez être connecté pour réserver !");
+  return;
+}
     try {
       const response = await addReservationApi(buildReservationFormData());
       console.log("Réservation créée :", response);
-      alert("Votre réservation a été confirmée !");
-      setCurrentStep(3); 
+      toast.success("Réservation en attente de comfirmation!");
     } catch (error: any) {
       if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -282,7 +282,7 @@ export default function ReservationDetails() {
                 </Card>
 
                 {/* Services additionnels */}
-                <Card className="p-6">
+                {/* <Card className="p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <Shield className="w-6 h-6 text-primary" />
                     <h2 className="text-2xl font-semibold">
@@ -319,7 +319,7 @@ export default function ReservationDetails() {
                       <p className="font-medium">8 000 FCFA /jour</p>
                     </div>
                   </div>
-                </Card>
+                </Card> */}
               </div>
 
               {/* Colonne droite - Résumé véhicule */}
@@ -327,7 +327,6 @@ export default function ReservationDetails() {
                 <Card className="overflow-hidden">
                   <div className="h-64 bg-gray-100 relative">
                     <img
-                      // src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d"
                       src={selectedCar?.photo_url}
                       alt={`${selectedCar?.mark} ${selectedCar?.model}`}
                       className="w-full h-full object-cover"
@@ -341,9 +340,9 @@ export default function ReservationDetails() {
                     <h3 className="text-2xl font-bold mt-1">
                       {selectedCar?.mark} {selectedCar?.model}
                     </h3>
-                    <p className="text-gray-500">
+                    {/* <p className="text-gray-500">
                       100% Électrique • Transmission Intégrale
-                    </p>
+                    </p> */}
 
                     <div className="mt-8 space-y-4 text-sm">
                       <div className="flex justify-between">
@@ -354,10 +353,10 @@ export default function ReservationDetails() {
                         <span className="text-gray-600">Durée</span>
                         <span className="font-medium"> {estimate?.days} jours </span>
                       </div>
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="text-gray-600">Assurance</span>
                         <span className="font-medium">75 000 FCFA</span>
-                      </div>
+                      </div> */}
                     </div>
 
                     <div className="mt-8 pt-6 border-t">
@@ -385,197 +384,10 @@ export default function ReservationDetails() {
                 Retour au catalogue
               </Button>
 
-              {/* <Button onClick={() => setCurrentStep(3) } size="lg" className="px-12 py-7 text-lg"> */}
+             
               <Button onClick={handleConfirm } size="lg" className="px-12 py-7 text-lg">
-                Confirmer &amp; Payer
+                Confirmer la réservation →
               </Button>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 3 && (
-          <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-6xl mx-auto px-6">
-              <div className="grid lg:grid-cols-5 gap-10">
-                {/* Colonne Gauche - Mode de Paiement */}
-                <Card className="lg:col-span-3 p-5">
-                  <h1 className="text-3xl font-bold mb-8">Mode de Paiement</h1>
-
-                  {/* Options de paiement */}
-                  <div className="grid grid-cols-3 gap-4 mb-8">
-                    <Card
-                      onClick={() => setSelectedMethod("card")}
-                      className={`p-6 cursor-pointer transition-all hover:shadow-md ${
-                        selectedMethod === "card"
-                          ? "border-primary bg-blue-50"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex flex-col items-center text-center">
-                        <CreditCard className="w-8 h-8 mb-3" />
-                        <p className="font-medium">Carte Bancaire</p>
-                      </div>
-                    </Card>
-
-                    <Card
-                      onClick={() => setSelectedMethod("paypal")}
-                      className={`p-6 cursor-pointer transition-all hover:shadow-md ${
-                        selectedMethod === "paypal"
-                          ? "border-primary bg-blue-50"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex flex-col items-center text-center">
-                        <Wallet className="w-8 h-8 mb-3" />
-                        <p className="font-medium">PayPal</p>
-                      </div>
-                    </Card>
-
-                    <Card
-                      onClick={() => setSelectedMethod("agency")}
-                      className={`p-6 cursor-pointer transition-all hover:shadow-md ${
-                        selectedMethod === "agency"
-                          ? "border-primary bg-blue-50"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex flex-col items-center text-center">
-                        <Store className="w-8 h-8 mb-3" />
-                        <p className="font-medium">En agence</p>
-                      </div>
-                    </Card>
-                  </div>
-
-                  {/* Formulaire Carte Bancaire */}
-                  {selectedMethod === "card" && (
-                    <div>
-                      <div className="space-y-6">
-                        <div>
-                          <Label>Nom sur la carte</Label>
-                          <Input
-                            value={cardName}
-                            onChange={(e) => setCardName(e.target.value)}
-                            className="mt-2 text-lg h-10"
-                          />
-                        </div>
-
-                        <div>
-                          <Label>Numéro de carte</Label>
-                          <Input
-                            value={cardNumber}
-                            onChange={(e) => setCardNumber(e.target.value)}
-                            className="mt-2 text-lg tracking-widest h-10"
-                            maxLength={19}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-6">
-                          <div>
-                            <Label>Expiration (MM/AA)</Label>
-                            <Input
-                              value={expiry}
-                              onChange={(e) => setExpiry(e.target.value)}
-                              placeholder="MM/AA"
-                              className="mt-2 h-10"
-                            />
-                          </div>
-                          <div>
-                            <Label>CVV</Label>
-                            <Input
-                              value={cvv}
-                              onChange={(e) => setCvv(e.target.value)}
-                              maxLength={4}
-                              className="mt-2 h-10"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            checked={saveCard}
-                            onCheckedChange={(checked) =>
-                              setSaveCard(!!checked)
-                            }
-                          />
-                          <Label className="cursor-pointer">
-                            Enregistrer cette carte pour mes prochaines
-                            locations
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Sécurité */}
-                  <div className="mt-6 flex items-center gap-3 text-sm text-gray-600 bg-blue-50 p-4 rounded-xl">
-                    <Lock className="w-5 h-5 text-primary" />
-                    Paiement 100% sécurisé via protocole SSL. Vos données
-                    bancaires sont cryptées.
-                  </div>
-                </Card>
-
-                {/* Colonne Droite - Récapitulatif */}
-                <div className="lg:col-span-2">
-                  <Card className="p-8 sticky top-8">
-                    <h2 className="text-2xl font-semibold mb-6">
-                      Récapitulatif financier
-                    </h2>
-
-                    <div className="space-y-4">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">
-                          Location ( {estimate?.days} jours)
-                        </span>
-                        <span> {estimate?.carAmount} FCFA</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Assurance Premium</span>
-                        <span>62 500 FCFA</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">TVA (20%)</span>
-                        <span> {estimate?.tvaAmount} FCFA</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Réduction</span>
-                        <span> {estimate?.reductionAmount} FCFA</span>
-                      </div>
-
-                      <div className="border-t pt-6 mt-6">
-                        <div className="flex justify-between text-xl font-semibold">
-                          <span>Total à payer</span>
-                          <span className="text-primary"> {estimate?.totalAmount} FCFA</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Info véhicule */}
-                    <div className="mt-8 bg-gray-50 p-5 rounded-xl">
-                      <div className="flex gap-4">
-                        <img
-                          src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d"
-                          alt="BMW Série 3"
-                          className="w-24 h-16 object-cover rounded-lg"
-                        />
-                        <div>
-                          <p className="font-semibold">BMW Série 3</p>
-                          <p className="text-sm text-gray-500">
-                            Du 12 Oct. au 17 Oct. 2023
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button className="w-full mt-8 py-7 text-lg">
-                      Finaliser la réservation →
-                    </Button>
-
-                    <Button onClick={() => setCurrentStep(2)} variant={"link"} className="text-center text-sm text-gray-500 mt-4 cursor-pointer hover:underline">
-                      Retour au details
-                    </Button>
-                  </Card>
-                </div>
-              </div>
             </div>
           </div>
         )}

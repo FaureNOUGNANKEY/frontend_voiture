@@ -50,13 +50,10 @@ export default function LoginForm() {
       console.log("Connexion réussie :", response);
 
       toast.success("Bienvenue ! Connexion réussie.");
-
-      login(response.access_token, true);
-
       // Stocker l'utilisateur courant
       getCurrentUser(response.user);
-      // console.log("token",login(response.access_token, true))
-      // console.log("token",Cookies.get("token"))
+  
+      login(response.access_token, true,response.user);
       
     } catch (error: any) {
       if (error.response?.status === 422 && error.response.data.errors) {

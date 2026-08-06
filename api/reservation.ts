@@ -13,13 +13,14 @@ export const getReservationsApi = async () => {
 
 // Récupérer une réservation
 export const getReservationApi = async (id: string) => {
-  const response = await api.get(`/reservations/${id}`,{
+  const response = await api.get(`/reservations/${id}`, {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
-    },
+    }
   });
   return response.data;
-}
+};
+
 
 // Ajouter une réservation
 export const addReservationApi = async (formData: FormData) => {
@@ -50,5 +51,30 @@ export const deleteReservationApi = async (id: number) => {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },
   });
+  return response.data;
+};
+
+
+// Récupérer les réservations de l'utilisateur connecté
+export const getMyReservationsApi = async (status?: string) => {
+  const url = status ? `/reservations/myReservations?status=${status}` : `/reservations/myReservations`;
+
+  const response = await api.get(url, {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+
+  return response.data; 
+};
+
+// Annuler une réservation
+export const cancelReservationApi = async (id: number) => {
+  const response = await api.put(`/reservations/${id}/cancel`, {}, {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+
   return response.data;
 };

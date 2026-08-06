@@ -11,6 +11,7 @@ interface AuthContextType extends AuthState {
   logout: () => void;
   getCurrentUser: (currentUser: User) => void;
   setLoading: (isLoading: boolean) => void;
+  isHydrated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: false,
     isLoading: false,
   });
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const router = useRouter();
 
@@ -58,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: false,
         isLoading: false,
       });
+      setIsHydrated(true); 
     }
   }, []);
 
@@ -109,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Vérifier le rôle avant de rediriger
     if (auth.currentUser?.role === "admin") {
-      router.push("client");
+      router.push("login-admin");
       toast.success("Vous êtes déconnecté avec succès.");
     } else {
       router.push("client");
@@ -138,7 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, logout, getCurrentUser, setLoading }}>
+    <AuthContext.Provider value={{ ...auth, login,isHydrated, logout, getCurrentUser, setLoading }}>
       {children}
     </AuthContext.Provider>
   );

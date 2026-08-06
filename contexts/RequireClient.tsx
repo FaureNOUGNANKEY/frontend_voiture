@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function RequireClient({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated, currentUser,isHydrated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (!isAuthenticated) {
       //Pas connecté → redirection vers la page de login client
       router.push("/login-client");

@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function RequireAdmin({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated, currentUser,isHydrated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (!isAuthenticated) {
       router.push("/login-client");
     } else if (currentUser?.role !== "admin") {

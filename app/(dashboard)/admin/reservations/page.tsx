@@ -9,7 +9,7 @@ import Sidebar from "@/components/admin/sidebar";
 import AdminHeader from "@/components/admin/adminHeader";
 import { Car, Driver, Reservation, User } from "@/lib/types";
 import { useState, useEffect } from "react";
-import { getReservationApi, getReservationsApi } from "@/api/seservation";
+import { getReservationApi, getReservationsApi } from "@/api/reservation";
 import { getDriversApi } from "@/api/driver";
 import { getUsersApi } from "@/api/user";
 import { getCarsApi } from "@/api/car";
