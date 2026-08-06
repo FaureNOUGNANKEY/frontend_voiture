@@ -1,4 +1,4 @@
-type carStatus = "disponible" | "loué" | "en maintenance"|"en Panne";
+type carStatus = "disponible" | "loué" | "en maintenance"|"en panne";
 
 export interface AuthState {
   token: string | null;

@@ -12,10 +12,11 @@ const ICONS: Record<string, LucideIcon> = {
 
 interface StatisticsProps {
   statistics: Statistics;
+  onSuccess?: () => void;
 }
 
 
-export default function VehiculeKpis({ statistics }: StatisticsProps) {
+export default function VehiculeKpis({ statistics,onSuccess }: StatisticsProps) {
 
   const total = statistics.totals.cars;
   const available = statistics.totals.availableCars;

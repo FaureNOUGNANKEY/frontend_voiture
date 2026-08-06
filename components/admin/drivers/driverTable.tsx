@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Filter, PlusCircle, Pencil, TriangleAlert, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, PlusCircle, Pencil, TriangleAlert, Eye, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,12 @@ import {
 } from "@/components/ui/table";
 import { Driver } from "@/lib/types";
 import CreateDriverModal from "@/components/modals/createDriverModal";
+import ConfirmModal from "@/components/modals/confirmModal";
+import { deleteDriverApi } from "@/api/driver";
+import { toast } from "sonner";
 
 
-type driverStatus = "disponible" | "affecté" | "indisponible"|"inactif";
+type driverStatus = "disponible" | "affecté" | "indisponible" | "inactif";
 
 const STATUS_CLASSES: Record<driverStatus, string> = {
   "disponible": "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
@@ -33,17 +36,41 @@ interface DriverProps {
   onEdit: (id: number) => void;
 }
 
-export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) {
+export default function DriversTable({ drivers, onSuccess, onEdit }: DriverProps) {
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-  
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [driverToDelete, setDriverToDelete] = useState<Driver | null>(null);
+
+  const handleDelete = async () => {
+    if (!driverToDelete) return;
+
+    try {
+      await deleteDriverApi(driverToDelete.id);
+      toast.success("Chauffeur supprimé avec succès");
+
+      // Fermer la modal
+      setDeleteOpen(false);
+      setDriverToDelete(null);
+
+      // Rafraîchir la liste si onSuccess est fourni
+      onSuccess?.();
+    } catch (error: any) {
+      console.error("Erreur suppression chauffeur:", error);
+      toast.error("Échec de la suppression ");
+    }
+  };
+
+
+
 
   const filtered = drivers.filter((d) =>
     `${d.lastname} ${d.firstname} ${d.status}`.toLowerCase().includes(search.toLowerCase())
   );
 
-    
+
   return (
     <Card className="shadow-sm overflow-hidden">
       {/* Toolbar */}
@@ -84,9 +111,9 @@ export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) 
             {filtered.map((driver) => (
               <TableRow
                 key={driver.id}
-                // className={`hover:bg-slate-50 transition-colors ${
-                //   car.status === "En Panne" ? "bg-red-50/40" : ""
-                // }`}
+              // className={`hover:bg-slate-50 transition-colors ${
+              //   car.status === "En Panne" ? "bg-red-50/40" : ""
+              // }`}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -112,7 +139,7 @@ export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) 
                   </div>
                 </TableCell>
                 <TableCell className="text-sm">{driver.phone}</TableCell>
-        
+
                 <TableCell>
                   <Badge className={`${STATUS_CLASSES[driver.status]} font-bold uppercase tracking-tight text-[10px] gap-1.5`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -131,20 +158,32 @@ export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) 
                 <TableCell>
                   <div className="flex justify-center gap-1">
                     <div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary" onClick={()=>{
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary" onClick={() => {
                         setSelectedDriver(driver);
                         setCreateOpen(true);
                         onEdit(driver.id);
                       }}>
                         <Pencil size={18} />
                       </Button>
-                      
+
+
+                    </div>
+                    <div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-primary" 
+                      onClick={() => {
+                      setDriverToDelete(driver);
+                      setDeleteOpen(true);
+                    }}
+                      >
+                        <Trash2 size={18} />
+                      </Button>
+
 
                     </div>
 
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
+                    {/* <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
                       <TriangleAlert size={18} />
-                    </Button> 
+                    </Button>  */}
                   </div>
                 </TableCell>
               </TableRow>
@@ -159,10 +198,20 @@ export default function DriversTable({ drivers,onSuccess,onEdit }: DriverProps) 
           </TableBody>
         </Table>
       </div>
-      <CreateDriverModal open={createOpen} 
+      <CreateDriverModal open={createOpen}
         onOpenChange={setCreateOpen}
         initialData={selectedDriver}
-        onSuccess={onSuccess}                     
+        onSuccess={onSuccess}
+      />
+
+      {/* modal suppression */}
+      <ConfirmModal
+        message="Voulez-vous vraiment supprimer ce conducteur ?"
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={handleDelete}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
       />
 
       <div className="p-6 bg-slate-50 flex items-center justify-between">
