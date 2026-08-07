@@ -15,7 +15,7 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
     } else if (currentUser?.role !== "admin") {
       router.push("/403");
     }
-  }, [isAuthenticated, currentUser, router]);
+  }, [isAuthenticated, currentUser, router,isHydrated]);
 
   if (!isAuthenticated || !currentUser) {
     return <p>Chargement...</p>;

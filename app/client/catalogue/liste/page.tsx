@@ -176,8 +176,7 @@ export default function CataloguePage() {
                         👥 {car.place} Places
                       </div>
                       <div className="flex items-center gap-1">
-                        {/* ⚙️ {car.transmission} */}
-                        ⚙️ 
+                        ⚙️ {car.transmission}
                       </div>
                     </div>
 

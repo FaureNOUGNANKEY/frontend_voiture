@@ -33,32 +33,33 @@ export default function ReservationDetails() {
   const [pickupDate, setPickupDate] = useState("2024-11-20T10:00");
   const [returnDate, setReturnDate] = useState("2024-11-25T10:00");
   const [currentStep, setCurrentStep] = useState(2);
-  const {id} = useParams();
+  const { id } = useParams();
   const router = useRouter();
-  const { isAuthenticated, currentUser,logout } = useAuth();
+  const { isAuthenticated, currentUser, logout } = useAuth();
+  
 
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
   const getCar = async (id: string | number) => {
-      try {
-        const response = await getCarApi(String(id));
-        setSelectedCar(response.data);
-        console.log("Fetched car:", response.data);
-      } catch (error) {
-        console.error("Error fetching car:", error);
-      }
-    };
+    try {
+      const response = await getCarApi(String(id));
+      setSelectedCar(response.data);
+      console.log("Fetched car:", response.data);
+    } catch (error) {
+      console.error("Error fetching car:", error);
+    }
+  };
 
   useEffect(() => {
     if (id) {
       getCar(id as string);
     }
   }, [id]);
-  
+
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
-  
+
   const reservationData = {
-    user_id: currentUser?.id ,
+    user_id: currentUser?.id,
     car_id: selectedCar?.id,
     dateStart: pickupDate,
     dateBack: returnDate,
@@ -70,23 +71,22 @@ export default function ReservationDetails() {
     if (reservationData.car_id !== undefined) {
       data.append("car_id", String(reservationData.car_id));
     }
-    data.append("user_id",String(reservationData.user_id))
-    // data.append("user_id", String(currentUser?.id));
+    data.append("user_id", String(reservationData.user_id))
     data.append("dateStart", reservationData.dateStart);
     data.append("dateBack", reservationData.dateBack);
     data.append("type", reservationData.type);
     return data;
   };
-   
+
   const [formData, setFormData] = useState({
-    user_id: currentUser?.id ,
+    user_id: currentUser?.id,
     car_id: "",
     driver_id: "",
     dateStart: "",
     dateBack: "",
     type: "leasing",
   });
-  
+
   const [estimate, setEstimate] = useState<Estimate | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -136,13 +136,14 @@ export default function ReservationDetails() {
   //créer la reservation 
   const handleConfirm = async () => {
     if (!currentUser) {
-  toast.error("Vous devez être connecté pour réserver !");
-  return;
-}
+      toast.error("Vous devez être connecté pour réserver !");
+      return;
+    }
     try {
       const response = await addReservationApi(buildReservationFormData());
       console.log("Réservation créée :", response);
       toast.success("Réservation en attente de comfirmation!");
+      router.push("/client/reservation/me")
     } catch (error: any) {
       if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors);
@@ -154,7 +155,7 @@ export default function ReservationDetails() {
 
 
   return (
-    
+
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-6xl mx-auto px-6">
         {/* Stepper */}
@@ -165,7 +166,7 @@ export default function ReservationDetails() {
             <h1 className="text-4xl font-bold text-center mb-10">
               Détails de la Réservation
             </h1>
-            
+
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Colonne gauche */}
               <div className="lg:col-span-2 space-y-8">
@@ -218,11 +219,10 @@ export default function ReservationDetails() {
                     {/* Card Conduite Autonome */}
                     <div
                       onClick={() => setDriveOption("reservation")}
-                      className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                        driveOption === "reservation"
+                      className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${driveOption === "reservation"
                           ? "border-primary bg-blue-50"
                           : "border-gray-200 hover:border-gray-300"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
@@ -234,11 +234,10 @@ export default function ReservationDetails() {
                           </p>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            driveOption === "reservation"
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${driveOption === "reservation"
                               ? "border-primary"
                               : "border-gray-300"
-                          }`}
+                            }`}
                         >
                           {driveOption === "reservation" && (
                             <div className="w-3 h-3 bg-primary rounded-full" />
@@ -250,11 +249,10 @@ export default function ReservationDetails() {
                     {/* Card Chauffeur Professionnel */}
                     <div
                       onClick={() => setDriveOption("leasing")}
-                      className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                        driveOption === "leasing"
+                      className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${driveOption === "leasing"
                           ? "border-primary bg-blue-50"
                           : "border-gray-200 hover:border-gray-300"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
@@ -266,11 +264,10 @@ export default function ReservationDetails() {
                           </p>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            driveOption === "leasing"
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${driveOption === "leasing"
                               ? "border-primary"
                               : "border-gray-300"
-                          }`}
+                            }`}
                         >
                           {driveOption === "leasing" && (
                             <div className="w-3 h-3 bg-primary rounded-full" />
@@ -384,8 +381,8 @@ export default function ReservationDetails() {
                 Retour au catalogue
               </Button>
 
-             
-              <Button onClick={handleConfirm } size="lg" className="px-12 py-7 text-lg">
+
+              <Button onClick={ () => {handleConfirm()}} size="lg" className="px-12 py-7 text-lg">
                 Confirmer la réservation →
               </Button>
             </div>

@@ -34,7 +34,7 @@ export default function CatalogueWhyUsSection() {
               </div>
               <h3 className="text-2xl font-semibold mb-3">Assistance 24/7</h3>
               <p className="text-blue-100">
-                Une équipe dédiée prête à intervenir partout en Europe en moins de 45 minutes.
+                Une équipe dédiée prête à intervenir partout au Togo en moins de 45 minutes.
               </p>
             </div>
           </div>

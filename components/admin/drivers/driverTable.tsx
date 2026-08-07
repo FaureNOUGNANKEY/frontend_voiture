@@ -21,13 +21,13 @@ import { deleteDriverApi } from "@/api/driver";
 import { toast } from "sonner";
 
 
-type driverStatus = "disponible" | "affecté" | "indisponible" | "inactif";
+type driverStatus = "Disponible" | "Affecté" | "Indisponible" | "Inactif";
 
 const STATUS_CLASSES: Record<driverStatus, string> = {
-  "disponible": "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
-  "affecté": "bg-blue-100 text-blue-900 hover:bg-blue-100",
-  "indisponible": "bg-red-100 text-red-900 hover:bg-red-100",
-  "inactif": "bg-amber-100 text-amber-700 hover:bg-amber-100",
+  "Disponible": "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  "Affecté": "bg-blue-100 text-blue-900 hover:bg-blue-100",
+  "Indisponible": "bg-red-100 text-red-900 hover:bg-red-100",
+  "Inactif": "bg-amber-100 text-amber-700 hover:bg-amber-100",
 };
 
 interface DriverProps {
@@ -111,9 +111,9 @@ export default function DriversTable({ drivers, onSuccess, onEdit }: DriverProps
             {filtered.map((driver) => (
               <TableRow
                 key={driver.id}
-              // className={`hover:bg-slate-50 transition-colors ${
-              //   car.status === "En Panne" ? "bg-red-50/40" : ""
-              // }`}
+              className={`hover:bg-slate-50 transition-colors ${
+                driver.status === "Indisponible" ? "bg-red-50/40" : ""
+              }`}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">

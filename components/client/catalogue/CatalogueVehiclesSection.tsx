@@ -7,41 +7,6 @@ import { getCarsApi } from "@/api/car";
 import { Car } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
 
-const vehicles = [
-  {
-    name: "Mercedes Classe C",
-    type: "Berline • Automatique",
-    price: 25000,
-    places: 5,
-    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-    badge: "Premium",
-    badgeColor: "bg-amber-500",
-  },
-  {
-    name: "Tesla Model Y",
-    type: "SUV • Électrique",
-    price: 150000,
-    places: 5,
-    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89",
-    badge: "Électrique",
-    badgeColor: "bg-emerald-500",
-  },
-  {
-    name: "BMW X5",
-    type: "SUV • AWD",
-    price: 120000,
-    places: 7,
-    image: "https://images.unsplash.com/photo-1556189250-72cc5f5a5f5d",
-  },
-  {
-    name: "VW Golf 8",
-    type: "Compact • Manuel",
-    price: 12500,
-    places: 5,
-    image: "https://images.unsplash.com/photo-1549317666-7d1e0b3b9d2a",
-  },
-];
-
 export default function CatalogueVehiclesSection() {
   const router = useRouter();
   const [cars, setCars] = useState<Car[]>([]);
@@ -91,7 +56,11 @@ export default function CatalogueVehiclesSection() {
 
               <div className="p-5">
                 <h3 className="font-semibold text-xl">{car.mark} {car.model}</h3>
-                <p className="text-gray-500 text-sm mt-1">{car.type}</p>
+                {/* <p className="text-gray-500 flex text-sm mt-1">{car.category.name}  ⚙️{car.transmission}</p> */}
+                <div className="flex justify-between text-gray-500 text-sm mt-1">
+    <span>{car.category.name}</span>
+    <span>⚙️ {car.transmission}</span>
+  </div>
 
                 <div className="flex justify-between items-end mt-6">
                   <div>

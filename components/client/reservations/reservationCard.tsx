@@ -8,15 +8,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import ConfirmModal from "@/components/modals/confirmModal";
 import { useState } from "react";
 
-export type MyReservationStatus = "à venir" | "en cours" | "terminée" | "annulée";
+export type MyReservationStatus = "A venir" | "En cours" | "Terminée" | "Annulée";
 export type Status = "validé";
 
 
 export const STATUS_CLASSES: Record<MyReservationStatus, string> = {
-  "à venir": "bg-blue-100 text-blue-800",
-  "en cours": "bg-emerald-100 text-emerald-800",
-  "terminée": "bg-slate-100 text-slate-600",
-  "annulée": "bg-red-100 text-red-700",
+  "A venir": "bg-blue-100 text-blue-800",
+  "En cours": "bg-emerald-100 text-emerald-800",
+  "Terminée": "bg-slate-100 text-slate-600",
+  "Annulée": "bg-red-100 text-red-700",
 };
 
 export default function ReservationCard({ reservation, onCancel }: { reservation: Reservation, onCancel: (id: number) => void }) {
@@ -83,7 +83,7 @@ export default function ReservationCard({ reservation, onCancel }: { reservation
 
               <div className="flex gap-2">
                 {/* Cas : réservation à venir → uniquement Annuler */}
-                {reservation.computed_status === "à venir" && (
+                {reservation.computed_status === "A venir" && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -95,7 +95,7 @@ export default function ReservationCard({ reservation, onCancel }: { reservation
                 )}
 
                 {/* Cas : réservation validée → Annuler ET Payer */}
-                {reservation.status === ("validé" as Reservation["status"]) && (
+                {reservation.status === ("Validée" as Reservation["status"]) && (
                   <>
                     <Button
                       variant="outline"

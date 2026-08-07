@@ -18,7 +18,7 @@ export default function RequireClient({ children }: { children: React.ReactNode 
       //Connecté mais pas client → accès interdit
       router.push("/403");
     }
-  }, [isAuthenticated, currentUser, router]);
+  }, [isAuthenticated, currentUser, router,isHydrated]);
 
   if (!isAuthenticated || !currentUser) {
     return <p>Chargement...</p>;

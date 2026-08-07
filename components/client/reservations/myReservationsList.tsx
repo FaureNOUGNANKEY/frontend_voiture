@@ -6,14 +6,14 @@ import { Reservation } from "@/lib/types";
 import ConfirmModal from "@/components/modals/confirmModal";
 import { useState } from "react";
 
-export type MyReservationStatus = "à venir" | "en cours" | "terminée" | "annulée";
+export type MyReservationStatus = "A venir" | "En cours" | "Terminée" | "Annulée";
 
 const TABS: { value: string; label: string; filter?: MyReservationStatus }[] = [
   { value: "all", label: "Toutes" },
-  { value: "upcoming", label: "À venir", filter: "à venir" },
-  { value: "ongoing", label: "En cours", filter: "en cours" },
-  { value: "completed", label: "Terminées", filter: "terminée" },
-  { value: "cancelled", label: "Annulées", filter: "annulée" },
+  { value: "upcoming", label: "À venir", filter: "A venir" },
+  { value: "ongoing", label: "En cours", filter: "En cours" },
+  { value: "completed", label: "Terminées", filter: "Terminée" },
+  { value: "cancelled", label: "Annulées", filter: "Annulée" },
 ];
 
 interface MyReservationsListProps {
