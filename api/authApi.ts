@@ -11,16 +11,26 @@ export const registerApi = async (formData: FormData) => {
   return response.data;
 };
 
-//Connexion (Login) 
-export const loginApi = async (data: { email: string; password: string }) => {
-  const response = await api.post("/login", data, {
+// Connexion Admin
+export const loginAdminApi = async (data: { email: string; password: string }) => {
+  const response = await api.post("/loginAdmin", data, {
     headers: {
       "Content-Type": "application/json",
-
     },
   });
   return response.data;
 };
+
+// Connexion Client
+export const loginClientApi = async (data: { email: string; password: string }) => {
+  const response = await api.post("/loginClient", data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
 
 //Déconnexion (Logout) 
 export const logoutApi = async () => {

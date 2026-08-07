@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { loginApi } from "@/api/authApi";
+import { loginAdminApi} from "@/api/authApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -46,7 +46,7 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const response = await loginApi({ email, password });
+      const response = await loginAdminApi({ email, password });
       console.log("Connexion réussie :", response);
 
       toast.success("Bienvenue ! Connexion réussie.");
