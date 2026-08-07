@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { addReservationApi, updateReservationApi } from "@/api/reservation";
 import {User, Car, Client, Driver} from "@/lib/types";
+import { toast } from "sonner";
 
 interface CreateReservationModalProps {
   open: boolean;
@@ -72,6 +73,7 @@ export default function CreateReservationModal({
   },[initialData])
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setErrors({});
     e.preventDefault();
     setIsLoading(true);
     
@@ -91,8 +93,10 @@ export default function CreateReservationModal({
     try {
       if (initialData) {
         await updateReservationApi(initialData.id, data);
+        toast.success ("Réservation mis à jours avec succès !")
       } else {
         await addReservationApi(data);
+        toast.success ("Réservation ajouter avec succès !")
       }
         onSuccess?.();
         onOpenChange(false);
@@ -256,11 +260,11 @@ export default function CreateReservationModal({
                   <SelectValue placeholder="Sélectionner le statut" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en cours">En cours</SelectItem>
-                  <SelectItem value="terminée">Terminée</SelectItem>
+                  <SelectItem value="En cours">En cours</SelectItem>
+                  <SelectItem value="Terminée">Terminée</SelectItem>
                   {/* <SelectItem value="En attente">En attente</SelectItem> */}
-                  <SelectItem value="refusée">Refusée</SelectItem>
-                  <SelectItem value="validé">Validé</SelectItem>
+                  <SelectItem value="Refusée">Refusée</SelectItem>
+                  <SelectItem value="Validée">Validée</SelectItem>
                 </SelectContent>
               </Select>
               {errors.status && <p className="text-red-600 text-sm">{errors.status[0]}</p>}

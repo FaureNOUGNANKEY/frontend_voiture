@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Category } from "@/lib/types";
 import { addCarApi, updateCarApi } from "@/api/car";
+import { toast } from "sonner";
 
 interface CarFormModalProps {
   open: boolean;
@@ -56,6 +57,7 @@ export default function CreateVehiculeModal({
     kilometrage: initialData?.kilometrage || "",
     niveauCarburant: initialData?.niveauCarburant || "Plein",
     dommage: initialData?.dommage || "",
+    transmission: initialData?.transmission || "",
   });
 
   const [preview, setPreview] = useState<string | null>(null);
@@ -80,6 +82,7 @@ export default function CreateVehiculeModal({
         kilometrage: initialData.kilometrage || "",
         niveauCarburant: initialData.niveauCarburant || "Plein",
         dommage: initialData.dommage || "",
+        transmission: initialData?.transmission || "",
       });
       setPreview(initialData.photo_url || null);
       console.log("initial data : ", initialData);
@@ -116,8 +119,10 @@ export default function CreateVehiculeModal({
     try {
       if (initialData) {
         await updateCarApi(initialData.id, data);
+        toast.success ("Voiture mis à jour avec succès ! ")
       } else {
         await addCarApi(data);
+        toast.success("Voiture ajouter avec succès ! ")
       }
       onSuccess?.();
       onOpenChange(false);
@@ -138,6 +143,7 @@ export default function CreateVehiculeModal({
         kilometrage: "",
         niveauCarburant: "Plein",
         dommage: "",
+        transmission: "",
       });
       setPreview(null);
     } catch (error: any) {
@@ -283,8 +289,8 @@ export default function CreateVehiculeModal({
             {errors.description && <p className="text-red-600 text-sm">{errors.description[0]}</p>}
           </div>
 
-          {/* Prix */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Prix + transmission*/}
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="prix_par_jour">Prix par jour (FCFA) <span className="text-red-600">*</span></Label>
               <Input
@@ -317,6 +323,27 @@ export default function CreateVehiculeModal({
               />
               {errors.kmAmount && <p className="text-red-600 text-sm">{errors.kmAmount[0]}</p>}
             </div>
+
+             {/* transmission */}
+            <div>
+              <Label>Transmission<span className="text-red-600">*</span></Label>
+              <Select
+                value={formData.transmission}
+                onValueChange={(value) =>
+                  setFormData({ ...formData,transmission: value })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Transmission" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Automatique">Automatique</SelectItem>
+                  <SelectItem value="Manuelle">Manuelle</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.transmission && <p className="text-red-600 text-sm">{errors.transmission[0]}</p>}
+            </div>
+      
           </div>
 
           {/* État + Categorie + Carburant */}
@@ -377,7 +404,7 @@ export default function CreateVehiculeModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Vide">Vide</SelectItem>
-                  <SelectItem value="14">14</SelectItem>
+                  <SelectItem value="14">1/4</SelectItem>
                   <SelectItem value="1/2">1/2</SelectItem>
                   <SelectItem value="3/4">3/4</SelectItem>
                   <SelectItem value="Plein">Plein</SelectItem>

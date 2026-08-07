@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, Download, Eye, Pencil, Receipt, History, ShieldCheck, TriangleAlert, BadgeCheck, X } from "lucide-react";
+import { Search, Filter, Download, Eye, Pencil, Receipt, History, ShieldCheck, TriangleAlert, BadgeCheck, X, Car as CarIcon, Loader} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,18 +24,18 @@ import {
 import { Car, Driver, Reservation,Client } from "@/lib/types";
 import CreateReservationModal from "@/components/modals/createReservationModal";
 
-type PaymentStatus = "paid" | "pending" | "loyalty";
-type ReservationTimelineState = "active" | "upcoming" | "completed";
 
 // 1. Définir les états possibles
-type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
+type ReservationStatus = "En cours" | "Terminée" | "Annulée" | "En attente" | "Refusée"| "Validée";
 
 // 2. Associer chaque état à une couleur (classes Tailwind)
 const RESERVATION_CLASSES: Record<ReservationStatus, string> = {
   "En attente": "bg-orange-100 text-orange-700 hover:bg-orange-200",
-  "en cours": "bg-green-100 text-green-700 hover:bg-green-200",
-  "annulée": "bg-red-100 text-red-700 hover:bg-red-200",
-  "terminée": "bg-blue-100 text-blue-700 hover:bg-blue-200",
+  "En cours": "bg-green-100 text-green-700 hover:bg-green-200",
+  "Annulée": "bg-red-100 text-red-700 hover:bg-red-200",
+  "Refusée": "bg-red-100 text-red-700 hover:bg-red-200",
+  "Terminée": "bg-blue-100 text-blue-700 hover:bg-blue-200",
+  "Validée": "bg-blue-100 text-blue-700 hover:bg-blue-200",
 };
 const AVATAR_COLORS = [
   "bg-emerald-100 text-emerald-700",
@@ -213,40 +213,42 @@ function getInitials(firstname: string, lastname: string) {
 
                 <TableCell>
                   <div className="flex justify-center gap-1 opacity-100 transition-opacity">
-                    {r.status === "terminée" ? (
+                    {r.status === "Terminée" ? (
                       <>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" 
                         >
                           <Receipt size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                          <History size={18} />
-                        </Button>
+            
                       </>
-                    ) : r.status === "annulée" ? (
+                    ) : ["Annulée","Refusée"].includes(r.status?.toLowerCase()) ? (
                       <>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" 
                         >
                           <X size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                          <History size={18} />
-                        </Button>
+                        
                       </>
-                    ) :  r.driverAmount !== 0 && r.driver == null ? (
+                    ) : r.status === "Validée"  && !["En cours", "Terminée","A venir"].includes(r.computed_status?.toLowerCase())? (
                       <>
-                        <Button variant="ghost" size="icon" className="h-8 w-8  bg-red-300 animate-pulse" 
-                        onClick={() => {
-                          setCreateOpen(true);
-                          setSelectedReservation(r);
-                          onEdit(r.id);
-                        }}
+                        <Button variant="ghost" size="icon" 
+                        className={ `h-8 w-8 text-red-600 ${r.driverAmount != 0 && r.driver == null && !["Annulée", "Refusée"].includes(r.status?.toLowerCase()) ? "bg-red-300 animate-pulse" : "h-8 w-8 text-primary"}}`}
                         >
-                          <Pencil size={18} />
+                          <CarIcon size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                          <History size={18} />
+
+                        
+                      </>
+                    ) : r.computed_status=== "En cours" && r.status === "Validée" ? (
+                      <>
+                        <Button variant="ghost" size="icon" 
+                        className={ `h-8 w-8 text-red-600 ${r.driverAmount != 0 && r.driver == null && !["Annulée", "Refusée"].includes(r.status?.toLowerCase()) ? "bg-red-300 animate-pulse" : "h-8 w-8 text-green-800"}}`}
+                        // className=  "h-8 w-8 text-green-800"
+                        >
+                          <Loader size={18} />
                         </Button>
+
+                        
                       </>
                     ) : (
                       <>
@@ -260,11 +262,12 @@ function getInitials(firstname: string, lastname: string) {
                           <Pencil size={18} />
                         </Button>
 
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
+                        
+                      </>)}
+
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-primary">
                           <Eye size={18} />
                         </Button>
-                      </>
-                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -290,7 +293,7 @@ function getInitials(firstname: string, lastname: string) {
           onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
 
       <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-sm">
-        <span className="text-slate-500">Affichage de 1 à {filtered.length} sur 42 résultats</span>
+        <span className="text-slate-500">Affichage de 1 à {filtered.length} sur {reservations.length} résultats</span>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" disabled>
             Précédent

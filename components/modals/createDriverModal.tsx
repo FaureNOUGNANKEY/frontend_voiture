@@ -83,9 +83,10 @@ export default function CreateDriverModal({
       if (initialData){
         await updateDriverApi(initialData.id, data)
         console.log("data",data)
-        toast.success("chauffeur mis à jour avec succès.");
+        toast.success("chauffeur mis à jour avec succès !");
       }else{
         await addDriverApi(data);
+        toast.success("chauffeur ajouter avec succès !")
       }
       onSuccess?.();
       onOpenChange(false);

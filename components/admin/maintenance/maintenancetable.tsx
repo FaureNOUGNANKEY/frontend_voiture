@@ -19,59 +19,6 @@ import ConfirmModal from "@/components/modals/confirmModal";
 
 export type Priority = "Urgente" | "Moyenne" | "Faible";
 
-// export type MaintenanceTicket = {
-//   id: string;
-//   vehicle: string;
-//   plate: string;
-//   fuelType: string;
-//   icon: string;
-//   description: string;
-//   priority: Priority;
-//   cost: string;
-//   progress: number;
-//   progressLabel: string;
-// };
-
-// export const maintenanceTickets: MaintenanceTicket[] = [
-//   {
-//     id: "m1",
-//     vehicle: "Mercedes-Benz Actros",
-//     plate: "AA-123-BB",
-//     fuelType: "Diesel",
-//     icon: "Car",
-//     description:
-//       "Surchauffe moteur et perte de puissance sur autoroute. Fuite de liquide de refroidissement détectée.",
-//     priority: "Urgente",
-//     cost: "3 450 €",
-//     progress: 15,
-//     progressLabel: "Diagnostic terminé",
-//   },
-//   {
-//     id: "m2",
-//     vehicle: "Iveco Daily",
-//     plate: "CK-982-PL",
-//     fuelType: "GNV",
-//     icon: "Truck",
-//     description: "Révision périodique des 50 000km + Remplacement des plaquettes de frein avant.",
-//     priority: "Moyenne",
-//     cost: "850 €",
-//     progress: 75,
-//     progressLabel: "En cours de remontage",
-//   },
-//   {
-//     id: "m3",
-//     vehicle: "Renault Zoe E-Tech",
-//     plate: "EV-444-ZZ",
-//     fuelType: "Électrique",
-//     icon: "Zap",
-//     description: "Défaut système de charge. Le véhicule ne prend plus la charge sur bornes rapides.",
-//     priority: "Faible",
-//     cost: "1 100 €",
-//     progress: 40,
-//     progressLabel: "Attente pièces",
-//   },
-// ];
-
 interface PanneProps {
   pannes: Panne[],
 }
@@ -184,7 +131,7 @@ export default function MaintenanceTable({ pannes }: PanneProps) {
       </div>
 
       <div className="p-6 border-t border-slate-200 flex justify-between items-center">
-        <span className="text-sm text-slate-500">Affichage de 1-{filtered.length} sur 12 pannes</span>
+        <span className="text-sm text-slate-500">Affichage de 1-{filtered.length} sur {pannes.length} pannes</span>
         <div className="flex gap-1">
           <Button variant="outline" size="icon" className="h-8 w-8" disabled>
             <ChevronLeft size={16} />
