@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import { useState } from "react";
 import {
@@ -14,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { loginApi } from "@/api/authApi";
+import { loginAdminApi} from "@/api/authApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -27,7 +28,8 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const { login } = useAuth();
+  // const { login } = useAuth();
+  const { login, getCurrentUser,  } = useAuth();
 
   // const handleSubmit = (e: React.FormEvent) => {
   //   e.preventDefault();
@@ -44,12 +46,15 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const response = await loginApi({ email, password });
-      console.log("Connexion réussie :", response.data);
+      const response = await loginAdminApi({ email, password });
+      console.log("Connexion réussie :", response);
 
       toast.success("Bienvenue ! Connexion réussie.");
-
-      login(response.data.token, true);
+      // Stocker l'utilisateur courant
+      getCurrentUser(response.user);
+  
+      login(response.access_token, true,response.user);
+      
     } catch (error: any) {
       if (error.response?.status === 422 && error.response.data.errors) {
         setErrors(error.response.data.errors);

@@ -1,4 +1,4 @@
-type carStatus = "disponible" | "loué" | "en maintenance"|"en Panne";
+type carStatus = "Disponible" | "Louée" | "En maintenance"|"En panne";
 
 export interface AuthState {
   token: string | null;
@@ -24,7 +24,9 @@ export interface Car {
     place: number;
     door: number;
     kilometrage: number;
-    niveauCarburant: number;
+    niveauCarburant: "Plein" | "1/4" | "1/2" | "3/4" | "Vide";
+    transmission : 'Automatique'| 'Manuelle';
+    active : boolean;
     domage?: string;
     category: Category;
     created_at: string;
@@ -42,14 +44,14 @@ export interface Panne {
   id: number;
   description: string;
   priority: "Urgente" | "Moyenne" | "Faible";
-  status: "En attente" | "En réparation" | "Réparé";
+  status: "En attente" | "En réparation" | "Réparée";
   panneAmount: number;
   car : Car,
   created_at: string;
   updated_at: string;
 }
 
-type ReservationStatus = "en cours" | "terminée" | "annulée" | "En attente";
+export type ReservationStatus = "En cours" | "Terminée" | "Annulée" | "En attente" | "Refusée"| "Validée";
 export interface Reservation {
     id:number,
     dateStart: string,
@@ -57,10 +59,13 @@ export interface Reservation {
     driverAmount: number,
     type: string,
     status: ReservationStatus,
+    computed_status: "A venir" | "En cours" | "Terminée" ,
     car : Car,
+    days: number,
     driver?: Driver,
     totalAmount?: number,
     user: User,
+    invoice?: invoice,
     created_at: string,
     updated_at: string 
 }
@@ -101,7 +106,7 @@ export interface Client {
     created_at: string,
     updated_at: string 
 }
-type driverStatus = "disponible" | "affecté" | "indisponible"|"inactif";
+type driverStatus = "Disponible" | "Affecté" | "Indisponible"|"Inactif";
 export interface Driver {
     id:number,
     lastname:string,    
@@ -109,6 +114,7 @@ export interface Driver {
     photo?: string,
     phone : string,
     photo_url?: string,
+    acttive: boolean,
     status: driverStatus,
     created_at: string,
     updated_at: string ,
@@ -162,7 +168,9 @@ export interface Totals {
   availableCars: number;      
   unAvailableCars: number;     
   rentedCars: number;        
-  brokenCars: number;      
+  brokenCars: number; 
+  carInRepair:number,
+  waitingForDriver:number;     
 }
 
 // Activité des réservations par jour
@@ -186,4 +194,18 @@ export interface Estimate {
   tvaAmount: number;
   totalAmount: number;
 }
+
+export interface CarBack {
+  id: number;
+  reservation_id: number;
+  returnKm: number; 
+  fluelLevel: "Plein" | "1/4" | "1/2" | "3/4" | "Vide"; 
+  state: string;
+  domage?: string | null;  
+  comment?: string | null; 
+  created_at: string;       
+  updated_at: string;      
+  reservation?: Reservation; 
+}
+
 

@@ -1,25 +1,28 @@
 import CreateReservationModal from "@/components/modals/createReservationModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Car, Driver, User } from "@/lib/types";
+import { Car, Driver, Statistics, User } from "@/lib/types";
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
 
-export const reservationStats = [
-  { id: "total", label: "Total actif", value: "42", delta: "+12%" },
-  { id: "pending", label: "En attente de chauffeur", value: "08", tag: "URGENT" },
-];
+
 
 interface ReservationProps{
   drivers:Driver[];
   clients:User[];
   cars :Car[],
+  statistics : Statistics,
   onSuccess?: () => void;
 }
 
-export default function ReservationsHeader({clients,drivers,cars,onSuccess}:ReservationProps) {
+export default function ReservationsHeader({clients,drivers,cars,statistics,onSuccess}:ReservationProps) {
+
+  const reservationStats = [
+  { id: "total", label: "Total actif", value: statistics?.totals.activeReservations, delta: "+12%" },
+  { id: "pending", label: "En attente de chauffeur", value: statistics?.totals.waitingForDriver , tag: "URGENT" },
+];
   const [createOpen, setCreateOpen] = useState(false);
   return (
     <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">

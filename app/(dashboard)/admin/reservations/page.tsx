@@ -7,12 +7,13 @@ import ReservationsTable from "@/components/admin/reservations/reservationTable"
 import SystemActivities from "@/components/admin/reservations/systemActivities";
 import Sidebar from "@/components/admin/sidebar";
 import AdminHeader from "@/components/admin/adminHeader";
-import { Car, Driver, Reservation, User } from "@/lib/types";
+import { Car, Driver, Reservation, Statistics, User } from "@/lib/types";
 import { useState, useEffect } from "react";
-import { getReservationApi, getReservationsApi } from "@/api/seservation";
+import { getReservationApi, getReservationsApi } from "@/api/reservation";
 import { getDriversApi } from "@/api/driver";
 import { getUsersApi } from "@/api/user";
 import { getCarsApi } from "@/api/car";
+import { getStatisticsApi } from "@/api/statistic";
 
 
 
@@ -22,6 +23,7 @@ export default function ReservationsPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [cars, setCars] = useState<Car[]>([]);
   const [clients, setClients] = useState<User[]>([]);
+  const [statistics, setStatistics] = useState<Statistics | null>(null);
 
   const getReservations = async () => {
     try {
@@ -40,6 +42,17 @@ export default function ReservationsPage() {
       console.log("Fetched Reservation:", response.data);
     } catch (error) {
       console.error("Error fetching Reservation:", error);
+
+    }
+  }
+
+  const getStatistics = async () => {
+    try {
+      const response = await getStatisticsApi();
+      setStatistics(response.data);
+      console.log("Fetched Statistics:", response.data);
+    } catch (error) {
+      console.error("Error fetching Statistics:", error);
 
     }
   }
@@ -84,6 +97,7 @@ export default function ReservationsPage() {
     getCars();
     getClients();
     getReservations();
+    getStatistics();
     getDrivers();
   }, []);
 
@@ -91,7 +105,7 @@ export default function ReservationsPage() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          <ReservationsHeader clients={clients} cars={cars} onSuccess={getReservations} drivers={drivers} />
+          {statistics &&<ReservationsHeader clients={clients} cars={cars} onSuccess={getReservations} drivers={drivers} statistics={statistics} />}
           <ReservationsTable reservations={reservations} drivers={drivers} onEdit={(id: string | number) => getReservation(id)} onSuccess={getReservations} clients={clients} cars={cars}/>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

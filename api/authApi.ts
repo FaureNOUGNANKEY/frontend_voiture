@@ -1,4 +1,5 @@
 import api from "../lib/api";
+import Cookies from "js-cookie";
 
 //Inscription (Register) 
 export const registerApi = async (formData: FormData) => {
@@ -10,15 +11,26 @@ export const registerApi = async (formData: FormData) => {
   return response.data;
 };
 
-//Connexion (Login) 
-export const loginApi = async (data: { email: string; password: string }) => {
-  const response = await api.post("/login", data, {
+// Connexion Admin
+export const loginAdminApi = async (data: { email: string; password: string }) => {
+  const response = await api.post("/loginAdmin", data, {
     headers: {
       "Content-Type": "application/json",
     },
   });
   return response.data;
 };
+
+// Connexion Client
+export const loginClientApi = async (data: { email: string; password: string }) => {
+  const response = await api.post("/loginClient", data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
 
 //Déconnexion (Logout) 
 export const logoutApi = async () => {
@@ -30,7 +42,7 @@ export const logoutApi = async () => {
 export const getUserstokenApi = async (token: string) => {
   const response = await api.get("/users", {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
   });
   return response.data;

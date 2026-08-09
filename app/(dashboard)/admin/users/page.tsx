@@ -8,7 +8,10 @@ import Sidebar from "@/components/admin/sidebar";
 import UsersHeader from "@/components/admin/users/usersHeader";
 import UsersStats from "@/components/admin/users/usersStats";
 import UsersTable from "@/components/admin/users/usersTable";
+import { useAuth } from "@/contexts/AuthContext";
+import RequireAdmin from "@/contexts/RequireAdmin";
 import { Statistics, User } from "@/lib/types";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 

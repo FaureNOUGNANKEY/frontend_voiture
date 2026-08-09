@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { addUserApi, updateUserApi } from "@/api/user";
+import { toast } from "sonner";
 
 interface CreateUserModalProps {
   open: boolean;
@@ -110,8 +111,10 @@ export default function CreateUserModal({
     try {
       if(initialData){
         await updateUserApi(initialData.id,data)
+        toast.success ("Utilisateur mis à jour avec succès")
       }else{
          await addUserApi(data);
+         toast.success ("Utilisateur ajouter avec succès !")
       }
       onSuccess?.();
       onOpenChange(false);

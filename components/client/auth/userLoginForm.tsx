@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { loginApi } from "@/api/authApi";
+import { loginClientApi } from "@/api/authApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -32,12 +32,15 @@ export default function UserLoginForm() {
     setIsLoading(true);
 
     try {
-      const response = await loginApi({ email, password });
-      console.log("Connexion réussie :", response.data);
+      const response = await loginClientApi({ email, password });
+      console.log("Connexion réussie :", response);
 
       toast.success("Bienvenue ! Vous êtes connecté avec succès.");
 
-      login(response.data.token, false);
+      // Stocker l'utilisateur courant
+      getCurrentUser(response.user);
+  
+      login(response.access_token, false,response.user);
     } catch (error: any) {
       if (error.response?.status === 422 && error.response.data.errors) {
         setErrors(error.response.data.errors);

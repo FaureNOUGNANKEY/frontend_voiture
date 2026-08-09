@@ -63,7 +63,7 @@ export default function ConducteursPage() {
           <DriverHeader onSuccess={getDrivers} />
           {statistics && <DriversKpis statistics={statistics} />}
           {/* <DriversKpis statistics={statistics} /> */}
-          <DriversTable drivers={drivers} onEdit={(id: number | string) =>getDriver(id)} onSuccess={getDrivers}/>
+          <DriversTable drivers={drivers} onEdit={(id: number | string) =>getDriver(id)} onSuccess={ () => {getDrivers();getStatistics()}}/>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* <IncidentsList /> */}

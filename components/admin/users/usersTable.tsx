@@ -25,6 +25,9 @@ import { Input } from "@base-ui/react";
 import { useState } from "react";
 import { User } from "@/lib/types";
 import CreateUserModal from "@/components/modals/createUserModal";
+import ConfirmModal from "@/components/modals/confirmModal";
+import { deleteUserApi } from "@/api/user";
+import { toast } from "sonner";
 
 function formatDate(isoDate: string) {
   const date = new Date(isoDate);
@@ -34,7 +37,7 @@ function formatDate(isoDate: string) {
   }).format(date);
 }
 
-interface UserProps{
+interface UserProps {
   users: User[];
   onSuccess?: () => void;
   onEdit: (id: number) => void;
@@ -47,107 +50,149 @@ export const ROLE_CLASSES: Record<UserRole, string> = {
   "admin": "bg-indigo-100 text-indigo-800",
 };
 
-function UsersRows({ users, onSuccess,onEdit }: UserProps) {
+function UsersRows({ users, onSuccess, onEdit }: UserProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  
+  const handleDelete = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await deleteUserApi(userToDelete.id);
+      toast.success("Utilisateur supprimé avec succès");
+      // Fermer la modal
+      setDeleteOpen(false);
+      setUserToDelete(null);
+      // Rafraîchir la liste si onSuccess est fourni
+      if (onSuccess) onSuccess();
+    } catch (error: any) {
+      console.error("Erreur suppression utilisateur:", error);
+      toast.error("Échec de la suppression");
+    }
+  };
+
+
   return (
-    <TableBody>
-      {users.map((user) => (
-        <TableRow
-          key={user.id}
-          className="hover:bg-slate-50 transition-colors group"
-        >
-          <TableCell>
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-12 h-15 rounded bg-slate-100 overflow-hidden border border-slate-200 "grayscale opacity-70" : "" }`}
-              >
-                <img  src={user.photo_url} alt={user.lastname} className="w-full h-full object-cover"/>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
-                  {user.lastname} {user.firstname}
-                </p>
-                <p className="text-xs text-slate-500">ID: 00000{user.id}</p>
-              </div>
-            </div>
-          </TableCell>
-          <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
-          <TableCell className="text-sm text-slate-600">{user.phone}</TableCell>
-          <TableCell>
-            <Badge
-              className={`${ROLE_CLASSES[user.role]} font-bold hover:${ROLE_CLASSES[user.role]}`}
-            >
-              {user.role}
-            </Badge>
-          </TableCell>
-          <TableCell className="text-sm text-slate-600">
-            {formatDate(user.created_at)}
-          </TableCell>
-          <TableCell className="text-right">
-            <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-              <div>
-              <Button
-                onClick={() => {
-                  setCreateOpen(true);
-                  setSelectedUser(user);
-                  onEdit(user.id);
-                }}
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-blue-900"
-              >
-                <Pencil size={18} />
-              </Button>
-              {/* Modal */}
-              <CreateUserModal 
-                      open={createOpen}
-                      onOpenChange={setCreateOpen}
-                      initialData={selectedUser}
-                      onSuccess={onSuccess}
-                    />
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-red-600"
-              >
-                <Trash2 size={18} />
-              </Button>
-            </div>
-          </TableCell>
-        </TableRow>
-      ))}
-      {users.length === 0 && (
-        <TableRow>
-          <TableCell
-            colSpan={5}
-            className="text-center py-8 text-sm text-slate-400"
+    <>
+      <TableBody>
+        {users.map((user) => (
+          <TableRow
+            key={user.id}
+            className="hover:bg-slate-50 transition-colors group"
           >
-            Aucun utilisateur dans cette catégorie.
-          </TableCell>
-        </TableRow>
-      )}
-    </TableBody>
+            <TableCell>
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-12 h-15 rounded bg-slate-100 overflow-hidden border border-slate-200 "grayscale opacity-70" : "" }`}
+                >
+                  <img src={user.photo_url} alt={user.lastname} className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {user.lastname} {user.firstname}
+                  </p>
+                  <p className="text-xs text-slate-500">ID: 00000{user.id}</p>
+                </div>
+              </div>
+            </TableCell>
+            <TableCell className="text-sm text-slate-600">{user.email}</TableCell>
+            <TableCell className="text-sm text-slate-600">{user.phone}</TableCell>
+            <TableCell>
+              <Badge
+                className={`${ROLE_CLASSES[user.role]} font-bold hover:${ROLE_CLASSES[user.role]}`}
+              >
+                {user.role}
+              </Badge>
+            </TableCell>
+            <TableCell className="text-sm text-slate-600">
+              {formatDate(user.created_at)}
+            </TableCell>
+            <TableCell className="text-right">
+              <div className="flex justify-end gap-1 opacity-100 transition-opacity">
+                <div>
+                  <Button
+                    onClick={() => {
+                      setCreateOpen(true);
+                      setSelectedUser(user);
+                      onEdit(user.id);
+                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-blue-900"
+                  >
+                    <Pencil size={18} />
+                  </Button>
+
+                </div>
+                <div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-600"
+                    onClick={() => {
+                      setUserToDelete(user);
+                      setDeleteOpen(true);
+                    }}
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+
+                </div>
+              </div>
+
+            </TableCell>
+          </TableRow>
+        ))}
+        {users.length === 0 && (
+          <TableRow>
+            <TableCell
+              colSpan={5}
+              className="text-center py-8 text-sm text-slate-400"
+            >
+              Aucun utilisateur dans cette catégorie.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+      {/* Modal */}
+      <CreateUserModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        initialData={selectedUser}
+        onSuccess={onSuccess}
+      />
+
+      {/* modal suppression */}
+      <ConfirmModal
+        message="Voulez-vous vraiment supprimer cet utilisateur ?"
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={handleDelete}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+      />
+
+    </>
   );
 }
 
-export default function UsersTable({ users,onSuccess,onEdit }: UserProps) {
+
+export default function UsersTable({ users, onSuccess, onEdit }: UserProps) {
 
   const clients = users.filter((u) => u.role !== "admin");
   const admins = users.filter((u) => u.role === "admin");
   const [search, setSearch] = useState("");
   // Filtrage dynamique
   const filteredClients = clients.filter((u) =>
-    [u.lastname,u.firstname, u.email, u.role].some((field) =>
+    [u.lastname, u.firstname, u.email, u.role].some((field) =>
       field.toLowerCase().includes(search.toLowerCase())
     )
   );
 
   const filteredAdmins = admins.filter((u) =>
-    [u.lastname,u.firstname, u.email, u.role].some((field) =>
+    [u.lastname, u.firstname, u.email, u.role].some((field) =>
       field.toLowerCase().includes(search.toLowerCase())
     )
   );

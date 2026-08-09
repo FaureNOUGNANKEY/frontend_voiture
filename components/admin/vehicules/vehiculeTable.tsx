@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, Filter, PlusCircle, Pencil, TriangleAlert, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, PlusCircle, Pencil, TriangleAlert, Eye, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,14 +16,17 @@ import {
 } from "@/components/ui/table";
 import { Car, Category } from "@/lib/types";
 import CreateVehiculeModal from "@/components/modals/createVehiculeModal";
+import ConfirmModal from "@/components/modals/confirmModal";
+import { deleteCarApi } from "@/api/car";
+import { toast } from "sonner";
 
-type carStatus = "disponible" | "loué" | "en maintenance" | "en Panne";
+type carStatus = "Disponible" | "Louée" | "En maintenance" | "En panne";
 
 const STATUS_CLASSES: Record<carStatus, string> = {
-  disponible: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
-  loué: "bg-blue-100 text-blue-900 hover:bg-blue-100",
-  "en maintenance": "bg-blue-100 text-blue-900 hover:bg-blue-100",
-  "en Panne": "bg-amber-100 text-amber-700 hover:bg-amber-100",
+  Disponible: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
+  Louée: "bg-blue-100 text-blue-900 hover:bg-blue-100",
+  "En maintenance": "bg-blue-100 text-blue-900 hover:bg-blue-100",
+  "En panne": "bg-amber-100 text-amber-700 hover:bg-amber-100",
 };
 
 
@@ -38,6 +41,30 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [carToDelete, setCarToDelete] = useState<Car | null>(null);
+
+  const handleDelete = async () => {
+    if (!carToDelete) return;
+
+    try {
+      await deleteCarApi(carToDelete.id);
+      toast.success("Voiture supprimée avec succès");
+
+      // Fermer la modal
+      setDeleteOpen(false);
+      setCarToDelete(null);
+
+      // Rafraîchir la liste si onSuccess est fourni
+      if (onSuccess) onSuccess();
+    } catch (error: any) {
+      // console.error("Erreur suppression voiture:", error);
+      const msg = error.response?.data?.message || "Erreur lors de la suppression";
+      toast.error(msg);
+      console.log("Suppression échouée:", msg);
+    }
+  };
 
 
   const filtered = cars.filter((c) =>
@@ -78,6 +105,8 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
               <TableHead className="text-xs font-semibold uppercase tracking-wider">Immatriculation</TableHead>
               <TableHead className="text-xs font-semibold uppercase tracking-wider">État</TableHead>
               <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">Kilométrage</TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">Niveau Carburant</TableHead>
+             
               <TableHead className="text-xs font-semibold uppercase tracking-wider text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -85,13 +114,13 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
             {filtered.map((car) => (
               <TableRow
                 key={car.id}
-                className={`hover:bg-slate-50 transition-colors ${car.status === "en Panne" ? "bg-red-50/40" : ""
+                className={`hover:bg-slate-50 transition-colors ${car.status === "En panne" ? "bg-red-50/40" : ""
                   }`}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-12 h-8 rounded bg-slate-100 overflow-hidden border border-slate-200 ${car.status === "en Panne" ? "grayscale opacity-70" : ""
+                      className={`w-12 h-8 rounded bg-slate-100 overflow-hidden border border-slate-200 ${car.status === "En panne" ? "grayscale opacity-70" : ""
                         }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -122,6 +151,9 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
                 <TableCell className="text-right font-mono text-sm text-slate-700">
                   {car.kilometrage}
                 </TableCell>
+                <TableCell className="text-right font-mono text-sm text-slate-700">
+                  {car.niveauCarburant}
+                </TableCell>
                 <TableCell>
                   <div className="flex justify-center gap-1">
                     <div>
@@ -133,26 +165,25 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
                         <Pencil size={18} />
                       </Button >
 
-                      {/* Modal */}
-                      <CreateVehiculeModal
-                        open={createOpen}
-                        onOpenChange={setCreateOpen}
-                        categories={categories} 
-                        initialData={selectedCar}
-                        onSuccess={onSuccess}
-                      />
+                    </div>
+                    <div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600"
+                      onClick={() => {
+                        setCarToDelete(car);
+                        setDeleteOpen(true);
+                      }} >
+                        <Trash2 size={18} />
+                      </Button >
 
                     </div>
-                    {car.status === "en Panne" ? (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
-                        <Eye size={18} />
-                      </Button>
-
-
-
-                    ) : (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
+                    {car.status === "En panne" ? (
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-600 animate-pulse">
                         <TriangleAlert size={18} />
+                      </Button>
+                      
+                    ) : (
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
+                        {/* <Eye size={18} /> */}
                       </Button>
                     )}
                   </div>
@@ -161,13 +192,30 @@ export default function VehiclesTable({ cars, categories,onSuccess,onEdit }: Car
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-sm text-slate-400">
+                <TableCell colSpan={7} className="text-center py-8 text-sm text-slate-400">
                   Aucun véhicule ne correspond à votre recherche.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+        {/* Modal */}
+        <CreateVehiculeModal
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          categories={categories} 
+          initialData={selectedCar}
+          onSuccess={onSuccess}
+        />
+        {/* modal suppression */}
+      <ConfirmModal
+        message="Voulez-vous vraiment supprimer cet utilisateur ?"
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={handleDelete}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+      />
       </div>
 
       <div className="p-6 bg-slate-50 flex items-center justify-between">

@@ -1,18 +1,23 @@
 import { CarFront, Hourglass, Wallet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Statistics } from "@/lib/types";
 
 
-export const maintenanceOverview = {
-  immobilized: { value: "12", trend: "+2 par rapport à hier" },
-  activeRepairs: { value: "08", capacity: "45% de la capacité atelier" },
+interface StatisticsProps{
+  statistics : Statistics,
+}
+
+export default function MaintenanceOverview({statistics} : StatisticsProps) {
+
+  const maintenanceOverview = {
+  immobilized: { value: statistics.totals.brokenCars , trend: "+2 par rapport à hier" },
+  activeRepairs: { value: statistics.totals.carInRepair??0, capacity: "45% de la capacité atelier" },
   monthlyBudget: {
     total: "45 280 FCFA",
     urgent: "28k",
     routine: "17k",
   },
 };
-
-export default function MaintenanceOverview() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
       {/* Véhicules En panne */}

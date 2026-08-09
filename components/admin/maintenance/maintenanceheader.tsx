@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Car } from "@/lib/types";
+import { Car, Statistics } from "@/lib/types";
 import { addPanneApi } from "@/api/panne";
 
 interface CarProps {

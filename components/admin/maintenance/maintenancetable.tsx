@@ -14,65 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Panne } from "@/lib/types";
+import ConfirmModal from "@/components/modals/confirmModal";
 
 
 export type Priority = "Urgente" | "Moyenne" | "Faible";
 
-// export type MaintenanceTicket = {
-//   id: string;
-//   vehicle: string;
-//   plate: string;
-//   fuelType: string;
-//   icon: string;
-//   description: string;
-//   priority: Priority;
-//   cost: string;
-//   progress: number;
-//   progressLabel: string;
-// };
- 
-// export const maintenanceTickets: MaintenanceTicket[] = [
-//   {
-//     id: "m1",
-//     vehicle: "Mercedes-Benz Actros",
-//     plate: "AA-123-BB",
-//     fuelType: "Diesel",
-//     icon: "Car",
-//     description:
-//       "Surchauffe moteur et perte de puissance sur autoroute. Fuite de liquide de refroidissement détectée.",
-//     priority: "Urgente",
-//     cost: "3 450 €",
-//     progress: 15,
-//     progressLabel: "Diagnostic terminé",
-//   },
-//   {
-//     id: "m2",
-//     vehicle: "Iveco Daily",
-//     plate: "CK-982-PL",
-//     fuelType: "GNV",
-//     icon: "Truck",
-//     description: "Révision périodique des 50 000km + Remplacement des plaquettes de frein avant.",
-//     priority: "Moyenne",
-//     cost: "850 €",
-//     progress: 75,
-//     progressLabel: "En cours de remontage",
-//   },
-//   {
-//     id: "m3",
-//     vehicle: "Renault Zoe E-Tech",
-//     plate: "EV-444-ZZ",
-//     fuelType: "Électrique",
-//     icon: "Zap",
-//     description: "Défaut système de charge. Le véhicule ne prend plus la charge sur bornes rapides.",
-//     priority: "Faible",
-//     cost: "1 100 €",
-//     progress: 40,
-//     progressLabel: "Attente pièces",
-//   },
-// ];
-
-interface PanneProps{
-  pannes : Panne[],
+interface PanneProps {
+  pannes: Panne[],
 }
 
 export const PRIORITY_CLASSES: Record<Priority, { badge: string; dot: string; bar: string }> = {
@@ -84,7 +32,7 @@ export const PRIORITY_CLASSES: Record<Priority, { badge: string; dot: string; ba
 
 const ICONS: Record<string, LucideIcon> = { Car, Truck, Zap };
 
-export default function MaintenanceTable( {pannes}  : PanneProps) {
+export default function MaintenanceTable({ pannes }: PanneProps) {
   const [search, setSearch] = useState("");
 
   const filtered = pannes.filter((p) =>
@@ -134,13 +82,13 @@ export default function MaintenanceTable( {pannes}  : PanneProps) {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
-                        <img src={p.car.photo_url} alt={p.car.mark}/>
+                        <img src={p.car.photo_url} alt={p.car.mark} />
                         {/* {Icon && <Icon size={20} className="text-primary" />} */}
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-slate-900">{p.car.mark} {p.car.model} </p>
                         <p className="text-xs text-slate-500 font-mono">
-                          {p.car.imatriculation} • {p.car.mark} 
+                          {p.car.imatriculation} • {p.car.mark}
                           {/* {ticket.fuelType} */}
                         </p>
                       </div>
@@ -158,8 +106,8 @@ export default function MaintenanceTable( {pannes}  : PanneProps) {
                   <TableCell className="font-semibold text-primary">{p.panneAmount}</TableCell>
                   <TableCell className="min-w-[160px]">
                     {/* <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-1"> */}
-                      {/* <div className={`h-full ${priority.bar}`} style={{ width: `${ticket.progress}%` }} /> */}
-                      <div className={`h-full `}  >{p.status} </div>
+                    {/* <div className={`h-full ${priority.bar}`} style={{ width: `${ticket.progress}%` }} /> */}
+                    <div className={`h-full `}  >{p.status} </div>
                     {/* </div> */}
                     {/* <span className="text-xs text-slate-500">{ticket.progressLabel}</span> */}
                   </TableCell>
@@ -183,7 +131,7 @@ export default function MaintenanceTable( {pannes}  : PanneProps) {
       </div>
 
       <div className="p-6 border-t border-slate-200 flex justify-between items-center">
-        <span className="text-sm text-slate-500">Affichage de 1-{filtered.length} sur 12 pannes</span>
+        <span className="text-sm text-slate-500">Affichage de 1-{filtered.length} sur {pannes.length} pannes</span>
         <div className="flex gap-1">
           <Button variant="outline" size="icon" className="h-8 w-8" disabled>
             <ChevronLeft size={16} />
@@ -202,6 +150,8 @@ export default function MaintenanceTable( {pannes}  : PanneProps) {
           </Button>
         </div>
       </div>
+
+      
     </Card>
   );
 }
