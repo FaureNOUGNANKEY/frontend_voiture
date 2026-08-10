@@ -39,7 +39,7 @@ export default function DashboardPage() {
               Dashboard
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Bienvenue dans votre centre de gestion AutoFleet.
+              Bienvenue dans votre centre de gestion Easy Car Rental.
             </p>
           </div>
           <div className="flex gap-2">

@@ -11,7 +11,7 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!isHydrated) return;
     if (!isAuthenticated) {
-      router.push("/login-client");
+      router.push("/login-admin");
     } else if (currentUser?.role !== "admin") {
       router.push("/403");
     }
