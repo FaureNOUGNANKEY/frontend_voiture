@@ -1,14 +1,23 @@
 import { Users } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Statistics } from "@/lib/types";
 
-export const driverAvailability = [
-  { id: "on-duty", label: "En service", detail: "14 conducteurs en circulation", percent: 65, color: "bg-emerald-500" },
-  { id: "standby", label: "En attente", detail: "6 conducteurs à la base", percent: 28, color: "bg-blue-300" },
-  { id: "unavailable", label: "Indisponible", detail: "2 conducteurs en congé", percent: 7, color: "bg-red-500" },
+
+interface statatisticsProps{
+  statistics : Statistics
+}
+
+export default function DriverAvailability( {statistics}:statatisticsProps ) {
+  const router = useRouter();
+
+  const driverAvailability = [
+  { id: "on-duty", label: "En service", detail: statistics?.totals.busyDrivers + "  conducteurs en circulation" , percent: (statistics?.totals.busyDrivers/statistics?.totals.drivers)*100, color: "bg-emerald-500" },
+  { id: "standby", label: "En attente", detail: statistics?.totals.availableDrivers +" conducteurs à la base", percent: (statistics?.totals.availableDrivers/statistics?.totals.drivers)*100, color: "bg-blue-300" },
+  { id: "unavailable", label: "Indisponible", detail: statistics?.totals.unAvailableDrivers +" conducteurs en congé", percent: (statistics?.totals.unAvailableDrivers/statistics?.totals.drivers)*100, color: "bg-red-500" },
 ];
 
-export default function DriverAvailability() {
   return (
     <Card className="shadow-sm hover:-translate-y-0.5 transition-transform">
       <CardHeader className="flex-row items-center justify-between space-y-0">
@@ -35,6 +44,7 @@ export default function DriverAvailability() {
         <Button
           variant="outline"
           className="w-full mt-2 border-primary text-primary hover:bg-blue-50"
+          onClick={() => router.push('/admin/drivers')}
         >
           Gérer les équipes
         </Button>

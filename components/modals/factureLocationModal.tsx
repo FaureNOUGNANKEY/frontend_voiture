@@ -7,42 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Printer, CreditCard, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Invoice } from "@/lib/types";
 
-export type FactureLocation = {
-  id: string;
-  statut: "en_attente" | "payee" | "annulee";
-  client: {
-    nom: string;
-    email: string;
-    telephone: string;
-    adresse: string;
-  };
-  societe: {
-    titre: string;
-    telephone: string;
-    adresse: string;
-  };
-  vehicule: {
-    marque: string;
-    modele: string;
-    type: string;
-    etat: string;
-    couleur: string;
-    immatriculation: string;
-    chauffeur: string;
-    dateDebut: string;
-    dateRetour: string;
-  };
-  paiement: {
-    tarifChauffeurHT: number;
-    reduction: number;
-    montantVehiculeHT: number;
-    montantTotalHT: number;
-    montantTotalTTC: number;
-    montantTVA: number;
-    caution: number;
-  };
-};
+export const societe= {
+    titre: "Location Véhicule",
+    telephone: "+228 91 45 51 51",
+    adresse: "367 Rue Agodja Kodjoviakopé",
+  }
 
 const formatFCFA = (n: number) =>
   n.toLocaleString("fr-FR", { minimumFractionDigits: 0 }) + " FCFA";
@@ -74,7 +45,7 @@ function DetailRow({
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  facture: FactureLocation;
+  facture: Invoice;
   onPayer?: () => void;
 }
 
@@ -84,8 +55,10 @@ export default function FactureLocationModal({
   facture,
   onPayer,
 }: Props) {
-  const isPayee = facture.statut === "payee";
-  const isEnAttente = facture.statut === "en_attente";
+
+  console.log("facture", facture)
+  const isPayee = facture?.status === "Payée";
+  const isEnAttente = facture?.status === "En attente";
 
   const handlePrint = () => {
     const source = document.getElementById("facture-print-area");
@@ -147,12 +120,12 @@ export default function FactureLocationModal({
                   "text-xs print:border print:border-slate-300",
                   isPayee && "bg-emerald-500 hover:bg-emerald-500",
                   isEnAttente && "bg-amber-500 hover:bg-amber-500",
-                  facture.statut === "annulee" && "bg-slate-400",
+                  facture?.status === "Annulée" && "bg-slate-400",
                 )}
               >
                 {isPayee && "Payée"}
                 {isEnAttente && "En attente de paiement"}
-                {facture.statut === "annulee" && "Annulée"}
+                {/* {facture.status ===  "Annulée"} */}
               </Badge>
             </div>
           </div>
@@ -163,25 +136,25 @@ export default function FactureLocationModal({
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-1">
                 <p className="text-base font-bold tracking-tight text-slate-900 uppercase">
-                  {facture.client.nom}
+                  {facture?.reservation.user.lastname}
                 </p>
-                <p className="text-sm text-slate-600">{facture.client.email}</p>
+                <p className="text-sm text-slate-600">{facture?.reservation.user.email}</p>
                 <p className="text-sm text-slate-600">
-                  {facture.client.telephone}
+                  {facture?.reservation.user.phone}
                 </p>
                 <p className="text-sm text-slate-500 capitalize">
-                  {facture.client.adresse}
+                  {facture?.reservation.user.address}
                 </p>
               </div>
               <div className="space-y-1 sm:text-right">
                 <p className="text-base font-bold tracking-tight text-slate-900">
-                  {facture.societe.titre}
+                  {societe.titre}
                 </p>
                 <p className="text-sm text-slate-600">
-                  {facture.societe.telephone}
+                  {societe.telephone}
                 </p>
                 <p className="text-sm text-slate-500">
-                  {facture.societe.adresse}
+                  {societe.adresse}
                 </p>
               </div>
             </div>
@@ -193,26 +166,26 @@ export default function FactureLocationModal({
                 Détails Véhicule
               </h3>
               <div className="rounded-xl border bg-slate-50/50 px-4 py-2 print:bg-white">
-                <DetailRow label="Marque" value={facture.vehicule.marque} />
-                <DetailRow label="Modèle" value={facture.vehicule.modele} />
-                <DetailRow label="Type" value={facture.vehicule.type} />
-                <DetailRow label="État" value={facture.vehicule.etat} />
-                <DetailRow label="Couleur" value={facture.vehicule.couleur} />
+                <DetailRow label="Marque" value={facture.reservation.car.mark} />
+                <DetailRow label="Modèle" value={facture.reservation.car.model} />
+                <DetailRow label="Type" value={facture.reservation.car.category.name} />
+                <DetailRow label="État" value={facture.reservation.car.state} />
+                <DetailRow label="Couleur" value={facture.reservation.car.color} />
                 <DetailRow
                   label="Immatriculation"
-                  value={facture.vehicule.immatriculation}
+                  value={facture.reservation.car.imatriculation}
                 />
                 <DetailRow
                   label="Chauffeur"
-                  value={facture.vehicule.chauffeur}
+                  value={facture.reservation?.driver?.lastname || "sans"}
                 />
                 <DetailRow
                   label="Date Début"
-                  value={facture.vehicule.dateDebut}
+                  value={facture.reservation.dateStart}
                 />
                 <DetailRow
                   label="Date Retour"
-                  value={facture.vehicule.dateRetour}
+                  value={facture.reservation.dateBack}
                 />
               </div>
             </section>
@@ -224,35 +197,35 @@ export default function FactureLocationModal({
               <div className="rounded-xl border bg-slate-50/50 px-4 py-2 print:bg-white">
                 <DetailRow
                   label="Tarif Chauffeur HT"
-                  value={formatFCFA(facture.paiement.tarifChauffeurHT)}
+                  value={formatFCFA(facture.driverAmount)}
                 />
                 <DetailRow
                   label="Montant de réduction"
-                  value={formatFCFA(facture.paiement.reduction)}
+                  value={formatFCFA(facture.reductionAmount)}
                 />
                 <DetailRow
                   label="Montant Véhicule HT"
-                  value={formatFCFA(facture.paiement.montantVehiculeHT)}
+                  value={formatFCFA(facture.amount)}
                 />
                 <Separator className="my-2" />
                 <DetailRow
                   label="Montant total HT"
-                  value={formatFCFA(facture.paiement.montantTotalHT)}
+                  value={formatFCFA(facture.totalHT)}
                   bold
                 />
                 <DetailRow
                   label="Montant total TVA"
-                  value={formatFCFA(facture.paiement.montantTVA)}
+                  value={formatFCFA(facture.tvaAmount)}
                 />
                 <DetailRow
                   label="Montant total TTC"
-                  value={formatFCFA(facture.paiement.montantTotalTTC)}
+                  value={formatFCFA(facture.totalAmount)}
                   bold
                 />
-                <DetailRow
+                {/* <DetailRow
                   label="Caution"
                   value={formatFCFA(facture.paiement.caution)}
-                />
+                /> */}
               </div>
             </section>
 
@@ -261,7 +234,7 @@ export default function FactureLocationModal({
                 Total à payer
               </span>
               <span className="text-2xl font-bold tracking-tight text-primary print:text-slate-900">
-                {formatFCFA(facture.paiement.montantTotalTTC)}
+                {formatFCFA(facture.totalAmount)}
               </span>
             </div>
           </div>

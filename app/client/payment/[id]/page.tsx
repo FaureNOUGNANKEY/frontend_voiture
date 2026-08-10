@@ -6,11 +6,15 @@ import { fr } from "date-fns/locale";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Wallet, Store, Lock } from "lucide-react";
-import { invoice, Reservation } from "@/lib/types";
+import { Invoice, Reservation } from "@/lib/types";
 import { getReservationApi } from "@/api/reservation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import FactureLocationModal from "@/components/modals/factureLocationModal";
+import { getInvoiceApi } from "@/api/invoice";
+import { addPaymentApi } from "@/api/payment";
+import { toast } from "sonner";
 
 export default function PaymentPage() {
   const { id } = useParams();
@@ -25,17 +29,38 @@ export default function PaymentPage() {
   const [phoneNumber, setPhoneNumber] = useState("EX : 90 00 90 00");
 
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
-  const [invoice, setInvoice] = useState<invoice |null>(null);
+  const [invoice, setInvoice] = useState<Invoice |null>(null);
+
+  const [open, setOpen] = useState(false);
+
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentErrors, setPaymentErrors] = useState<{ [key: string]: string[] }>({});
+
+  type PaymentMethod = "card" | "miss by yas" | "flooz";
+
+  const MODE_PAYEMENT_MAP: Record<PaymentMethod, string> = {
+    card: "carte",
+    "miss by yas": "miss by yas",
+    flooz: "flooz",
+  };
+ 
 
   const getReservation = async (id: string | number) => {
     try {
       const response = await getReservationApi(String(id));
       setSelectedReservation(response.data);
-      setInvoice(response.data.invoice);
       console.log("Fetched reservation:", response.data);
-      console.log("Facture:", response.data.invoice);
     } catch (error) {
       console.error("Error fetching reservation:", error);
+    }
+  };
+  const getInvoice = async (id: string | number) => {
+    try {
+      const response = await getInvoiceApi(String(id));
+      setInvoice(response.data);
+      console.log("Fetched Invoice:", response.data);
+    } catch (error) {
+      console.error("Error fetching Invoice:", error);
     }
   };
 
@@ -45,8 +70,52 @@ export default function PaymentPage() {
   useEffect(() => {
     if (id) {
       getReservation(id as string);
+      getInvoice(id as string);
     }
   }, [id]);
+
+  const handlePayer = async () => {
+    if (!invoice) {
+      toast.error("Aucune facture trouvée pour cette réservation.");
+      return;
+    }
+ 
+    // Détermine le montant selon le mode de paiement choisi
+    const montant =
+      selectedMethod === "card"
+        ? selectedReservation?.totalAmount
+        : Number(amount.replace(/\s/g, ""));
+ 
+    if (!montant || montant <= 0) {
+      toast.error("Le montant à payer est invalide.");
+      return;
+    }
+ 
+    setIsPaying(true);
+    setPaymentErrors({});
+ 
+    const data = new FormData();
+    data.append("invoice_id", String(invoice.id));
+    data.append("modePayement", MODE_PAYEMENT_MAP[selectedMethod]);
+    data.append("amount", String(montant));
+ 
+    try {
+      const response = await addPaymentApi(data);
+      console.log("Paiement enregistré :", response);
+      toast.success("Paiement effectué avec succès !");
+      setOpen(false);
+    } catch (error: any) {
+      if (error.response && error.response.data.errors) {
+        setPaymentErrors(error.response.data.errors);
+        toast.error("Veuillez vérifier les informations du paiement.");
+      } else {
+        console.error("Erreur API /payments :", error.response?.data || error.message);
+        toast.error("Une erreur est survenue lors du paiement.");
+      }
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -219,11 +288,28 @@ export default function PaymentPage() {
             </div>
           </div>
 
-          <Button className="w-full mt-8 py-7 text-lg">
+          <Button className="w-full mt-8 py-7 text-lg"
+          onClick={() =>{setOpen(true)}}
+          >
             Finaliser le paiement →
           </Button>
         </Card>
       </div>
+
+      {invoice && (
+        <FactureLocationModal
+          open={open}
+          onOpenChange={setOpen}
+          facture={invoice}
+          onPayer={() => {handlePayer()
+            
+            console.log("Payer");
+          }}
+          // onImprimer={() => {
+          //   return window.print();
+          // }}
+        />
+      )}
     </div>
   );
 }

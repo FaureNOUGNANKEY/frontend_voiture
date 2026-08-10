@@ -43,15 +43,19 @@ export const updateDriverApi =  async (id: number, formData: FormData) => {
   return response.data;
 };
 
-
-// export const updateDriverApi = async (id: number, formData: FormData) => {
-//   const response = await api.post(`/drivers/${id}?_method=PUT`, formData);
-//   return response.data;
-// };
-
 // Supprimer un chauffeur
 export const deleteDriverApi = async (id: number) => {
   const response = await api.delete(`/drivers/${id}`,{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+};
+
+// récupérer les voitures disponibles
+export const getAvailableDriversApi = async () => {
+  const response = await api.get("/drivers/available", {
     headers: {
       Authorization: `Bearer ${Cookies.get("token")}`,
     },

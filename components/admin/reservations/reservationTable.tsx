@@ -23,6 +23,7 @@ import {
 
 import { Car, Driver, Reservation,Client } from "@/lib/types";
 import CreateReservationModal from "@/components/modals/createReservationModal";
+import CarBackModal from "@/components/modals/CarBackModal";
 
 
 // 1. Définir les états possibles
@@ -65,6 +66,8 @@ export default function ReservationsTable({ reservations, drivers,onEdit,onSucce
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+
+  const [carBackOpen, setcarBackOpen] = useState(false);
 
   const filtered = reservations.filter((r) =>
     `${r.user.lastname}  ${r.car.mark}`
@@ -233,6 +236,12 @@ function getInitials(firstname: string, lastname: string) {
                       <>
                         <Button variant="ghost" size="icon" 
                         className={ `h-8 w-8 text-red-600 ${r.driverAmount != 0 && r.driver == null && !["Annulée", "Refusée"].includes(r.status?.toLowerCase()) ? "bg-red-300 animate-pulse" : "h-8 w-8 text-primary"}}`}
+
+                        onClick={() => {
+                          setcarBackOpen(true);
+                          setSelectedReservation(r);
+                          onSuccess?.()
+                        }}
                         >
                           <CarIcon size={18} />
                         </Button>
@@ -244,6 +253,12 @@ function getInitials(firstname: string, lastname: string) {
                         <Button variant="ghost" size="icon" 
                         className={ `h-8 w-8 text-red-600 ${r.driverAmount != 0 && r.driver == null && !["Annulée", "Refusée"].includes(r.status?.toLowerCase()) ? "bg-red-300 animate-pulse" : "h-8 w-8 text-green-800"}}`}
                         // className=  "h-8 w-8 text-green-800"
+
+                        onClick={() => {
+                          setcarBackOpen(true);
+                          setSelectedReservation(r);
+                          onSuccess?.()
+                        }}
                         >
                           <Loader size={18} />
                         </Button>
@@ -257,6 +272,7 @@ function getInitials(firstname: string, lastname: string) {
                           setCreateOpen(true);
                           setSelectedReservation(r);
                           onEdit(r.id);
+                          onSuccess?.()
                         }}
                         >
                           <Pencil size={18} />
@@ -291,6 +307,13 @@ function getInitials(firstname: string, lastname: string) {
           onOpenChange={setCreateOpen}
           initialData={selectedReservation}
           onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/>
+      {/* Modal */}
+        <CarBackModal 
+        open={carBackOpen}
+        onOpenChange={setcarBackOpen}
+        initialData={selectedReservation} reservationId={""} 
+        onSuccess={onSuccess}
+                 />
 
       <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-sm">
         <span className="text-slate-500">Affichage de 1 à {filtered.length} sur {reservations.length} résultats</span>
