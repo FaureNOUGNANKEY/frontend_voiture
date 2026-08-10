@@ -31,48 +31,9 @@ export default function AdminLayout({
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  // return (
-  //   <RequireAdmin>
-  //     <div className="min-h-screen flex flex-col bg-slate-50">
-  //       {/* Header avec bouton menu */}
-  //       <AdminHeader onMenuClick={toggleMobileMenu} isMobile={isMobile} />
-
-  //       {/* Overlay mobile */}
-  //       {isMobile && isMobileMenuOpen && (
-  //         <div
-  //           className="fixed inset-0 bg-black/50 z-40 md:hidden"
-  //           onClick={closeMobileMenu}
-  //         />
-  //       )}
-
-  //       {/* Sidebar */}
-  //       <div
-  //         className={cn(
-  //           "fixed left-0 top-16 h-[calc(100vh-64px)] z-40 transition-transform duration-300 ease-in-out",
-  //           isMobile && !isMobileMenuOpen && "-translate-x-full",
-  //           isMobile && isMobileMenuOpen && "translate-x-0",
-  //           !isMobile && "translate-x-0",
-  //         )}
-  //       >
-  //         <Sidebar mobile={isMobile} onClose={closeMobileMenu} />
-  //       </div>
-
-  //       {/* Contenu principal */}
-  //       <main
-  //         className={cn(
-  //           "flex-1 transition-all duration-300 pt-16 flex flex-col",
-  //           !isMobile ? "ml-64" : "ml-0",
-  //         )}
-  //       >
-  //         <div className="flex-1">{children}</div>
-  //         <AdminFooter />
-  //       </main>
-  //     </div>
-  //   </RequireAdmin>
-  // );
-
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <RequireAdmin>
+      <div className="min-h-screen flex flex-col bg-slate-50">
         {/* Header avec bouton menu */}
         <AdminHeader onMenuClick={toggleMobileMenu} isMobile={isMobile} />
 
@@ -107,5 +68,6 @@ export default function AdminLayout({
           <AdminFooter />
         </main>
       </div>
+    </RequireAdmin>
   );
 }
