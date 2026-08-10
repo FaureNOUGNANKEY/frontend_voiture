@@ -145,7 +145,7 @@ export default function CreateReservationModal({
                 onValueChange={(value) => setFormData({ ...formData, user_id: Number(value) })}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner une catégorie...">
+                  <SelectValue placeholder="Sélectionner le client...">
                     {clients.findLast((e) => e.id === formData.user_id)?.lastname}
                   </SelectValue>
                 </SelectTrigger>
@@ -166,8 +166,8 @@ export default function CreateReservationModal({
                 onValueChange={(value) => setFormData({ ...formData, car_id: Number(value) })}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner une catégorie...">
-                    {cars.findLast((e) => e.id === formData.car_id)?.mark}
+                  <SelectValue placeholder="Sélectionner la voiture...">
+                    {cars.findLast((e) => e.id == formData.car_id)?.mark}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>

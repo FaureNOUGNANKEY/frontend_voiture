@@ -51,7 +51,7 @@ export default function CreateVehiculeModal({
     description: initialData?.description || "",
     dayAmount: initialData?.dayAmount || "",
     kmAmount: initialData?.kmAmount || "",
-    state: initialData?.state || "Disponible",
+    state: initialData?.state || "Bon",
     place: initialData?.place || "",
     door: initialData?.door || "",
     kilometrage: initialData?.kilometrage || "",
@@ -137,7 +137,7 @@ export default function CreateVehiculeModal({
         description: "",
         dayAmount: "",
         kmAmount: "",
-        state: "Disponible",
+        state: "Bon",
         place: "",
         door: "",
         kilometrage: "",
@@ -371,7 +371,6 @@ export default function CreateVehiculeModal({
             <div >
               <Label >Catégorie<span className="text-red-600">*</span></Label>
               <Select
-                // defaultValue={categories.findLast((e) => e.id === formData.category_id)?.name}
                 value={formData.category_id ? String(formData.category_id) : ""}
                 onValueChange={(value) => setFormData({ ...formData, category_id: Number(value) })}
               >
@@ -404,7 +403,7 @@ export default function CreateVehiculeModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Vide">Vide</SelectItem>
-                  <SelectItem value="14">1/4</SelectItem>
+                  <SelectItem value="1/4">1/4</SelectItem>
                   <SelectItem value="1/2">1/2</SelectItem>
                   <SelectItem value="3/4">3/4</SelectItem>
                   <SelectItem value="Plein">Plein</SelectItem>

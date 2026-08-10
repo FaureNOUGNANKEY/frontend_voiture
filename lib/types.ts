@@ -65,7 +65,7 @@ export interface Reservation {
     driver?: Driver,
     totalAmount?: number,
     user: User,
-    invoice?: invoice,
+    invoice?: Invoice,
     created_at: string,
     updated_at: string 
 }
@@ -127,13 +127,14 @@ export interface Historic {
     heureDeconnecxion: Date,
 }
 
-export interface invoice {
+export interface Invoice {
     id:number,
     invoiceNumber: string,
     driverAmount: number,
     reductionAmount: number,
     tvaAmount: number,
     amount: number,
+    totalHT:number,
     totalAmount: number,
     status: string,
     reservation: Reservation,
@@ -145,7 +146,7 @@ export interface Payment {
     id:number,
     amount: number,
     modePayment: string,
-    invoice: invoice,
+    invoice: Invoice,
     created_at: string,
     updated_at: string 
 }

@@ -10,9 +10,9 @@ import AdminHeader from "@/components/admin/adminHeader";
 import { Car, Driver, Reservation, Statistics, User } from "@/lib/types";
 import { useState, useEffect } from "react";
 import { getReservationApi, getReservationsApi } from "@/api/reservation";
-import { getDriversApi } from "@/api/driver";
+import { getAvailableDriversApi, getDriversApi } from "@/api/driver";
 import { getUsersApi } from "@/api/user";
-import { getCarsApi } from "@/api/car";
+import { getAvailableCarsApi, getCarsApi } from "@/api/car";
 import { getStatisticsApi } from "@/api/statistic";
 
 
@@ -20,8 +20,8 @@ import { getStatisticsApi } from "@/api/statistic";
 export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedreservation, setSelectedReservation] = useState<Reservation | null>(null);
-  const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [cars, setCars] = useState<Car[]>([]);
+  const [availabledrivers, setAvailableDrivers] = useState<Driver[]>([]);
+  const [availablecars, setAvailableCars] = useState<Car[]>([]);
   const [clients, setClients] = useState<User[]>([]);
   const [statistics, setStatistics] = useState<Statistics | null>(null);
 
@@ -58,10 +58,10 @@ export default function ReservationsPage() {
   }
   
 
-  const getDrivers = async () => {
+  const getAvailableDrivers = async () => {
     try {
-      const response = await getDriversApi();
-      setDrivers(response.data);
+      const response = await getAvailableDriversApi();
+      setAvailableDrivers(response.data);
       console.log("Fetched Drivers:", response.data);
     } catch (error) {
       console.error("Error fetching Drivers:", error);
@@ -81,10 +81,10 @@ export default function ReservationsPage() {
     }
   };
 
-  const getCars = async () => {
+  const getAvailableCars = async () => {
     try {
-      const response = await getCarsApi();
-      setCars(response.data);
+      const response = await getAvailableCarsApi();
+      setAvailableCars(response.data);
       console.log("Fetched cars:", response.data);
     } catch (error) {
       console.error("Error fetching cars:", error);
@@ -94,22 +94,22 @@ export default function ReservationsPage() {
 
   
   useEffect(() => {
-    getCars();
+    getAvailableCars();
     getClients();
     getReservations();
     getStatistics();
-    getDrivers();
+    getAvailableDrivers();
   }, []);
 
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          {statistics &&<ReservationsHeader clients={clients} cars={cars} onSuccess={getReservations} drivers={drivers} statistics={statistics} />}
-          <ReservationsTable reservations={reservations} drivers={drivers} onEdit={(id: string | number) => getReservation(id)} onSuccess={getReservations} clients={clients} cars={cars}/>
+          {statistics &&<ReservationsHeader clients={clients} cars={availablecars} onSuccess={getReservations} drivers={availabledrivers} statistics={statistics} />}
+          <ReservationsTable reservations={reservations} drivers={availabledrivers} onEdit={(id: string | number) => getReservation(id)} onSuccess={getReservations} clients={clients} cars={availablecars}/>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <DriverAvailability />
+            {statistics &&<DriverAvailability statistics={statistics}/>}
             <ReductionEngine />
             <SystemActivities />
           </div>
