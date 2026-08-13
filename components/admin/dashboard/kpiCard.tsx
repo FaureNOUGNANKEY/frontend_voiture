@@ -27,7 +27,7 @@ export type Kpi = {
 
 
 interface StatisticProps {
-  statistics: Statistics;
+  statistics: Statistics | null;
 }
 
 export default function KpiCard({ statistics}:StatisticProps ) {
@@ -36,7 +36,7 @@ export default function KpiCard({ statistics}:StatisticProps ) {
     {
       id: "vehicles",
       label: "Total Véhicules",
-      value: statistics.totals.cars,
+      value: statistics?.totals.cars ??0,
       delta: "+4.2%",
       trend: "up",
       icon: "Car",
@@ -46,7 +46,7 @@ export default function KpiCard({ statistics}:StatisticProps ) {
     {
       id: "reservations",
       label: "Réservations Actives",
-      value: statistics.totals.activeReservations,
+      value: statistics?.totals.activeReservations ??0,
       delta: "+12%",
       trend: "up",
       icon: "CalendarRange",
@@ -56,7 +56,7 @@ export default function KpiCard({ statistics}:StatisticProps ) {
     {
       id: "drivers",
       label: "Chauffeurs Dispos",
-      value: statistics.totals.availableDrivers,
+      value: statistics?.totals.availableDrivers??0,
       delta: "-2.1%",
       trend: "down",
       icon: "Users",
@@ -66,7 +66,7 @@ export default function KpiCard({ statistics}:StatisticProps ) {
     {
       id: "revenue",
       label: "Revenus Mensuels",
-      value: statistics.totals.monthlyRevenue,
+      value: statistics?.totals.monthlyRevenue??0,
       delta: "+8.4%",
       trend: "up",
       icon: "Wallet",

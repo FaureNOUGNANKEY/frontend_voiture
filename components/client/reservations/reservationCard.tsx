@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ConfirmModal from "@/components/modals/confirmModal";
 import { useState } from "react";
+import { formatDate } from "@/app/client/payment/[id]/page";
+import { handlePrint } from "@/components/modals/factureLocationModal";
 
 export type MyReservationStatus = "A venir" | "En cours" | "Terminée" | "Annulée";
 export type Status = "validé";
@@ -55,7 +57,7 @@ export default function ReservationCard({ reservation, onCancel }: { reservation
               <div className="flex flex-col gap-1.5 mt-4 text-sm text-slate-600">
                 <div className="flex items-center gap-2">
                   <CalendarDays size={16} className="text-slate-400" />
-                  {reservation.dateStart} - {reservation.dateBack}
+                  {formatDate(reservation.dateStart, "dd MMM. yyyy")} - {formatDate(reservation.dateBack, "dd MMM. yyyy")}
                 </div>
                 {/* <div className="flex items-center gap-2">
                 <MapPin size={16} className="text-slate-400" />
@@ -83,46 +85,49 @@ export default function ReservationCard({ reservation, onCancel }: { reservation
 
               <div className="flex gap-2">
                 {/* Cas : réservation à venir → uniquement Annuler */}
-                {reservation.computed_status === "A venir" && (
+                {reservation.computed_status === "A venir" || reservation.status != "Validée" && (
                   <Button
                     variant="outline"
                     size="sm"
                     className="bg-red-100 text-red-700"
-                    onClick={() => setDeleteOpen(true)} 
+                    onClick={() => setDeleteOpen(true)}
                   >
                     Annuler
                   </Button>
                 )}
 
-                {/* Cas : réservation validée → Annuler ET Payer */}
+                {/* Cas : réservation validée → Annuler + Payer si facture non payée */}
                 {reservation.status === ("Validée" as Reservation["status"]) && (
                   <>
                     <Button
                       variant="outline"
                       size="sm"
                       className="bg-red-100 text-red-700"
-                      onClick={() => setDeleteOpen(true)} 
+                      onClick={() => setDeleteOpen(true)}
                     >
                       Annuler
                     </Button>
 
-                    <Button
-
-                      onClick={() => { router.push(`/client/payment/${reservation.id}`); }
-                        //   if (currentUser?.role?.toString().toLowerCase() === "client") {
-                        //     router.push(`/client/payment/${reservation.id}`);
-                        //   } else {
-                        //     router.push("/login-client");
-                        //   }
-                        // }
-                      }
-                      variant="outline"
-                      size="sm"
-                      className="text-green-600 border-green-200 hover:bg-green-50"
-                    // onClick={() => onPay(reservation.id)}
-                    >
-                      Payer
-                    </Button>
+                    {reservation.invoice?.status !== "Payé" ? (
+                      <Button
+                        onClick={() => router.push(`/client/payment/${reservation.id}`)}
+                        variant="outline"
+                        size="sm"
+                        className="text-green-600 border-green-200 hover:bg-green-50"
+                      >
+                        Payer
+                      </Button>
+                    ) : (
+                      <Button
+                        // onClick={() => router.push(`/client/invoice/${reservation.invoice.id}/download`)}
+                        variant="outline"
+                        // onClick={handlePrint}
+                        size="sm"
+                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                      >
+                        Télécharger
+                      </Button>
+                    )}
                   </>
                 )}
               </div>

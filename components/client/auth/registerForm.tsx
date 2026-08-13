@@ -86,14 +86,13 @@ export default function RegisterForm() {
         }
       }
     });
-    console.log("Données du formulaire :", Object.fromEntries(data.entries()));
     try {
       const response = await registerApi(data);
       console.log("Compte créé :", response.data);
 
       toast.success("Bienvenue ! Votre compte a été créé avec succès.");
 
-      login(response.data.token, false);
+      login(response.access_token, false,response.user);
 
 
       // Reset du formulaire

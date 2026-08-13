@@ -1,11 +1,13 @@
 "use client";
 // components/home/Hero.tsx
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { ArrowRight, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function HomeHero() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   return (
     <section className="bg-white pt-16 pb-10">
@@ -35,9 +37,19 @@ export default function HomeHero() {
             >
               Parcourir le catalogue <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button className="text-lg p-6" variant="outline">
-              Nos solutions Fleet
-            </Button>
+
+
+
+            {!isAuthenticated && (
+              <Button
+                onClick={() => router.push("/login-client")}
+                className="text-lg p-6 bg-primary text-white"
+              >
+                Se connecter
+              </Button>
+
+            )}
+
           </div>
         </div>
 

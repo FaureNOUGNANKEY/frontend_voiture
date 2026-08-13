@@ -49,18 +49,7 @@ interface Props {
   onPayer?: () => void;
 }
 
-export default function FactureLocationModal({
-  open,
-  onOpenChange,
-  facture,
-  onPayer,
-}: Props) {
-
-  console.log("facture", facture)
-  const isPayee = facture?.status === "Payée";
-  const isEnAttente = facture?.status === "En attente";
-
-  const handlePrint = () => {
+export const handlePrint = () => {
     const source = document.getElementById("facture-print-area");
     const target = document.getElementById("print-root");
 
@@ -81,6 +70,19 @@ export default function FactureLocationModal({
     });
   };
 
+
+export default function FactureLocationModal({
+  open,
+  onOpenChange,
+  facture,
+  onPayer,
+}: Props) {
+
+  console.log("facture", facture)
+  const isPayee = facture?.status === "Payé";
+  const isEnAttente = facture?.status === "En attente";
+
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent

@@ -1,7 +1,9 @@
 // components/home/Categories.tsx
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function HomeCategories() {
+  const router = useRouter();
   const categories = [
     {
       title: "Berlines Executives",
@@ -33,7 +35,9 @@ export default function HomeCategories() {
             <h2 className="text-4xl font-bold">Explorez nos Catégories</h2>
             <p className="text-gray-600">Le véhicule parfait pour chaque destination.</p>
           </div>
-          <Button variant="outline">VOIR TOUT LE PARC</Button>
+          <Button variant="outline"
+          onClick={() => router.push("/client/catalogue/liste")}
+          >VOIR TOUT LE PARC</Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

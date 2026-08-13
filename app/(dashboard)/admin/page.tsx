@@ -68,12 +68,12 @@ export default function DashboardPage() {
             kpis.map((kpi) => (
               <KpiCard key={kpi.id} kpi={kpi} statistics={statistics} />
             ))} */}
-          {statistics && <KpiCard statistics={statistics} />}
+          <KpiCard statistics={statistics} />
         </div>
 
         {/* Chart + Alerts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          {statistics && <ActivityChart statistics={statistics} />}
+          <ActivityChart statistics={statistics} />
           <AlertsList />
         </div>
 

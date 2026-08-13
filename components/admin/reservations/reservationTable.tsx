@@ -24,6 +24,7 @@ import {
 import { Car, Driver, Reservation,Client } from "@/lib/types";
 import CreateReservationModal from "@/components/modals/createReservationModal";
 import CarBackModal from "@/components/modals/CarBackModal";
+import { formatDate } from "@/app/client/payment/[id]/page";
 
 
 // 1. Définir les états possibles
@@ -149,7 +150,7 @@ function getInitials(firstname: string, lastname: string) {
 
                 <TableCell>
                   <div className="flex flex-col text-[13px]">
-                    <span className="text-slate-900">{r.dateStart} à {r.dateBack} </span>
+                    <span className="text-slate-900">{formatDate(r.dateStart, "dd MMM. yyyy")} au {formatDate(r.dateBack, "dd MMM. yyyy")} </span>
                     <span className={`${RESERVATION_CLASSES[r.status]} text-[11px]  font-semibold `}>
                       {r.status}
                     </span>

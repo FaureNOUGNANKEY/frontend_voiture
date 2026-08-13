@@ -112,10 +112,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Vérifier le rôle avant de rediriger
     if (auth.currentUser?.role === "admin") {
-      router.push("client");
+      router.push("/login-admin");
       toast.success("Vous êtes déconnecté avec succès.");
     } else {
-      router.push("client");
+      router.push("/client");
       toast.success("Vous êtes déconnecté avec succès.");
     }
   };

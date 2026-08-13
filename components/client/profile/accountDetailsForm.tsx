@@ -9,15 +9,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
 const profileUser = {
-  fullName: "Jean-Pierre Dupont",
+  fullName: "Jean-Pierre Koffi",
   memberSince: "Client Premium depuis 2022",
   status: "Actif" as const,
   avatarUrl:
     "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=256&h=256&fit=crop",
-  email: "jp.dupont@business.fr",
-  phone: "+33 6 12 34 56 78",
-  city: "Paris",
-  address: "15 Avenue des Champs-Élysées, 75008 Paris",
+  email: "jp.@gmail.com",
+  phone: "+228 12 34 56 78",
+  city: "lome",
+  address: "baguida",
 };
 
 export default function AccountDetailsForm() {

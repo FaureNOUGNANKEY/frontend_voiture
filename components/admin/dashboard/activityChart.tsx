@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 
 interface StatisticsProps {
-  statistics : Statistics;
+  statistics : Statistics | null;
 }
 export default function ActivityChart( {statistics}:StatisticsProps ) {
   const dayTranslations: Record<string, string> = {
@@ -21,12 +21,12 @@ export default function ActivityChart( {statistics}:StatisticsProps ) {
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   const weeklyActivity = daysOfWeek.map((day) => {
-    const found = statistics.reservationActivity.find((item) => item.day === day);
-    const totalWeek = statistics.reservationActivity.reduce((sum, item) => sum + item.count, 0);
+    const found = statistics?.reservationActivity.find((item) => item.day === day);
+    const totalWeek = statistics?.reservationActivity.reduce((sum, item) => sum + item.count, 0)??0;
 
     return {
       day: dayTranslations[day], // affichage en français
-      value: found ? (found.count/totalWeek) *100 : 0, // hauteur de la barre
+      value: found && totalWeek >0? (found.count/totalWeek) *100 : 0, // hauteur de la barre
       count: found ? found.count : 0,
     };
   });

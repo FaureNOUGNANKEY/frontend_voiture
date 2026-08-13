@@ -60,14 +60,11 @@ export default function ConducteursPage() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          <DriverHeader onSuccess={getDrivers} />
+          <DriverHeader onSuccess={ () => {getDrivers(),getStatistics()}} />
           {statistics && <DriversKpis statistics={statistics} />}
-          {/* <DriversKpis statistics={statistics} /> */}
           <DriversTable drivers={drivers} onEdit={(id: number | string) =>getDriver(id)} onSuccess={ () => {getDrivers();getStatistics()}}/>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* <IncidentsList /> */}
-            {/* <UpcomingMaintenance /> */}
           </div>
         </div>
       </main>

@@ -6,17 +6,44 @@ import { Statistics } from "@/lib/types";
 
 
 interface statatisticsProps{
-  statistics : Statistics
+  statistics : Statistics | null
 }
 
 export default function DriverAvailability( {statistics}:statatisticsProps ) {
   const router = useRouter();
 
+  const busy = statistics?.totals.busyDrivers ?? 0;
+  const available = statistics?.totals.availableDrivers ?? 0;
+  const unavailable = statistics?.totals.unAvailableDrivers ?? 0;
+  const total = statistics?.totals.drivers ?? 0;
+
+  const getPercent = (value: number) =>
+    total > 0 ? ((value / total) * 100).toFixed(2) : "0.00";
+
   const driverAvailability = [
-  { id: "on-duty", label: "En service", detail: statistics?.totals.busyDrivers + "  conducteurs en circulation" , percent: (statistics?.totals.busyDrivers/statistics?.totals.drivers)*100, color: "bg-emerald-500" },
-  { id: "standby", label: "En attente", detail: statistics?.totals.availableDrivers +" conducteurs à la base", percent: (statistics?.totals.availableDrivers/statistics?.totals.drivers)*100, color: "bg-blue-300" },
-  { id: "unavailable", label: "Indisponible", detail: statistics?.totals.unAvailableDrivers +" conducteurs en congé", percent: (statistics?.totals.unAvailableDrivers/statistics?.totals.drivers)*100, color: "bg-red-500" },
-];
+    {
+      id: "on-duty",
+      label: "En service",
+      detail: `${busy} conducteurs en circulation`,
+      percent: getPercent(busy),
+      color: "bg-emerald-500",
+    },
+    {
+      id: "standby",
+      label: "En attente",
+      detail: `${available} conducteurs à la base`,
+      percent: getPercent(available),
+      color: "bg-blue-300",
+    },
+    {
+      id: "unavailable",
+      label: "Indisponible",
+      detail: `${unavailable} conducteurs en congé`,
+      percent: getPercent(unavailable),
+      color: "bg-red-500",
+    },
+  ];
+
 
   return (
     <Card className="shadow-sm hover:-translate-y-0.5 transition-transform">

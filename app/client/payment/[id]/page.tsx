@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -16,17 +16,20 @@ import { getInvoiceApi } from "@/api/invoice";
 import { addPaymentApi } from "@/api/payment";
 import { toast } from "sonner";
 
+export const formatDate = (date?: string, dateFormat = "dd MMM.") =>
+  date ? format(new Date(date), dateFormat, { locale: fr }) : "";
+
 export default function PaymentPage() {
   const { id } = useParams();
   // const [reservation, setReservation] = useState<any>(null);
   const [selectedMethod, setSelectedMethod] = useState<"card" | "miss by yas" | "flooz">("card");
-  const [cardName, setCardName] = useState("JEAN DUPONT");
-  const [cardNumber, setCardNumber] = useState("0000 0000 0000 0000");
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [saveCard, setSaveCard] = useState(false);
-  const [amount, setAmount] = useState("EX : 10000");
-  const [phoneNumber, setPhoneNumber] = useState("EX : 90 00 90 00");
+  const [amount, setAmount] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [invoice, setInvoice] = useState<Invoice |null>(null);
@@ -43,7 +46,7 @@ export default function PaymentPage() {
     "miss by yas": "miss by yas",
     flooz: "flooz",
   };
- 
+ const router = useRouter();
 
   const getReservation = async (id: string | number) => {
     try {
@@ -64,8 +67,7 @@ export default function PaymentPage() {
     }
   };
 
-  const formatReservationDate = (date?: string, dateFormat = "dd MMM.") =>
-    date ? format(new Date(date), dateFormat, { locale: fr }) : "";
+  
 
   useEffect(() => {
     if (id) {
@@ -96,7 +98,7 @@ export default function PaymentPage() {
  
     const data = new FormData();
     data.append("invoice_id", String(invoice.id));
-    data.append("modePayement", MODE_PAYEMENT_MAP[selectedMethod]);
+    data.append("modePayment", MODE_PAYEMENT_MAP[selectedMethod]);
     data.append("amount", String(montant));
  
     try {
@@ -104,6 +106,7 @@ export default function PaymentPage() {
       console.log("Paiement enregistré :", response);
       toast.success("Paiement effectué avec succès !");
       setOpen(false);
+      router.push("/client/reservation/me")
     } catch (error: any) {
       if (error.response && error.response.data.errors) {
         setPaymentErrors(error.response.data.errors);
@@ -157,6 +160,7 @@ export default function PaymentPage() {
                 <div>
                   <Label>Nom sur la carte</Label>
                   <Input
+                    placeholder="NOUGNANKEY Faure"
                     value={cardName}
                     onChange={(e) => setCardName(e.target.value)}
                     className="mt-2 text-lg h-10"
@@ -167,6 +171,7 @@ export default function PaymentPage() {
                   <Label>Numéro de carte</Label>
                   <Input
                     value={cardNumber}
+                    placeholder="700 800 900"
                     onChange={(e) => setCardNumber(e.target.value)}
                     className="mt-2 text-lg tracking-widest h-10"
                     maxLength={19}
@@ -216,6 +221,7 @@ export default function PaymentPage() {
                 <div>
                   <Label>Montant</Label>
                   <Input
+                    placeholder="Ex: 6000"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="mt-2 text-lg h-10"
@@ -226,6 +232,7 @@ export default function PaymentPage() {
                   <Label>Numéro de télephone</Label>
                   <Input
                     value={phoneNumber}
+                    placeholder="70 44 36 91"
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="mt-2 text-lg tracking-widest h-10"
                     maxLength={19}
@@ -280,9 +287,9 @@ export default function PaymentPage() {
                 <p className="font-semibold">{selectedReservation?.car.mark} {selectedReservation?.car.model} </p>
                 <p className="text-sm text-gray-500">
                   {selectedReservation?.dateStart &&
-                    `Du ${formatReservationDate(selectedReservation.dateStart, "dd MMM.")}`}
+                    `Du ${formatDate(selectedReservation.dateStart, "dd MMM. yyyy")}`}
                   {selectedReservation?.dateBack &&
-                    ` au ${formatReservationDate(selectedReservation.dateBack, "dd MMM. yyyy")}`}
+                    ` au ${formatDate(selectedReservation.dateBack, "dd MMM. yyyy")}`}
                 </p>
               </div>
             </div>

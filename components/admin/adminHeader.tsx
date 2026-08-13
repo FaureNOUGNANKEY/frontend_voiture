@@ -39,7 +39,7 @@ export default function AdminHeader({
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
-    const { isAuthenticated, currentUser,logout } = useAuth();
+  const { isAuthenticated, currentUser,logout } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-6 h-16 bg-white shadow-xl">
@@ -64,7 +64,7 @@ export default function AdminHeader({
         />
         <img src="/appLogo.png" alt="logo" width={80} className="sm:hidden" />
 
-        <div className="hidden md:flex ml-8 gap-4">
+        {/* <div className="hidden md:flex ml-8 gap-4">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -74,7 +74,7 @@ export default function AdminHeader({
               {link.label}
             </Link>
           ))}
-        </div>
+        </div> */}
       </div>
 
       {/* <div className="flex items-center gap-2 md:gap-4">
@@ -241,6 +241,7 @@ export default function AdminHeader({
                   </SheetClose>
                   <SheetClose>
                     <Button
+                    onClick={logout}
                       variant="destructive"
                       className="w-full justify-start gap-3"
                     >
