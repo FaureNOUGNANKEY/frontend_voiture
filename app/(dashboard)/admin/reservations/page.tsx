@@ -105,7 +105,7 @@ export default function ReservationsPage() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          {statistics &&<ReservationsHeader clients={clients} cars={availablecars} onSuccess={ () => {getReservations(),getStatistics()}} drivers={availabledrivers} statistics={statistics} />}
+          {statistics &&<ReservationsHeader clients={clients} cars={availablecars} onSuccess={ () => {getReservations(),getStatistics(),getAvailableCars(),getAvailableDrivers()}} drivers={availabledrivers} statistics={statistics} />}
           <ReservationsTable reservations={reservations} drivers={availabledrivers} onEdit={(id: string | number) => getReservation(id)} onSuccess={getReservations} clients={clients} cars={availablecars}/>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

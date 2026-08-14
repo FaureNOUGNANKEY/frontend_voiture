@@ -111,7 +111,7 @@ function getInitials(firstname: string, lastname: string) {
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="text-xs font-semibold uppercase">ID Réservation</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Réservation</TableHead>
               <TableHead className="text-xs font-semibold uppercase">Client</TableHead>
               <TableHead className="text-xs font-semibold uppercase">Véhicule</TableHead>
               <TableHead className="text-xs font-semibold uppercase">Période</TableHead>
@@ -125,7 +125,7 @@ function getInitials(firstname: string, lastname: string) {
               <TableRow key={r.id} className="hover:bg-slate-50 transition-colors group">
                 <TableCell>
                   <span className="font-mono text-xs text-primary bg-blue-50 px-2 py-1 rounded">
-                    RES-000000{r.id}
+                    {r.reservationNumber}
                   </span>
                 </TableCell>
 

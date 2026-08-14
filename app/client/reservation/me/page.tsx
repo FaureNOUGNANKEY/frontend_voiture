@@ -22,6 +22,7 @@ export default function MyReservationsPage() {
       console.log("Fetched myReservations:", response.data);
     } catch (error) {
       console.error("Error fetching myReservations:", error);
+      setReservations([]);
     } finally {
       setLoading(false);
     }

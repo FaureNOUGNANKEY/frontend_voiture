@@ -69,9 +69,9 @@ const sidebarLinks = [
     icon: "Wrench",
   },
   {
-    id: "invoices",
-    label: "Factures",
-    href: "/admin/invoices",
+    id: "payments",
+    label: "Payements",
+    href: "/admin/payments",
     icon: "Receipt",
   },
   {

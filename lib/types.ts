@@ -54,6 +54,7 @@ export interface Panne {
 export type ReservationStatus = "En cours" | "Terminée" | "Annulée" | "En attente" | "Refusée"| "Validée";
 export interface Reservation {
     id:number,
+    reservationNumber:string,
     dateStart: string,
     dateBack: string,
     driverAmount: number,
@@ -122,9 +123,9 @@ export interface Driver {
 
 export interface Historic {
     id:number,
-    activite: string,
-    dateConnecxion: Date,
-    heureDeconnecxion: Date,
+    action: string,
+    actionDate: Date,
+    description:string,
 }
 
 export interface Invoice {
@@ -144,6 +145,7 @@ export interface Invoice {
 
 export interface Payment {
     id:number,
+    paymentNumber:string,
     amount: number,
     modePayment: string,
     invoice: Invoice,
@@ -204,6 +206,7 @@ export interface CarBack {
   state: string;
   domage?: string | null;  
   comment?: string | null; 
+  returnDate: Date,
   created_at: string;       
   updated_at: string;      
   reservation?: Reservation; 
