@@ -65,10 +65,8 @@ export default function PaymentsTable({ payments,onEdit,onSuccess}: PaymentProps
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
-  const [carBackOpen, setcarBackOpen] = useState(false);
-
   const filtered = payments.filter((p) =>
-    `${p.invoice.reservation.user.lastname}  ${p.invoice.reservation.car.mark}`
+    `${p.invoice.reservation.user.lastname}  ${p.invoice.reservation.reservationNumber}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
@@ -89,7 +87,7 @@ function getInitials(firstname: string, lastname: string) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher par client, ID ou véhicule..."
+            placeholder="Rechercher par client, ou numéro de reservation..."
             className="pl-10 bg-white"
           />
         </div>
@@ -109,7 +107,7 @@ function getInitials(firstname: string, lastname: string) {
           <TableHeader>
             <TableRow className="bg-slate-50 hover:bg-slate-50">
               <TableHead className="text-xs font-semibold uppercase">Payements</TableHead>
-              <TableHead className="text-xs font-semibold uppercase">Facture</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Reservation</TableHead>
               <TableHead className="text-xs font-semibold uppercase">Client</TableHead>
               <TableHead className="text-xs font-semibold uppercase">Montant</TableHead>
               <TableHead className="text-xs font-semibold uppercase">Méthode</TableHead>
@@ -127,7 +125,7 @@ function getInitials(firstname: string, lastname: string) {
                 </TableCell>
                 <TableCell>
                   <span className="font-mono text-xs text-primary bg-blue-50 px-2 py-1 rounded">
-                    {p.invoice.invoiceNumber}
+                    {p.invoice.reservation.reservationNumber}
                   </span>
                 </TableCell>
 

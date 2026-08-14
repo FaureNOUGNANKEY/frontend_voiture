@@ -2,7 +2,7 @@
 
 import { Payment, Reservation, Statistics, User } from "@/lib/types";
 import { useState, useEffect } from "react";
-import { getReservationApi } from "@/api/reservation";
+import { getReservationApi, getReservationsApi } from "@/api/reservation";
 import { getStatisticsApi } from "@/api/statistic";
 import { getPaymentsApi } from "@/api/payment";
 import PaymentsTable from "@/components/admin/payment/paymentTable";
@@ -25,13 +25,23 @@ export default function ReservationsPage() {
 
     }
   }
-  const getReservation = async (id: string | number) => {
+  const getReservations = async () => {
+    try {
+      const response = await getReservationsApi();
+      setReservations(response.data);
+      console.log("Fetched Reservations:", response.data);
+    } catch (error) {
+      console.error("Error fetching Reservations:", error);
+
+    }
+  }
+  const getReservation = async (id :number|string ) => {
     try {
       const response = await getReservationApi(String(id));
       setReservations(response.data);
-      console.log("Fetched Reservation:", response.data);
+      console.log("Fetched Reservations:", response.data);
     } catch (error) {
-      console.error("Error fetching Reservation:", error);
+      console.error("Error fetching Reservations:", error);
 
     }
   }
@@ -49,7 +59,7 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     getStatistics();
-
+    getReservations();
     getPayments();
   }, []);
 
@@ -57,7 +67,7 @@ export default function ReservationsPage() {
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <main className="">
         <div className="p-6 mx-auto">
-          <PaymentsHeader onSuccess={() => { getPayments()}}  />
+          <PaymentsHeader  reservations={reservations} onSuccess={() => { getPayments()}}  />
           <PaymentsTable payments={payments} onEdit={(id: string | number) => getReservation(id)} onSuccess={getPayments} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

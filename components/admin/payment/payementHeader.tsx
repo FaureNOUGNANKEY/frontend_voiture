@@ -1,13 +1,15 @@
 import { Filter, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Car, Category } from "@/lib/types";
+import { Car, Category, Reservation } from "@/lib/types";
 import CreateVehiculeModal from "@/components/modals/createVehiculeModal";
 import { useState } from "react";
+import CreatePaymentModal from "@/components/modals/createPaymentModal";
 
 interface PaymentProps{
   onSuccess?: () => void;
+  reservations:Reservation[];
 }
-export default function VehiculeHeader( {onSuccess} : PaymentProps ) {
+export default function VehiculeHeader( {onSuccess,reservations} : PaymentProps ) {
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
@@ -34,12 +36,12 @@ export default function VehiculeHeader( {onSuccess} : PaymentProps ) {
       </div>
 
       {/* Modal */}
-      {/* <CreateVehiculeModal
-        categories={categories}
+      <CreatePaymentModal
+        reservations={reservations}
         open={createOpen}
         onOpenChange={setCreateOpen}
         onSuccess={onSuccess}
-      /> */}
+      />
     </div>
   );
 }
