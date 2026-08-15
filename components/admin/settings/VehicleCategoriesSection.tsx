@@ -6,33 +6,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CategoryCard from "./CategoryCard";
 import AddCategoryCard from "./AddCategoryCard";
-import { VehicleCategory } from "@/app/(dashboard)/admin/settings/page";
+import { Category } from "@/lib/types";
+import { deleteCategoryApi } from "@/api/category";
+import { toast } from "sonner";
+import ConfirmModal from "@/components/modals/confirmModal";
+import CreateCategoryModal from "@/components/modals/createCategoryModal";
 
 interface VehicleCategoriesSectionProps {
-  initialCategories: VehicleCategory[];
+  categories: Category[];
+  onSuccess?: () => void;
 }
 
 export default function VehicleCategoriesSection({
-  initialCategories,
+  categories, onSuccess,
 }: VehicleCategoriesSectionProps) {
-  const [categories, setCategories] =
-    useState<VehicleCategory[]>(initialCategories);
-
-  const handleRemove = (id: string) => {
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-  };
-
-  const handleAdd = () => {
-    const name = window.prompt("Nom de la nouvelle catégorie");
-    if (!name?.trim()) return;
-    setCategories((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), name: name.trim() },
-    ]);
-  };
+  const [createOpen, setCreateOpen] = useState(false);
 
   return (
+
     <Card className="shadow-sm">
+      <div>
+        {/* Modal */}
+        <CreateCategoryModal
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          onSuccess={onSuccess}
+        />
+      </div>
+
       <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b pb-4">
         <div className="flex items-center gap-3">
           <LayoutGrid className="h-5 w-5 text-primary" />
@@ -43,7 +44,7 @@ export default function VehicleCategoriesSection({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleAdd}
+          onClick={() => setCreateOpen(true)}
           className="gap-1.5"
         >
           <Plus className="h-4 w-4" />
@@ -57,10 +58,10 @@ export default function VehicleCategoriesSection({
             <CategoryCard
               key={category.id}
               category={category}
-              onRemove={handleRemove}
+              onSuccess={onSuccess}
             />
           ))}
-          <AddCategoryCard onClick={handleAdd} />
+          <AddCategoryCard onClick={() => setCreateOpen(true)} />
         </div>
       </CardContent>
     </Card>

@@ -1,9 +1,12 @@
 "use client";
 
+import { getCategoriesApi } from "@/api/category";
 import PricingTaxSection from "@/components/admin/settings/PricingTaxSection";
 import PromotionsSection from "@/components/admin/settings/PromotionsSection";
 import VehicleCategoriesSection from "@/components/admin/settings/VehicleCategoriesSection";
+import { Category } from "@/lib/types";
 import { Building, Calendar, Infinity } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export type DriverPayType = "fixed" | "percentage";
 
@@ -14,10 +17,7 @@ export interface PricingSettings {
   autoApplyVat: boolean;
 }
 
-export interface VehicleCategory {
-  id: string;
-  name: string;
-}
+
 
 export type PromoVariant = "highlight" | "neutral";
 
@@ -39,14 +39,7 @@ export const defaultPricingSettings: PricingSettings = {
   autoApplyVat: true,
 };
 
-export const defaultVehicleCategories: VehicleCategory[] = [
-  { id: "economique", name: "Économique" },
-  { id: "luxe", name: "Luxe" },
-  { id: "suv", name: "SUV" },
-  { id: "utilitaire", name: "Utilitaire" },
-  { id: "berline", name: "Berline" },
-  { id: "electrique", name: "Électrique" },
-];
+
 
 export const defaultPromotions: Promotion[] = [
   {
@@ -79,6 +72,22 @@ export const defaultPromotions: Promotion[] = [
 ];
 
 export default function ParametresPage() {
+
+  const [categories,setCategories] = useState<Category[]>([]);
+  const getCategories = async () => {
+    try {
+      const response = await getCategoriesApi();
+      setCategories(response.data);
+      console.log(" Fetched Categories :", response.data);
+    } catch (error){
+      console.error("Error fetching Categories:",error)
+    }
+  }
+
+  useEffect(() => {
+    getCategories();
+  },[]);
+
   const handleSavePricing = (settings: PricingSettings) => {
     // TODO: brancher sur l'API (ex: fetch("/api/settings/pricing", { method: "POST", body: ... }))
     console.log("Sauvegarde des tarifs", settings);
@@ -109,7 +118,8 @@ export default function ParametresPage() {
               onSave={handleSavePricing}
             />
             <VehicleCategoriesSection
-              initialCategories={defaultVehicleCategories}
+              categories={categories}
+              onSuccess={() =>{getCategories()}}
             />
           </div>
 
