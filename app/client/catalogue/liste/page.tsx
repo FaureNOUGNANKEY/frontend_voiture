@@ -9,13 +9,15 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { getCarsApi } from "@/api/car";
-import { Car } from "@/lib/types";
+import { Car, Category } from "@/lib/types";
 import RequireClient from "@/contexts/RequireClient";
 import { useAuth } from "@/contexts/AuthContext";
+import { getCategoriesApi } from "@/api/category";
 
 export default function CataloguePage() {
   const [priceRange, setPriceRange] = useState([30000, 500000]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(["SUV"]);
+  const [selectedCategory, setSelectedCategory] = useState<Category[]>([]);
+  const [categories,setCategories] = useState<Category[]>([]);
   const { isAuthenticated, currentUser } = useAuth();
   const router = useRouter();
 
@@ -41,8 +43,20 @@ export default function CataloguePage() {
     }
   };
 
+  
+    const getCategories = async () => {
+      try {
+        const response = await getCategoriesApi();
+        setCategories(response.data);
+        console.log(" Fetched Categories :", response.data);
+      } catch (error){
+        console.error("Error fetching Categories:",error)
+      }
+    }
+    
   useEffect(() => {
     getCars();
+    getCategories();
   }, []);
 
 
@@ -77,21 +91,21 @@ export default function CataloguePage() {
             {/* Type de véhicule */}
             <div className="mb-8">
               <h3 className="font-medium mb-3">Type de véhicule</h3>
-              {["Berline", "SUV", "Utilitaire", "Électrique"].map((type) => (
-                <div key={type} className="flex items-center gap-3 mb-3">
+              {categories.map((c) => (
+                <div key={c.id} className="flex items-center gap-3 mb-3">
                   <Checkbox
-                    checked={selectedTypes.includes(type)}
+                    checked={selectedCategory.includes(c)}
                     onCheckedChange={() => {
-                      if (selectedTypes.includes(type)) {
-                        setSelectedTypes(
-                          selectedTypes.filter((t) => t !== type),
+                      if (selectedCategory.includes(c)) {
+                        setSelectedCategory(
+                          selectedCategory.filter((t) => t !== c),
                         );
                       } else {
-                        setSelectedTypes([...selectedTypes, type]);
+                        setSelectedCategory([...selectedCategory, c]);
                       }
                     }}
                   />
-                  <span>{type}</span>
+                  <span>{c.name}</span>
                 </div>
               ))}
             </div>

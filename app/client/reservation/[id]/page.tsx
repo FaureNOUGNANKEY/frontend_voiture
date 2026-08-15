@@ -26,12 +26,37 @@ import { addReservationApi } from "@/api/reservation";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Fonction utilitaire pour formater une date en "YYYY-MM-DDTHH:mm"
+const formatDateTimeLocal = (date: Date) => {
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes())
+  );
+};
+
+// Initialisation avec la date du jour
+const today = new Date();
+const defaultPickup = formatDateTimeLocal(today);
+
+// Exemple : retour 3 jours plus tard
+const defaultReturn = formatDateTimeLocal(
+  new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000)
+);
+
 export default function ReservationDetails() {
   const [driveOption, setDriveOption] = useState<"reservation" | "leasing">(
     "reservation",
   );
-  const [pickupDate, setPickupDate] = useState("2024-11-20T10:00");
-  const [returnDate, setReturnDate] = useState("2024-11-25T10:00");
+  const [pickupDate, setPickupDate] = useState(defaultPickup);
+  const [returnDate, setReturnDate] = useState(defaultReturn);
   const [currentStep, setCurrentStep] = useState(2);
   const { id } = useParams();
   const router = useRouter();
