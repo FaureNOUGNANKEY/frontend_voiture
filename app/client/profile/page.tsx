@@ -6,7 +6,7 @@ import RequireClient from "@/contexts/RequireClient";
 
 export default function ProfilePage() {
   return (
-    <RequireClient>
+    // <RequireClient>
       <main className="max-w-6xl mx-auto px-4 md:px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Colonne gauche */}
@@ -22,6 +22,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-    </RequireClient>
+    // </RequireClient>
   );
 }

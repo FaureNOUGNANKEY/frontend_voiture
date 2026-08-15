@@ -214,3 +214,12 @@ export interface CarBack {
 }
 
 
+export type SettingsMap = Record<string, string>;
+export interface Setting {
+  id?: number;   
+  key: string;      
+  value: string;
+  created_at?: string;
+  updated_at?: string;
+}
+

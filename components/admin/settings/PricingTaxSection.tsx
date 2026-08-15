@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PricingSettings } from "@/app/(dashboard)/admin/settings/page";
+import { Setting } from "@/lib/types";
+
+interface PricingSettings {
+  driverPayType: "fixed" | "percentage";
+  driverDailyRate: number;
+  tvaRate: number;
+  autoApplyVat: boolean;
+}
 
 interface PricingTaxSectionProps {
-  initialSettings: PricingSettings;
+  initialSettings: Setting[];
   onSave?: (settings: PricingSettings) => void;
 }
 
@@ -25,13 +32,26 @@ export default function PricingTaxSection({
   initialSettings,
   onSave,
 }: PricingTaxSectionProps) {
-  const [settings, setSettings] = useState<PricingSettings>(initialSettings);
+
+  const mapToPricingSettings = (settings: Setting[]): PricingSettings => ({
+    driverPayType: (settings.find(s => s.key === "driverPayType")?.value as "fixed" | "percentage") || "fixed",
+    driverDailyRate: Number(settings.find(s => s.key === "driverDailyRate")?.value || 0),
+    tvaRate: Number(settings.find(s => s.key === "tvaRate")?.value || 0),
+    autoApplyVat: settings.find(s => s.key === "autoApplyVat")?.value === "true",
+  });
+  const [settings, setSettings] = useState<PricingSettings>(
+    mapToPricingSettings(initialSettings)
+  );
+
+  useEffect(() => {
+  setSettings(mapToPricingSettings(initialSettings));
+}, [initialSettings]);
 
   const update = <K extends keyof PricingSettings>(
     key: K,
     value: PricingSettings[K]
   ) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+    setSettings((prev: PricingSettings) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -77,9 +97,9 @@ export default function PricingTaxSection({
                 <Input
                   id="driverPayValue"
                   type="number"
-                  value={settings.driverPayValue}
+                  value={settings.driverDailyRate}
                   onChange={(e) =>
-                    update("driverPayValue", Number(e.target.value))
+                    update("driverDailyRate", Number(e.target.value))
                   }
                   className="pr-10"
                 />
@@ -102,8 +122,8 @@ export default function PricingTaxSection({
                   id="vatRate"
                   type="number"
                   step="0.1"
-                  value={settings.vatRate}
-                  onChange={(e) => update("vatRate", Number(e.target.value))}
+                  value={settings.tvaRate}
+                  onChange={(e) => update("tvaRate", Number(e.target.value))}
                   className="pr-10"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
