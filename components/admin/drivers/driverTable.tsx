@@ -191,7 +191,7 @@ export default function DriversTable({ drivers, onSuccess, onEdit }: DriverProps
             {filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-sm text-slate-400">
-                  Aucun véhicule ne correspond à votre recherche.
+                  Aucun conducteur ne correspond à votre recherche.
                 </TableCell>
               </TableRow>
             )}

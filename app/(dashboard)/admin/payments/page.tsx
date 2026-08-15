@@ -4,7 +4,7 @@ import { Payment, Reservation, Statistics, User } from "@/lib/types";
 import { useState, useEffect } from "react";
 import { getReservationApi, getReservationsApi } from "@/api/reservation";
 import { getStatisticsApi } from "@/api/statistic";
-import { getPaymentsApi } from "@/api/payment";
+import { getPaymentApi, getPaymentsApi } from "@/api/payment";
 import PaymentsTable from "@/components/admin/payment/paymentTable";
 import PaymentsHeader from "@/components/admin/payment/payementHeader";
 
@@ -14,6 +14,7 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [statistics, setStatistics] = useState<Statistics | null>(null);
+  const [selectedpayment, setSelectedPayment] = useState<Payment | null>(null);
 
   const getPayments = async () => {
     try {
@@ -57,6 +58,17 @@ export default function ReservationsPage() {
     }
   }
 
+  const getPayment = async (id: string| number) => {
+    try {
+      const response = await getPaymentApi(String(id));
+      setSelectedPayment(response.data);
+      console.log("Fetched Payment:", response.data);
+    } catch (error) {
+      console.error("Error fetching Payment:", error);
+
+    }
+  }
+
   useEffect(() => {
     getStatistics();
     getReservations();
@@ -68,7 +80,7 @@ export default function ReservationsPage() {
       <main className="">
         <div className="p-6 mx-auto">
           <PaymentsHeader  reservations={reservations} onSuccess={() => { getPayments()}}  />
-          <PaymentsTable payments={payments} onEdit={(id: string | number) => getReservation(id)} onSuccess={getPayments} />
+          <PaymentsTable payments={payments} onEdit={(id: string | number) => getReservation(id)} onSuccess={getPayments} onPrint={(id: string | number) => getPayment(id)} />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           </div>

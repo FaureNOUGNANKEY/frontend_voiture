@@ -25,6 +25,7 @@ import { Car, Driver, Reservation,Client, Payment } from "@/lib/types";
 import CreateReservationModal from "@/components/modals/createReservationModal";
 import CarBackModal from "@/components/modals/CarBackModal";
 import { formatDate } from "@/app/client/payment/[id]/page";
+import FactureLocationModal from "@/components/modals/factureLocationModal";
 
 
 // 1. Définir les états possibles
@@ -58,11 +59,11 @@ interface PaymentProps {
   payments: Payment[];
   onSuccess?: () => void;
   onEdit: (id: number) => void;
+  onPrint: (id: number) => void;
 }
 
-export default function PaymentsTable({ payments,onEdit,onSuccess}: PaymentProps ) {
+export default function PaymentsTable({ payments,onEdit,onSuccess,onPrint}: PaymentProps ) {
   const [search, setSearch] = useState("");
-  const [createOpen, setCreateOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   const filtered = payments.filter((p) =>
@@ -75,6 +76,9 @@ export default function PaymentsTable({ payments,onEdit,onSuccess}: PaymentProps
 function getInitials(firstname: string, lastname: string) {
   return `${firstname.charAt(0)}${lastname.charAt(0)}`.toUpperCase();
 }
+
+const [open, setOpen] = useState(false);
+const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
 
 
   return (
@@ -167,6 +171,13 @@ function getInitials(firstname: string, lastname: string) {
                     <div className="flex justify-center gap-1">
                     <div>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary" 
+
+                      onClick={() => {
+                          setOpen(true);
+                          setSelectedPayment(p);
+                          onPrint(p.id);
+                          onSuccess?.()
+                        }}
                       >
                         <Pencil size={18} />
                       </Button>
@@ -197,12 +208,18 @@ function getInitials(firstname: string, lastname: string) {
         
       </div>
       {/* Modal */}
-        {/* <CreateReservationModal 
-          open={createOpen}
-          onOpenChange={setCreateOpen}
-          initialData={selectedReservation}
-          onSuccess={onSuccess} cars={cars} drivers={drivers} clients={clients}/> */}
-
+        
+                {selectedPayment && (
+                  <FactureLocationModal
+                    open={open}
+                    onOpenChange={setOpen}
+                    facture={selectedPayment.invoice}
+                    // onImprimer={() => {
+                    //   return window.print();
+                    // }}
+                  />
+                )}
+              
       <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-sm">
         <span className="text-slate-500">Affichage de 1 à {filtered.length} sur {payments.length} résultats</span>
         <div className="flex gap-2">

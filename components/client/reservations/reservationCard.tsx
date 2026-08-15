@@ -98,7 +98,7 @@ export default function ReservationCard({ reservation, onCancel }: { reservation
 
                 {/* Cas : réservation validée → Annuler + Payer si facture non payée */}
                 {reservation.status === ("Validée" as Reservation["status"]) && (
-                  <>
+                  <>{reservation.invoice?.status !== "Payé" ? (
                     <Button
                       variant="outline"
                       size="sm"
@@ -107,7 +107,7 @@ export default function ReservationCard({ reservation, onCancel }: { reservation
                     >
                       Annuler
                     </Button>
-
+                  ):( <> </>) }
                     {reservation.invoice?.status !== "Payé" ? (
                       <Button
                         onClick={() => router.push(`/client/payment/${reservation.id}`)}

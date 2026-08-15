@@ -129,6 +129,7 @@ export interface Historic {
 }
 
 export interface Invoice {
+    category: string;
     id:number,
     invoiceNumber: string,
     driverAmount: number,

@@ -137,6 +137,9 @@ export default function FactureLocationModal({
             {/* Client + Société */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-1">
+                <p className="text-base italic tracking-tight text-slate-900 uppercase">
+                  {facture?.invoiceNumber}
+                </p>
                 <p className="text-base font-bold tracking-tight text-slate-900 uppercase">
                   {facture?.reservation.user.lastname}
                 </p>
@@ -170,7 +173,7 @@ export default function FactureLocationModal({
               <div className="rounded-xl border bg-slate-50/50 px-4 py-2 print:bg-white">
                 <DetailRow label="Marque" value={facture.reservation.car.mark} />
                 <DetailRow label="Modèle" value={facture.reservation.car.model} />
-                <DetailRow label="Type" value={facture.reservation.car.category.name} />
+                <DetailRow label="Type" value={facture.reservation.car.category?.name ?? facture.category} />
                 <DetailRow label="État" value={facture.reservation.car.state} />
                 <DetailRow label="Couleur" value={facture.reservation.car.color} />
                 <DetailRow
