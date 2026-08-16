@@ -50,50 +50,39 @@
 }
 
 :root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklab(57.584999999999994% -0.05674 -0.09493);
+  --primary-hover: rgb(1, 59, 110);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: rgb(2, 8, 57);
+  --secondary: rgb(29, 30, 43);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: 0 0% 100%;
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-muted: 220 30% 20%;
-  --sidebar-accent: oklch(0.97 0 0);
-  --background: oklch(90.216% 0.00215 14.575);
-  --foreground: oklch(0.145 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: rgba(23, 49, 109, 1);
   --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-}
-
-* {
-  border-color: (var(--border));
-}
-
-body {
-  background-color: (var(--background));
-  color: (var(--foreground));
-  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
 
 .dark {
@@ -103,7 +92,8 @@ body {
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklab(69.506% -0.0942 -0.0091);
+  --primary: oklab(57.584999999999994% -0.05674 -0.09493);
+  --primary-hover: rgb(1, 59, 110);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: rgb(2, 8, 57);
   --secondary-foreground: oklch(0.985 0 0);
@@ -135,9 +125,62 @@ body {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground; 
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* ========== PRINT FACTURE ========== */
+@media print {
+  /* Cache tout le site */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Affiche uniquement le conteneur d'impression */
+  #print-root,
+  #print-root * {
+    visibility: visible;
+  }
+
+  #print-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+    background: white;
+  }
+
+  /* Pas de scroll, flux multi-pages */
+  #print-root * {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Évite de couper un bloc au milieu */
+  #print-root section,
+  #print-root .rounded-xl,
+  #print-root .border {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}
+
+/* À l'écran : le conteneur reste invisible */
+#print-root {
+  display: none;
+}
+@media print {
+  #print-root {
+    display: block !important;
   }
 }

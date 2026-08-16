@@ -1,10 +1,25 @@
 // components/layout/Header.tsx
-
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, Bell, HelpCircle } from "lucide-react";
+import {
+  Menu,
+  X,
+  Bell,
+  HelpCircle,
+  User,
+  Settings,
+  LogOut,
+  UserCircle,
+  ChevronDown,
+  Home,
+  Search,
+  Calendar,
+  MessageSquare,
+  LogIn,
+  CreativeCommons,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,102 +27,222 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ClientHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated, currentUser,logout } = useAuth();
+  
 
   const navLinks = [
-    { href: "", label: "Accueil" },
-    { href: "/catalogue", label: "Catalogue" },
-    { href: "#profile", label: "My Profile" },
-    { href: "#contact", label: "Contact" },
+    { href: "/client", label: "Accueil", icon: Home },
+    { href: "/client/catalogue", label: "Catalogue", icon: Search },
+    ...(isAuthenticated && currentUser
+    ? [{ href: "/client/reservation/me", label: "Réservations", icon: Calendar }]
+    : []),
+    // { href: "/client/reservation/me", label: "Réservations", icon: Calendar },
+    { href: "/client/messages", label: "Messages", icon: MessageSquare },
   ];
 
+
   return (
-    <header className="border-b bg-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <header className="shadow-lg bg-white sticky top-0 z-50 border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/client" className="flex items-center gap-3">
+        <Link href="/client" className="flex items-center gap-3 flex-shrink-0">
           <img
             src="/appLogo.png"
             alt="Easy Car Rental"
-            className="h-12 w-auto"
+            className="h-10 md:h-12 w-auto"
           />
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              href={`/client/${link.href}` }
-              className="text-sm font-medium hover:text-primary transition-colors"
+              href={link.href}
+              className="text-sm font-medium text-gray-600 hover:text-primary transition-colors relative group"
             >
               {link.label}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
-          {/* Desktop Icons */}
-          <Button variant="ghost" size="icon" className="hidden md:flex">
-            <Bell className="h-5 w-5" />
+        {/* Right section */}
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Notifications */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex relative"
+          >
+            <Bell className="h-5 w-5 text-gray-600" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </Button>
-          <Button variant="ghost" size="icon" className="hidden md:flex">
-            <HelpCircle className="h-5 w-5" />
-          </Button>
-          <Button className="hidden md:block">
-            <Link href="/signin">Sign Out</Link>
-          </Button>
+
+          {/* Help */}
+          {/* <Button variant="ghost" size="icon" className="hidden md:flex">
+            <HelpCircle className="h-5 w-5 text-gray-600" />
+          </Button> */}
+
+          {isAuthenticated && currentUser ? (
+            <div className="hidden md:block">
+              {/* Desktop Profile */}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className={
+                    "flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-full"
+                  }
+                >
+                  <Avatar className="h-8 w-8 border-2 border-primary/20">
+                    <AvatarImage src={currentUser.photo_url} alt={currentUser.lastname} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                     {currentUser.lastname.charAt(0).toUpperCase()}{currentUser.firstname.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-left hidden lg:block">
+                    <p className="text-sm font-semibold text-gray-700 leading-tight">
+                      {currentUser.lastname} {currentUser.firstname}
+                    </p>
+                    <p className="text-xs text-gray-400 leading-tight">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-gray-400 hidden lg:block" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem
+                    onClick={() => router.push("/client/profile")}
+                    className="cursor-pointer"
+                  >
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>Mon profil</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Paramètres</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                  onClick={logout}
+                  className="cursor-pointer text-red-600 hover:text-red-700">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Déconnexion</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 md:gap-4">
+              <Button
+                onClick={() => router.push("/login-client")}
+               className={"p-4"}>
+                <LogIn/> Se connecter
+              </Button>
+
+              <Button
+                variant={"outline"}
+                onClick={() => router.push("/register-client")}
+               className={"p-4 text-red-700"}>
+                <UserCircle /> Créer un compte
+              </Button>
+            </div>
+          )}
 
           {/* ==================== MOBILE MENU ==================== */}
-          <div>
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger className="md:hidden">
-                <div className="flex justify-center items-center p-2 rounded-lg border border-gray-300">
-                  <Menu className="h-4 w-4" />
-                </div>
-              </SheetTrigger>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger
+              className={"md:hidden border-gray-200 hover:bg-gray-50"}
+            >
+              <Menu className="h-5 w-5" />
+            </SheetTrigger>
 
-              <SheetContent side="right" className="w-80 bg-white">
-                <div className="flex flex-col h-full py-6">
-                  {/* Header du menu */}
-                  <div className="flex items-center justify-between mb-8 px-2">
-                    <div className="font-semibold text-xl text-gray-900">
-                      Menu
+            <SheetContent side="right" className="w-80 sm:w-96 bg-white p-0">
+              <div className="flex flex-col h-full">
+                {/* Header du menu avec profil */}
+                <div
+                  onClick={() => {
+                    router.push("/client/profile");
+                    setIsOpen(false);
+                  }}
+                  className="bg-gradient-to-r cursor-pointer from-primary/10 to-primary/5 px-6 py-8"
+                >
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16 border-2 border-white shadow-lg">
+                      <AvatarImage src={currentUser?.photo_url} alt={currentUser?.lastname} />
+                      <AvatarFallback className="bg-primary text-white text-xl font-semibold">
+                        {currentUser?.lastname.charAt(0).toUpperCase()}{currentUser?.firstname.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-lg font-semibold text-gray-900 truncate">
+                        {currentUser?.lastname} {currentUser?.firstname}
+                      </p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {currentUser?.email}
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  {/* Liens de navigation */}
-                  <div className="flex flex-col gap-2">
-                    {navLinks.map((link) => (
+                {/* Liens de navigation */}
+                <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                  {navLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
                       <SheetClose key={link.href}>
                         <Link
                           href={link.href}
-                          className="flex items-center px-4 py-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-all active:bg-gray-200"
+                          className="flex items-center gap-4 px-4 py-3 text-base font-medium text-gray-700 rounded-xl hover:bg-gray-50 hover:text-primary transition-all active:bg-gray-100 group"
                           onClick={() => setIsOpen(false)}
                         >
+                          <div className="w-10 h-10 rounded-lg bg-gray-50 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                            <Icon className="h-5 w-5 text-gray-500 group-hover:text-primary transition-colors" />
+                          </div>
                           {link.label}
                         </Link>
                       </SheetClose>
-                    ))}
-                  </div>
+                    );
+                  })}
+                </nav>
 
-                  {/* Séparateur */}
-                  <div className="my-8 border-t border-gray-200" />
-
-                  {/* Bouton Sign Out */}
-                  <div className="px-4 mt-auto">
-                    <SheetClose>
-                      <Button className="w-full py-6 text-base" size="lg">
-                        Sign Out
-                      </Button>
-                    </SheetClose>
-                  </div>
+                {/* Séparateur et boutons actions */}
+                <div className="border-t border-gray-100 px-4 py-6 space-y-3">
+                  <SheetClose>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-3 text-gray-600 border-gray-200 hover:bg-gray-50"
+                    >
+                      <Settings className="h-4 w-4" />
+                      Paramètres
+                    </Button>
+                  </SheetClose>
+                  <SheetClose>
+                    <Button
+                      variant="destructive"
+                      className="w-full justify-start gap-3"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Déconnexion
+                    </Button>
+                  </SheetClose>
                 </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

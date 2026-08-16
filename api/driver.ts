@@ -1,0 +1,64 @@
+import api from "../lib/api";
+import Cookies from "js-cookie";
+
+// Récupérer tous les chauffeurs
+export const getDriversApi = async () => {
+  const response = await api.get("/drivers",{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+};
+
+// Récupérer un chauffeur (driver)
+export const getDriverApi = async (id: string) => {
+  const response = await api.get(`/drivers/${id}`,{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+}
+
+// Ajouter un chauffeur
+export const addDriverApi = async (formData: FormData) => {
+  const response = await api.post("/drivers", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+};
+
+//Mettre à jour un chauffeur
+export const updateDriverApi =  async (id: number, formData: FormData) => {
+  const response = await api.post(`/drivers/${id}?_method=PUT`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+};
+
+// Supprimer un chauffeur
+export const deleteDriverApi = async (id: number) => {
+  const response = await api.delete(`/drivers/${id}`,{
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+};
+
+// récupérer les voitures disponibles
+export const getAvailableDriversApi = async () => {
+  const response = await api.get("/drivers/available", {
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
+  });
+  return response.data;
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Heart, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,69 +8,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-
-const vehicles = [
-  {
-    id: 1,
-    name: "Luxe Elite Sedan",
-    type: "Berline",
-    price: 85000, // en FCFA
-    places: 5,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d",
-    badge: "Populaire",
-  },
-  {
-    id: 2,
-    name: "Titan X7 Voyager",
-    type: "SUV",
-    price: 120000,
-    places: 7,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1533473359334-0135d6f3e2c0",
-    badge: "Nouveauté",
-  },
-  {
-    id: 3,
-    name: "E-Spark Compact",
-    type: "Électrique",
-    price: 65000,
-    places: 4,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1593941707882-5f0f3a5f3a0e",
-  },
-  {
-    id: 4,
-    name: "Transporter Pro Max",
-    type: "Utilitaire",
-    price: 95000,
-    places: 3,
-    transmission: "Manuelle",
-    image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24",
-  },
-  {
-    id: 5,
-    name: "Urban Explorer",
-    type: "SUV",
-    price: 110000,
-    places: 5,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1556189250-72cc5f5a5f5d",
-  },
-  {
-    id: 6,
-    name: "Premier Executive",
-    type: "Berline",
-    price: 150000,
-    places: 5,
-    transmission: "Automatique",
-    image: "https://images.unsplash.com/photo-1549317666-7d1e0b3b9d2a",
-  },
-];
+import { getCarsApi } from "@/api/car";
+import { Car, Category } from "@/lib/types";
+import RequireClient from "@/contexts/RequireClient";
+import { useAuth } from "@/contexts/AuthContext";
+import { getCategoriesApi } from "@/api/category";
 
 export default function CataloguePage() {
   const [priceRange, setPriceRange] = useState([30000, 500000]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(["SUV"]);
+  const [selectedCategory, setSelectedCategory] = useState<Category[]>([]);
+  const [categories,setCategories] = useState<Category[]>([]);
+  const { isAuthenticated, currentUser } = useAuth();
   const router = useRouter();
 
   const formatPrice = (price: number) => {
@@ -81,6 +29,36 @@ export default function CataloguePage() {
     const normalized = Array.isArray(value) ? value : [value, value];
     setPriceRange(normalized as number[]);
   };
+
+  const [cars, setCars] = useState<Car[]>([]);
+
+  const getCars = async () => {
+    try {
+      const response = await getCarsApi();
+      setCars(response.data);
+      console.log("Fetched cars:", response.data);
+    } catch (error) {
+      console.error("Error fetching cars:", error);
+      
+    }
+  };
+
+  
+    const getCategories = async () => {
+      try {
+        const response = await getCategoriesApi();
+        setCategories(response.data);
+        console.log(" Fetched Categories :", response.data);
+      } catch (error){
+        console.error("Error fetching Categories:",error)
+      }
+    }
+    
+  useEffect(() => {
+    getCars();
+    getCategories();
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -113,21 +91,21 @@ export default function CataloguePage() {
             {/* Type de véhicule */}
             <div className="mb-8">
               <h3 className="font-medium mb-3">Type de véhicule</h3>
-              {["Berline", "SUV", "Utilitaire", "Électrique"].map((type) => (
-                <div key={type} className="flex items-center gap-3 mb-3">
+              {categories.map((c) => (
+                <div key={c.id} className="flex items-center gap-3 mb-3">
                   <Checkbox
-                    checked={selectedTypes.includes(type)}
+                    checked={selectedCategory.includes(c)}
                     onCheckedChange={() => {
-                      if (selectedTypes.includes(type)) {
-                        setSelectedTypes(
-                          selectedTypes.filter((t) => t !== type),
+                      if (selectedCategory.includes(c)) {
+                        setSelectedCategory(
+                          selectedCategory.filter((t) => t !== c),
                         );
                       } else {
-                        setSelectedTypes([...selectedTypes, type]);
+                        setSelectedCategory([...selectedCategory, c]);
                       }
                     }}
                   />
-                  <span>{type}</span>
+                  <span>{c.name}</span>
                 </div>
               ))}
             </div>
@@ -169,7 +147,7 @@ export default function CataloguePage() {
           {/* Liste des véhicules */}
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6">
-              <p className="text-lg font-medium">24 véhicules trouvés</p>
+              <p className="text-lg font-medium">{cars.length} véhicules trouvés</p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Trier par :</span>
                 <select className="bg-white border cursor-pointer border-gray-200 rounded-lg px-4 py-2 text-sm">
@@ -182,34 +160,34 @@ export default function CataloguePage() {
 
             {/* Vehicules */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {vehicles.map((car) => (
+              {cars.map((car) => (
                 <div
                   key={car.id}
                   className="bg-white rounded-3xl overflow-hidden border hover:shadow-lg transition-all group"
                 >
                   <div className="relative h-52">
                     <img
-                      src={car.image}
-                      alt={car.name}
+                      src={car.photo_url}
+                      alt={car.mark}
                       className="w-full h-full object-cover"
                     />
-                    {car.badge && (
+                    {/* {car.badge && (
                       <Badge className="absolute top-4 left-4 bg-primary">
                         {car.badge}
                       </Badge>
-                    )}
+                    )} */}
                     <button className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center shadow">
                       <Heart className="w-5 h-5 text-gray-600 group-hover:text-red-500 transition-colors" />
                     </button>
                   </div>
 
                   <div className="p-5">
-                    <h3 className="font-semibold text-xl">{car.name}</h3>
+                    <h3 className="font-semibold text-xl">{car.mark} {car.model} </h3>
                     <Badge className="text-secondary border-0 bg-blue-100 text-xs">{car.type}</Badge>
 
                     <div className="flex items-center gap-4 text-sm text-gray-600 my-4">
                       <div className="flex items-center gap-1">
-                        👥 {car.places} Places
+                        👥 {car.place} Places
                       </div>
                       <div className="flex items-center gap-1">
                         ⚙️ {car.transmission}
@@ -219,14 +197,24 @@ export default function CataloguePage() {
                     <div className="flex items-end justify-between">
                       <div>
                         <span className="text-3xl font-bold text-gray-900">
-                          {car.price.toLocaleString("fr-FR")}
+                          {car.dayAmount.toLocaleString("fr-FR")}
                         </span>
                         <span className="text-sm text-gray-500">
                           {" "}
                           FCFA/jour
                         </span>
                       </div>
-                      <Button onClick={() => router.push("/client/reservation")} className={"px-6 py-4"}>Réserver</Button>
+                     
+                      <Button 
+                      onClick={() => {
+                        if (currentUser?.role?.toString().toLowerCase() === "client") {
+                          router.push(`/client/reservation/${car.id}`);
+                        } else {
+                          router.push("/login-client");
+                        }
+                      }}
+                      className={"px-6 py-4"}>Réserver</Button>
+                    
                     </div>
                   </div>
                 </div>

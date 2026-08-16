@@ -1,0 +1,237 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Upload, User, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { addDriverApi, updateDriverApi } from "@/api/driver";
+import { toast } from "sonner";
+
+interface CreateDriverModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+  initialData?: any;
+}
+
+export default function CreateDriverModal({
+  open,
+  onOpenChange,
+  onSuccess,
+  initialData,
+}: CreateDriverModalProps) {
+  const [formData, setFormData] = useState({
+    lastname: initialData?.lastname || "",
+    firstname: initialData?.firstname || "",
+    phone: initialData?.phone || "",
+    photo: initialData?.photo || null,
+  });
+
+  const [preview, setPreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+
+  useEffect(() => {
+    if (initialData){
+      setFormData({
+        lastname: initialData.lastname || "",
+        firstname: initialData.firstname || "",
+        phone: initialData.phone || "",
+        photo: null,
+      });
+      setPreview(initialData.photo_url || null);
+      console.log("initial data : ", initialData);
+    }
+  },[initialData]);
+
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, photo: file });
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        if (key === "photo") {
+          if (value instanceof File) {
+            data.append(key, value);
+          }
+        } else {
+          data.append(key, value as any);
+        }
+      }
+    });
+
+    try {
+      if (initialData){
+        await updateDriverApi(initialData.id, data)
+        console.log("data",data)
+        toast.success("chauffeur mis à jour avec succès !");
+      }else{
+        await addDriverApi(data);
+        toast.success("chauffeur ajouter avec succès !")
+      }
+      onSuccess?.();
+      onOpenChange(false);
+      setFormData({
+        lastname: "",
+        firstname: "",
+        phone: "",
+        photo: null,
+      });
+      setPreview(null);
+    }catch (error: any) {
+    if (error.response && error.response.data.errors) {
+        // récupèration des erreurs de validation
+        setErrors(error.response.data.errors);
+      } else {
+        console.error("Erreur API /drivers :", error.response?.data || error.message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="lg:min-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-lg flex items-center gap-2">
+            <User className="w-6 h-6" />
+            {initialData ? "Modifier le chauffeur" : "Ajouter un chauffeur"}
+          </DialogTitle>
+          <DialogDescription>
+            Remplissez les informations du chauffeur
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Photo */}
+          <div>
+            <Label>Photo du chauffeur</Label>
+            <div className="mt-2">
+              {preview || formData?.photo ? (
+                <div className="relative w-full h-48 rounded-xl overflow-hidden border">
+                  <img
+                    src={preview || formData?.photo}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreview(null);
+                      setFormData({ ...formData, photo: null });
+                    }}
+                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50 transition">
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-500">
+                    Cliquez pour ajouter une photo
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoChange}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          {/* Nom + Prénom */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="nom">
+                Nom <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="nom"
+                value={formData.lastname}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastname: e.target.value })
+                }
+                placeholder="Ex: Dupont"
+                required
+              />
+              {errors.lastname && <p className="text-red-600 text-sm">{errors.lastname[0]}</p>}
+            </div>
+            <div>
+              <Label htmlFor="prenom">
+                Prénom <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="prenom"
+                value={formData.firstname}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstname: e.target.value })
+                }
+                placeholder="Ex: Jean"
+                required
+              />
+              {errors.firstname && <p className="text-red-600 text-sm">{errors.firstname[0]}</p>}
+            </div>
+          </div>
+              
+          {/* Téléphone */}
+          <div>
+            <Label htmlFor="telephone">
+              Téléphone <span className="text-red-600">*</span>
+            </Label>
+            <Input
+              id="telephone"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+              placeholder="Ex: +228 90 12 34 56"
+              required
+            />
+            
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Annuler
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading
+                ? "Enregistrement..."
+                : initialData
+                  ? "Mettre à jour"
+                  : "Ajouter le chauffeur"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
